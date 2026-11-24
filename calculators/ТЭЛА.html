@@ -1,0 +1,1465 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ТЭЛА — калькуляторы риска | Синкевич Д.А.</title>
+<style>
+:root{
+  --bg:#eef3f9; --panel:#ffffff; --ink:#0f2334; --muted:#5b7186;
+  --line:#dde6ef; --soft:#f5f8fc; --accent:#1268b3; --accent-soft:#e7f0fa;
+  --low:#12855a; --low-bg:#e2f5ec;
+  --mid:#b8700a; --mid-bg:#fdf1de;
+  --high:#c0392b; --high-bg:#fdeae7;
+  --radius:16px;
+  --shadow:0 1px 2px rgba(16,42,67,.06), 0 10px 28px -16px rgba(16,42,67,.35);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:15px; line-height:1.45;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- Header ---------- */
+.topbar{
+  background:linear-gradient(135deg,#0f4c81,#1268b3 55%,#0b8f8a);
+  color:#fff; padding:18px 0 20px; box-shadow:0 8px 30px -18px rgba(15,76,129,.9);
+}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.mark{
+  display:grid;place-items:center;width:52px;height:52px;flex:none;
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35);
+  border-radius:14px; font-weight:800; font-size:13px; letter-spacing:.05em;
+  backdrop-filter:blur(4px);
+}
+.brand h1{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.brand p{margin:2px 0 0;font-size:12.5px;opacity:.82}
+
+/* ---------- Layout ---------- */
+.layout{
+  display:flex; gap:24px; max-width:1400px; margin:0 auto; padding:0 18px;
+}
+.sidebar{
+  width:260px; flex-shrink:0; padding-top:18px;
+}
+.sidebar-sticky{
+  position:sticky; top:18px;
+  max-height:calc(100vh - 36px);
+  overflow-y:auto;
+  display:flex; flex-direction:column; gap:16px;
+  scrollbar-width:none;
+}
+.sidebar-sticky::-webkit-scrollbar{display:none}
+
+.sidebar nav{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px; box-shadow:var(--shadow);
+  display:flex; flex-direction:column; gap:4px;
+}
+.sidebar .nav-title{
+  font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--muted); font-weight:800; margin:0 0 8px 12px;
+}
+.sidebar a{
+  display:block; padding:9px 12px; color:var(--muted); text-decoration:none;
+  border-radius:9px; font-size:14px; font-weight:500; transition:.15s;
+}
+.sidebar a:hover{background:var(--soft); color:var(--accent)}
+.sidebar a.active{background:var(--accent-soft); color:var(--accent); font-weight:700}
+
+/* PERC в сайдбаре */
+.perc-sidebar{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-left:4px solid var(--accent);
+  border-radius:var(--radius);
+  padding:14px 16px;
+  box-shadow:var(--shadow);
+  font-size:12.5px;
+  line-height:1.5;
+  color:var(--muted);
+}
+.perc-sidebar b{color:var(--ink); font-weight:700}
+.perc-sidebar ul{margin:6px 0 0 0; padding-left:16px}
+.perc-sidebar li{margin-bottom:2px}
+.perc-sidebar .warn{margin:8px 0 0; color:var(--high); font-weight:700}
+
+.content{flex-grow:1; padding-top:18px; padding-bottom:34px; min-width:0}
+
+/* ---------- Notice ---------- */
+.notice{
+  margin:0 0 18px; padding:12px 16px; font-size:13px; line-height:1.5;
+  background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--accent);
+  border-radius:12px; color:var(--muted); box-shadow:var(--shadow);
+}
+.notice b{color:var(--ink)}
+
+/* ---------- 2 Columns Layout ---------- */
+.grid{
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+.col{
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.card{
+  background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:16px 18px 16px;
+  display:flex; flex-direction:column; gap:12px;
+  scroll-margin-top: 20px;
+}
+.card-head{
+  display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+  padding-bottom:10px; border-bottom:2px solid var(--accent-soft);
+}
+.card-head h2{margin:0; font-size:16.5px; font-weight:700; letter-spacing:-.01em}
+.card-head .sub{display:block; margin-top:2px; font-size:12px; color:var(--muted); font-weight:400}
+.tag{
+  flex:none; font-size:10.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--accent); background:var(--accent-soft); padding:4px 9px; border-radius:999px;
+  white-space:nowrap; margin-top:2px;
+}
+
+/* ---------- Tables ---------- */
+table.items{width:100%; border-collapse:collapse; table-layout:auto}
+table.items td{
+  padding:7px 6px; border-bottom:1px solid var(--line); vertical-align:middle; font-size:14px;
+}
+table.items tr:last-child td{border-bottom:none}
+table.items tr:hover td{background:var(--soft)}
+.c-chk{width:50px; padding-left:0 !important}
+.c-pts{
+  width:56px; text-align:right; font-variant-numeric:tabular-nums;
+  color:var(--muted); font-weight:700; font-size:13px; white-space:nowrap; padding-right:0 !important;
+}
+.c-num{width:104px; padding-right:0 !important}
+
+/* ---------- Switch ---------- */
+.switch{position:relative; display:inline-block; width:42px; height:23px; flex:none; vertical-align:middle}
+.switch input{position:absolute; opacity:0; width:0; height:0}
+.switch span{
+  position:absolute; inset:0; background:#c8d4e0; border-radius:23px;
+  transition:background .18s; cursor:pointer;
+}
+.switch span::after{
+  content:""; position:absolute; width:17px; height:17px; left:3px; top:3px;
+  background:#fff; border-radius:50%; transition:transform .18s;
+  box-shadow:0 1px 3px rgba(0,0,0,.35);
+}
+.switch input:checked + span{background:var(--accent)}
+.switch input:checked + span::after{transform:translateX(19px)}
+.switch input:focus-visible + span{outline:2px solid var(--accent); outline-offset:2px}
+
+/* ---------- Inputs ---------- */
+input[type=number],input[type=text]{
+  width:100%; padding:7px 10px; border:1px solid var(--line); border-radius:9px;
+  background:var(--soft); color:var(--ink); font:inherit; font-size:14px;
+  font-variant-numeric:tabular-nums; transition:.15s;
+}
+input[type=number]:focus,input[type=text]:focus{
+  outline:none; border-color:var(--accent); background:var(--panel);
+  box-shadow:0 0 0 3px var(--accent-soft);
+}
+
+/* ---------- Radio ---------- */
+.radio-group{
+  display:flex; flex-wrap:wrap; gap:6px 14px; font-size:13px; margin-top:2px;
+}
+.radio-group label{
+  display:inline-flex; align-items:center; gap:5px; cursor:pointer;
+  color:var(--muted); transition:.15s; white-space:nowrap;
+}
+.radio-group label:hover{color:var(--accent)}
+.radio-group input[type="radio"]{
+  width:16px; height:16px; accent-color:var(--accent); cursor:pointer; margin:0;
+}
+
+/* ---------- Output ---------- */
+.out{
+  background:var(--soft); border:1px solid var(--line); border-radius:12px;
+  padding:10px 13px; display:flex; flex-direction:column; gap:6px;
+}
+.out-row{display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:13.5px}
+.out-row > span{color:var(--muted)}
+.out-row > b{font-variant-numeric:tabular-nums; text-align:right}
+.out-row.stack{
+  flex-direction:column; align-items:flex-start; gap:3px;
+}
+.out-row.stack > b{text-align:left; font-weight:700; color:var(--ink)}
+.pill{
+  padding:3px 11px; border-radius:999px; font-size:12.5px; font-weight:800;
+  letter-spacing:.02em; transition:.2s;
+}
+.pill.low{background:var(--low-bg); color:var(--low)}
+.pill.mid{background:var(--mid-bg); color:var(--mid)}
+.pill.high{background:var(--high-bg); color:var(--high)}
+.pill.none{background:transparent; color:var(--muted); font-weight:600}
+
+.tactics{
+  background:var(--accent-soft); border-radius:12px; padding:10px 13px;
+  font-size:13.5px; line-height:1.45;
+}
+.tactics .label{
+  display:block; font-size:10.5px; text-transform:uppercase; letter-spacing:.07em;
+  font-weight:800; color:var(--accent); margin-bottom:4px;
+}
+.tactics .warn{display:block; margin-top:7px; color:var(--high); font-weight:700}
+.tactics .warn:empty{display:none}
+.hintline{font-size:12px; color:var(--muted); line-height:1.4}
+
+/* ---------- Buttons ---------- */
+.actions{display:flex; gap:8px; margin-top:auto; padding-top:2px}
+button{font:inherit; cursor:pointer; border-radius:10px; border:1px solid transparent; transition:.15s}
+.copy{
+  flex:1; background:var(--accent); color:#fff; font-weight:700; font-size:13.5px;
+  padding:10px 14px; box-shadow:0 6px 16px -10px var(--accent);
+}
+.copy:hover{filter:brightness(1.1)}
+.copy:active{transform:translateY(1px)}
+.copy.done{background:var(--low); box-shadow:0 6px 16px -10px var(--low)}
+.ghost{
+  background:transparent; border-color:var(--line); color:var(--muted);
+  padding:10px 14px; font-size:13.5px;
+}
+.ghost:hover{border-color:var(--accent); color:var(--accent)}
+
+/* ---------- Image section ---------- */
+.figure-wrap{
+  margin:0; display:flex; justify-content:center; align-items:center;
+  flex-grow:1;
+}
+.figure-wrap img{
+  display:block; width:100%; max-width:100%; height:auto;
+  border-radius:12px; border:1px solid var(--line); background:#fff;
+  object-fit:contain;
+}
+
+/* ---------- Footer ---------- */
+footer{
+  background:var(--panel); border-top:1px solid var(--line);
+  padding:26px 0 30px; margin-top:10px;
+}
+footer h3{
+  font-size:12px; text-transform:uppercase; letter-spacing:.08em;
+  color:var(--accent); margin:0 0 10px; font-weight:800;
+}
+.foot-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr)); gap:26px}
+footer ul{margin:0; padding-left:18px; font-size:12.8px; color:var(--muted); line-height:1.6}
+footer ul li{margin-bottom:3px}
+footer ul li b{color:var(--ink); font-weight:600}
+.abbr{display:grid; grid-template-columns:auto 1fr; gap:3px 12px; font-size:12.8px; color:var(--muted)}
+.abbr dt{font-weight:700; color:var(--ink); white-space:nowrap}
+.abbr dd{margin:0}
+.copyright{
+  margin-top:24px; padding-top:16px; border-top:1px dashed var(--line);
+  text-align:center; font-size:12.5px; color:var(--muted); line-height:1.6;
+}
+.copyright b{color:var(--ink)}
+
+@media (max-width:860px){
+  .layout{flex-direction:column; padding:0 12px}
+  .sidebar{width:100%; padding-top:12px}
+  .sidebar-sticky{
+    position:static;
+    max-height:none;
+    overflow-y:visible;
+  }
+  .sidebar nav{
+    flex-direction:row; overflow-x:auto; gap:6px;
+    padding:10px; scrollbar-width:none;
+  }
+  .sidebar nav::-webkit-scrollbar{display:none}
+  .sidebar .nav-title{display:none}
+  .sidebar a{white-space:nowrap; padding:7px 12px; font-size:13px}
+  .perc-sidebar{margin-top:10px}
+  .content{padding-top:12px}
+  .brand h1{font-size:16px}
+  .card{padding:14px}
+  table.items td{font-size:13.2px}
+  .c-pts{width:44px; font-size:12px}
+  .c-chk{width:46px}
+  .grid{flex-direction:column}
+  .col{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <div class="mark">ТЭЛА</div>
+      <div>
+        <h1>Тромбоэмболия лёгочной артерии</h1>
+        <p>Калькуляторы вероятности, риска смерти, профилактики, прогноза рецидива и кровотечения при ВТЭ</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar">
+    <div class="sidebar-sticky">
+      <nav>
+        <span class="nav-title">Алгоритмы</span>
+        <a href="#wells">Индекс Wells</a>
+        <a href="#geneva">Индекс Geneva</a>
+        <a href="#pesi">Индекс PESI</a>
+        <a href="#esc">Риск смерти (ESC)</a>
+        <a href="#vte-phases">Фазы АКТ (схема)</a>
+        <a href="#years">Алгоритм YEARS 2026</a>
+        <a href="#improve">Шкала IMPROVE VTE</a>
+        <a href="#dash">Шкала DASH</a>
+        <a href="#vtebleed">Шкала VTE-BLEED</a>
+      </nav>
+
+      <!-- PERC под меню, внутри sticky-контейнера -->
+      <div class="perc-sidebar">
+        <b>Правило PERC (Pulmonary Embolism Rule-out Criteria)</b><br>
+        Если претестовая вероятность низкая (вероятность ТЭЛА ≤ 15%) и нет положительных критериев, можно с уверенностью исключить ТЭЛА без проведения дальнейшего обследования.
+        <ul>
+          <li>Возраст ≥ 50 лет</li>
+          <li>Тахикардия ≥ 100 уд/мин</li>
+          <li>SaO₂ при комнатной температуре &lt; 95%</li>
+          <li>Односторонний отёк ног</li>
+          <li>Кровохарканье</li>
+          <li>Недавняя операция или травма (&lt; 4 недель)</li>
+          <li>Предшествующая ТЭЛА или ТГВ</li>
+          <li>Использование оральных контрацептивов, заместительной гормональной терапии или эстрогенов у мужчин или женщин</li>
+        </ul>
+        <p class="warn">⚠ Если хоть один критерий положительный — необходимо определить уровень D-димера.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ================= CONTENT ================= -->
+  <main class="content">
+    <p class="notice">
+      <b>Внимание.</b> Инструмент предназначен для медицинских работников и носит справочный характер.
+      Результаты не заменяют клиническое суждение, данные визуализации и лабораторные исследования.
+      Все переключатели по умолчанию выключены — активируйте только подтверждённые критерии.
+    </p>
+
+    <div class="grid">
+      
+      <!-- ================= ЛЕВАЯ КОЛОНКА ================= -->
+      <div class="col">
+        
+        <!-- WELLS -->
+        <section class="card" id="wells">
+          <div class="card-head">
+            <div>
+              <h2>Индекс Wells</h2>
+              <span class="sub">Оценка вероятности ТЭЛА</span>
+            </div>
+            <span class="tag">Вероятность ТЭЛА</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Анамнез ТЭЛА или ТГВ</td>
+                <td class="c-pts">1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Тахикардия &gt; 100 уд/мин</td>
+                <td class="c-pts">1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Покой / хирургия ≤ 4 нед. назад</td>
+                <td class="c-pts">1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="3"><span></span></label></td>
+                <td>Признаки ТГВ</td>
+                <td class="c-pts">3</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="3"><span></span></label></td>
+                <td>Другой диагноз менее вероятен</td>
+                <td class="c-pts">3</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Кровохарканье</td>
+                <td class="c-pts">1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Активный рак или ≤ 6 мес. назад</td>
+                <td class="c-pts">1</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Вероятность ТЭЛА</span><b class="pill none" data-out="prob">—</b></div>
+            <div class="out-row"><span>Частота ТЭЛА</span><b data-out="freq">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Тактика</span>
+            <span data-out="tactics">—</span>
+            <span class="warn" data-out="warn"></span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- PESI -->
+        <section class="card" id="pesi">
+          <div class="card-head">
+            <div>
+              <h2>Индекс PESI</h2>
+              <span class="sub">Вероятность смерти при ТЭЛА в ближайшие 30 суток</span>
+            </div>
+            <span class="tag">Риск смерти</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"></td>
+                <td>Возраст</td>
+                <td class="c-num"><input type="number" id="p-age" min="0" max="120" placeholder="лет"></td>
+                <td class="c-pts" data-out="p-age-pts">0</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="10"><span></span></label></td>
+                <td>Мужской пол</td>
+                <td class="c-num"></td>
+                <td class="c-pts">10</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="30"><span></span></label></td>
+                <td>Злокачественное новообразование</td>
+                <td class="c-num"></td>
+                <td class="c-pts">30</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="10"><span></span></label></td>
+                <td>Сердечная недостаточность</td>
+                <td class="c-num"></td>
+                <td class="c-pts">10</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="10"><span></span></label></td>
+                <td>Хроническая болезнь лёгких</td>
+                <td class="c-num"></td>
+                <td class="c-pts">10</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="20"><span></span></label></td>
+                <td>Тахикардия ≥ 110 уд/мин</td>
+                <td class="c-num"></td>
+                <td class="c-pts">20</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="30"><span></span></label></td>
+                <td>Систолическое АД &lt; 100 мм рт. ст.</td>
+                <td class="c-num"></td>
+                <td class="c-pts">30</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="20"><span></span></label></td>
+                <td>Частота дыхания ≥ 30 в мин</td>
+                <td class="c-num"></td>
+                <td class="c-pts">20</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="20"><span></span></label></td>
+                <td>Температура &lt; 36 °C</td>
+                <td class="c-num"></td>
+                <td class="c-pts">20</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="20"><span></span></label></td>
+                <td>SaO₂ &lt; 90%</td>
+                <td class="c-num"></td>
+                <td class="c-pts">20</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="60"><span></span></label></td>
+                <td>Изменение психики</td>
+                <td class="c-num"></td>
+                <td class="c-pts">60</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Класс</span><b class="pill none" data-out="cls">—</b></div>
+            <div class="out-row"><span>Ожидаемая смертность</span><b data-out="mort">—</b></div>
+            <div class="out-row"><span>Летальность 30 сут.</span><b data-out="range">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Комментарий</span>
+            <span data-out="tactics">Введите возраст и активируйте имеющиеся критерии.</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- YEARS -->
+        <section class="card" id="years">
+          <div class="card-head">
+            <div>
+              <h2>Алгоритм YEARS <span style="font-weight:400; font-size:14px; color:var(--muted)">(ACC/AHA, 2026)</span></h2>
+              <span class="sub">Диагностика ТЭЛА с учётом D-димера</span>
+            </div>
+            <span class="tag">D-димер</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="y-1"><span></span></label></td>
+                <td>Клиника ТГВ <span class="hintline">(односторонняя боль / отёк, болезненность при пальпации)</span></td>
+                <td class="c-pts">—</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="y-2"><span></span></label></td>
+                <td>Гемофтиз (кровохарканье)</td>
+                <td class="c-pts">—</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="y-3"><span></span></label></td>
+                <td>ТЭЛА более вероятна, чем альтернативный диагноз</td>
+                <td class="c-pts">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"></td>
+                <td>D-димер</td>
+                <td class="c-num"><input type="number" id="y-dd" min="0" step="1" placeholder="650"></td>
+                <td class="c-pts"></td>
+              </tr>
+              <tr>
+                <td class="c-chk"></td>
+                <td colspan="3">
+                  <div style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em;">Входная концентрация</div>
+                  <div class="radio-group">
+                    <label><input type="radio" name="y-conc" value="ng_ml" checked> нг/мл</label>
+                    <label><input type="radio" name="y-conc" value="mkg_l"> мкг/л</label>
+                    <label><input type="radio" name="y-conc" value="mkg_ml"> мкг/мл</label>
+                    <label><input type="radio" name="y-conc" value="mg_l"> мг/л</label>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td class="c-chk"></td>
+                <td colspan="3">
+                  <div style="font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px; text-transform:uppercase; letter-spacing:.06em;">Входная единица измерения</div>
+                  <div class="radio-group">
+                    <label><input type="radio" name="y-unit" value="ddu" checked> DDU (D-Dimers Unit)</label>
+                    <label><input type="radio" name="y-unit" value="feu"> FEU (Fibrinogen Equivalent Unit)</label>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Порог D-димера</span><b data-out="cut">1000 нг/мл (DDU)</b></div>
+            <div class="out-row"><span>Результат</span><b class="pill none" data-out="res">—</b></div>
+            <div class="out-row stack">
+              <span>D-димер (приведённый)</span>
+              <b data-out="dd-info">—</b>
+            </div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Правило</span>
+            <span>0 критериев YEARS → порог D-димера &lt;1000 нг/мл DDU; ≥ 1 критерия → порог &lt;500 нг/мл DDU. 1 FEU = 2 DDU (FEU ×2 → DDU).</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- IMPROVE VTE -->
+        <section class="card" id="improve">
+          <div class="card-head">
+            <div>
+              <h2>Шкала IMPROVE VTE</h2>
+              <span class="sub">Риск ТГВ и/или ТЭЛА у госпитализированных больных нехирургического профиля</span>
+            </div>
+            <span class="tag">Профилактика ВТЭ</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Возраст &gt; 60 лет</td>
+                <td class="c-pts">1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Активный рак</td>
+                <td class="c-pts">2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="3"><span></span></label></td>
+                <td>Венозная тромбоэмболия ≤ 3 мес.</td>
+                <td class="c-pts">3</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Иммобилизация ≥ 7 дней <span class="hintline">(нахождение в кровати или на стуле с выходом в туалет или без него)</span></td>
+                <td class="c-pts">1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Пребывание в ОРИТ / неотложной кардиологии</td>
+                <td class="c-pts">1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Парез или паралич нижних конечностей</td>
+                <td class="c-pts">2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Тромбофилия <span class="hintline">(дефекты антитромбина III, протеина C и S, мутация протромбина G20210A, фактора V Лейдена, антифосфолипидный синдром)</span></td>
+                <td class="c-pts">2</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Риск ВТЭ</span><b class="pill none" data-out="risk">—</b></div>
+            <div class="out-row"><span>ВТЭ за 3 мес.</span><b data-out="rate">0,4%</b></div>
+            <div class="out-row"><span>Антикоагулянты</span><b data-out="ac">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Профилактика</span>
+            <span data-out="tactics">—</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+      </div> <!-- /ЛЕВАЯ КОЛОНКА -->
+
+      <!-- ================= ПРАВАЯ КОЛОНКА ================= -->
+      <div class="col">
+
+        <!-- GENEVA -->
+        <section class="card" id="geneva">
+          <div class="card-head">
+            <div>
+              <h2>Модифицированный индекс Geneva</h2>
+              <span class="sub">Оценка вероятности ТЭЛА</span>
+            </div>
+            <span class="tag">Вероятность ТЭЛА</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"></td>
+                <td>Возраст &gt; 65 лет</td>
+                <td class="c-num"><input type="number" id="g-age" min="0" max="120" placeholder="лет"></td>
+                <td class="c-pts" data-out="g-age-pts">0</td>
+              </tr>
+              <tr>
+                <td class="c-chk"></td>
+                <td>ЧСС, уд/мин <span class="hintline">(&lt;75 → 0; 75–94 → 3; ≥95 → 5)</span></td>
+                <td class="c-num"><input type="number" id="g-hr" min="0" max="300" placeholder="уд/мин"></td>
+                <td class="c-pts" data-out="g-hr-pts">0</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="3"><span></span></label></td>
+                <td>Анамнез ТЭЛА или ТГВ</td>
+                <td class="c-num"></td>
+                <td class="c-pts">3</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Хирургия / перелом ≤ 1 мес. назад</td>
+                <td class="c-num"></td>
+                <td class="c-pts">2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="3"><span></span></label></td>
+                <td>Односторонняя боль в ноге</td>
+                <td class="c-num"></td>
+                <td class="c-pts">3</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="4"><span></span></label></td>
+                <td>Боль в ноге при пальпации и односторонний отёк</td>
+                <td class="c-num"></td>
+                <td class="c-pts">4</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Кровохарканье</td>
+                <td class="c-num"></td>
+                <td class="c-pts">2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Активный рак или ≤ 1 года назад</td>
+                <td class="c-num"></td>
+                <td class="c-pts">2</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Вероятность ТЭЛА</span><b class="pill none" data-out="prob">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Тактика</span>
+            <span data-out="tactics">—</span>
+            <span class="warn" data-out="warn"></span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- ESC -->
+        <section class="card" id="esc">
+          <div class="card-head">
+            <div>
+              <h2>Алгоритм оценки риска смерти</h2>
+              <span class="sub">У больного с подтверждённой ТЭЛА, ближайшие 30 суток</span>
+            </div>
+            <span class="tag">Риск смерти</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="e-unstable"><span></span></label></td>
+                <td>Нестабильность гемодинамики <span class="hintline">(остановка сердца, обструктивный шок, персистирующая гипотония)</span></td>
+                <td class="c-pts">—</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="e-rv"><span></span></label></td>
+                <td>Дисфункция правого желудочка (ЭхоКГ / КТ)</td>
+                <td class="c-pts">—</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" id="e-trop"><span></span></label></td>
+                <td>Повышенный уровень тропонина T / I</td>
+                <td class="c-pts">—</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Риск ранней смерти</span><b class="pill none" data-out="risk">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Тактика</span>
+            <span data-out="tactics">Сначала рассчитайте индекс PESI.</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- VTE PHASES IMAGE -->
+        <section class="card" id="vte-phases">
+          <div class="card-head">
+            <div>
+              <h2>Фазы антикоагулянтной терапии ВТЭО</h2>
+              <span class="sub">Начальная / длительная / расширенная фаза — схемы ПОАК и АВК</span>
+            </div>
+            <span class="tag">Схемы АКТ</span>
+          </div>
+
+          <figure class="figure-wrap">
+            
+            <img
+              src="data:image/webp;base64,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"
+              alt="Фазы антикоагулянтной терапии ВТЭО"
+              width="950"
+              height="450"
+              loading="lazy"
+              decoding="async">
+          </figure>
+        </section>
+
+        <!-- DASH -->
+        <section class="card" id="dash">
+          <div class="card-head">
+            <div>
+              <h2>Шкала DASH</h2>
+              <span class="sub">Риск рецидива первого эпизода ВТЭО после завершения антикоагулянтной терапии (3–6 мес.)</span>
+            </div>
+            <span class="tag">Прогноз рецидива</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Повышенный уровень D-димера <span class="hintline">(измерен примерно через 1 месяц после прекращения антикоагулянтной терапии)</span></td>
+                <td class="c-pts">+2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Возраст ≥ 50 лет</td>
+                <td class="c-pts">+1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Мужской пол</td>
+                <td class="c-pts">+1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="-2"><span></span></label></td>
+                <td>Приём гормонов при первичном ВТЭО <span class="hintline">(у женщин)</span></td>
+                <td class="c-pts">−2</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Риск рецидива ВТЭО</span><b class="pill none" data-out="risk">—</b></div>
+            <div class="out-row"><span>Годовая частота рецидива</span><b data-out="rate">2,4%</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Рекомендация</span>
+            <span data-out="tactics">—</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+        <!-- VTE-BLEED -->
+        <section class="card" id="vtebleed">
+          <div class="card-head">
+            <div>
+              <h2>Шкала VTE-BLEED</h2>
+              <span class="sub">Риск клинически значимого кровотечения после 30-го дня антикоагулянтной терапии по поводу ВТЭО</span>
+            </div>
+            <span class="tag">Риск кровотечения</span>
+          </div>
+
+          <table class="items">
+            <tbody>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="2"><span></span></label></td>
+                <td>Активный рак</td>
+                <td class="c-pts">+2</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1"><span></span></label></td>
+                <td>Мужчины с неконтролируемой гипертензией <span class="hintline">(систолическое АД ≥ 140 мм рт. ст.)</span></td>
+                <td class="c-pts">+1</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Анемия <span class="hintline">(Hb &lt; 130 г/л у мужчин и Hb &lt; 120 г/л у женщин)</span></td>
+                <td class="c-pts">+1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Кровотечения в анамнезе <span class="hintline">(большие или небольшие клинически значимые)</span></td>
+                <td class="c-pts">+1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Почечная недостаточность <span class="hintline">(клиренс креатинина 30–60 мл/мин)</span></td>
+                <td class="c-pts">+1,5</td>
+              </tr>
+              <tr>
+                <td class="c-chk"><label class="switch"><input type="checkbox" data-v="1.5"><span></span></label></td>
+                <td>Возраст ≥ 60 лет</td>
+                <td class="c-pts">+1,5</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="out">
+            <div class="out-row"><span>Сумма баллов</span><b data-out="sum">0</b></div>
+            <div class="out-row"><span>Риск кровотечения</span><b class="pill none" data-out="risk">—</b></div>
+          </div>
+
+          <div class="tactics">
+            <span class="label">Рекомендация</span>
+            <span data-out="tactics">—</span>
+          </div>
+
+          <div class="actions">
+            <button class="copy" type="button" data-copy>Копировать</button>
+            <button class="ghost" type="button" data-reset>Сброс</button>
+          </div>
+        </section>
+
+      </div> <!-- /ПРАВАЯ КОЛОНКА -->
+
+    </div>
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+
+      <div>
+        <h3>Источники</h3>
+        <ul>
+          <li><b>Wells PS, et al.</b> Derivation of a simple clinical model to categorize patients' probability of pulmonary embolism. <i>Thromb Haemost.</i> 1997;78(6):1461–1465.</li>
+          <li><b>Le Gal G, et al.</b> Prediction of pulmonary embolism in the emergency department: the revised Geneva score. <i>Ann Intern Med.</i> 2006;144(3):165–171.</li>
+          <li><b>Aujesky D, et al.</b> Derivation and validation of a prognostic model for pulmonary embolism (PESI). <i>Am J Respir Crit Care Med.</i> 2005;172(8):1041–1046.</li>
+          <li><b>Konstantinides SV, et al.</b> 2019 ESC Guidelines for the diagnosis and management of acute pulmonary embolism. <i>Eur Heart J.</i> 2020;41(4):543–603.</li>
+          <li><b>Kline JA, et al.</b> Prospective multicenter evaluation of the pulmonary embolism rule-out criteria (PERC). <i>J Thromb Haemost.</i> 2008;6(5):772–780.</li>
+          <li><b>van der Hulle T, et al.</b> Simplified diagnostic management of suspected pulmonary embolism (the YEARS study). <i>Lancet.</i> 2017;390(10091):289–297.</li>
+          <li><b>Spyropoulos AC, et al.</b> Predictive and associative models to identify hospitalized medical patients at risk for VTE (IMPROVE). <i>Chest.</i> 2011;140(3):706–714.</li>
+          <li><b>Tosetto A, et al.</b> Predicting disease recurrence in patients with previous unprovoked venous thromboembolism: a proposed prediction score (DASH). <i>J Thromb Haemost.</i> 2012;10(6):1019–1025.</li>
+          <li><b>Tosetto A, et al.</b> External validation of the DASH prediction rule: a retrospective cohort study. <i>J Thromb Haemost.</i> 2017;15(10):1963–1970.</li>
+          <li><b>Klok FA, et al.</b> Prediction of bleeding events in patients with venous thromboembolism on stable anticoagulation treatment (VTE-BLEED). <i>Eur Respir J.</i> 2016;48(5):1369–1376.</li>
+          <li><b>Klok FA, et al.</b> External validation of the VTE-BLEED score for predicting major bleeding in stable anticoagulated patients with venous thromboembolism. <i>Thromb Haemost.</i> 2017;117(6):1164–1170.</li>
+        </ul>
+      </div>
+
+      <div>
+        <h3>Сокращения</h3>
+        <dl class="abbr">
+          <dt>ТЭЛА</dt><dd>тромбоэмболия лёгочной артерии</dd>
+          <dt>ТГВ</dt><dd>тромбоз глубоких вен</dd>
+          <dt>ВТЭ</dt><dd>венозная тромбоэмболия</dd>
+          <dt>ВТЭО</dt><dd>венозные тромбоэмболические осложнения</dd>
+          <dt>АКТ</dt><dd>антикоагулянтная терапия</dd>
+          <dt>ПОАК</dt><dd>прямые пероральные антикоагулянты</dd>
+          <dt>АВК</dt><dd>антагонисты витамина К</dd>
+          <dt>КТ</dt><dd>компьютерная томография</dd>
+          <dt>КТАП</dt><dd>КТ-ангиопульмонография</dd>
+          <dt>ЭхоКГ</dt><dd>эхокардиография</dd>
+          <dt>ПЖ</dt><dd>правый желудочек</dd>
+          <dt>ЧСС</dt><dd>частота сердечных сокращений</dd>
+          <dt>АД</dt><dd>артериальное давление</dd>
+          <dt>Hb</dt><dd>гемоглобин</dd>
+          <dt>МНО</dt><dd>международное нормализованное отношение</dd>
+          <dt>ККр</dt><dd>клиренс креатинина</dd>
+          <dt>SaO₂</dt><dd>насыщение гемоглобина кислородом</dd>
+          <dt>ОРИТ</dt><dd>отделение реанимации и интенсивной терапии</dd>
+          <dt>PESI</dt><dd>Pulmonary Embolism Severity Index</dd>
+          <dt>PERC</dt><dd>Pulmonary Embolism Rule-out Criteria</dd>
+          <dt>YEARS</dt><dd>алгоритм диагностики ТЭЛА с возраст-адаптированным D-димером</dd>
+          <dt>DASH</dt><dd>D-dimer, Age, Sex, Hormones — прогноз рецидива ВТЭО</dd>
+          <dt>VTE-BLEED</dt><dd>Venous Thromboembolism Bleeding Risk — риск кровотечения при ВТЭО</dd>
+          <dt>DDU</dt><dd>D-Dimer Unit</dd>
+          <dt>FEU</dt><dd>Fibrinogen Equivalent Unit</dd>
+        </dl>
+      </div>
+
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- helpers ---------- */
+  const $  = (s, r) => (r || document).querySelector(s);
+  const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+
+  const nf = n => String(Math.round(n * 1000) / 1000).replace(".", ",");
+  const today = () => new Date().toLocaleDateString("ru-RU");
+
+  const num = el => {
+    if (!el) return null;
+    const v = parseFloat(String(el.value).replace(",", "."));
+    return isNaN(v) ? null : v;
+  };
+
+  const set = (card, key, text) => {
+    const el = $(`[data-out="${key}"]`, card);
+    if (el) el.textContent = text;
+  };
+
+  const pill = (card, key, text, level) => {
+    const el = $(`[data-out="${key}"]`, card);
+    if (!el) return;
+    el.textContent = text;
+    el.className = "pill " + level;
+  };
+
+  const pts = card => {
+    let s = 0;
+    $$('input[type="checkbox"][data-v]', card).forEach(cb => {
+      if (cb.checked) s += parseFloat(cb.dataset.v);
+    });
+    return s;
+  };
+
+  /* ================= WELLS ================= */
+  function computeWells(card){
+    const s = pts(card);
+
+    const prob     = s < 2 ? "НИЗКАЯ" : (s >= 7 ? "ВЫСОКАЯ" : "СРЕДНЯЯ");
+    const probCopy = s < 2 ? "НИЗКИЙ" : (s >= 7 ? "ВЫСОКИЙ" : "СРЕДНИЙ");
+    const lvl      = s < 2 ? "low"    : (s >= 7 ? "high"     : "mid");
+
+    let freq = "—";
+    if (s >= 1 && s < 2)      freq = "6%";
+    else if (s >= 2 && s < 7) freq = "23%";
+    else if (s >= 7)          freq = "49%";
+
+    const tact = s < 2
+      ? "Критерии PERC, D-димер + алгоритм YEARS"
+      : (s >= 7 ? "КТ-ангиография (КТАП)" : "D-димер + алгоритм YEARS");
+
+    set(card, "sum", nf(s));
+    pill(card, "prob", prob, lvl);
+    set(card, "freq", freq);
+    set(card, "tactics", tact);
+    set(card, "warn", s >= 7 ? "Безотлагательное начало антикоагулянтной терапии" : "");
+
+    card.dataset.copyText =
+      `Индекс Wells от ${today()} — риск ТЭЛА: ${probCopy} (${nf(s)} балл.).`;
+  }
+
+  /* ================= GENEVA ================= */
+  function computeGeneva(card){
+    let s = 0;
+
+    const age = num($("#g-age", card));
+    const agePts = (age !== null && age > 65) ? 1 : 0;
+    s += agePts;
+    set(card, "g-age-pts", nf(agePts));
+
+    const hr = num($("#g-hr", card));
+    let hrPts = 0;
+    if (hr !== null){
+      if (hr >= 95) hrPts = 5;
+      else if (hr >= 75) hrPts = 3;
+      else hrPts = 0;
+    }
+    s += hrPts;
+    set(card, "g-hr-pts", nf(hrPts));
+
+    s += pts(card);
+
+    const prob     = s < 4 ? "НИЗКАЯ" : (s >= 11 ? "ВЫСОКАЯ" : "СРЕДНЯЯ");
+    const probCopy = s < 4 ? "НИЗКИЙ" : (s >= 11 ? "ВЫСОКИЙ" : "СРЕДНИЙ");
+    const lvl      = s < 4 ? "low"    : (s >= 11 ? "high"     : "mid");
+
+    const tact = s < 4
+      ? "Критерии PERC, D-димер + алгоритм YEARS"
+      : (s >= 11 ? "КТ-ангиография (КТАП)" : "D-димер + алгоритм YEARS");
+
+    set(card, "sum", nf(s));
+    pill(card, "prob", prob, lvl);
+    set(card, "tactics", tact);
+    set(card, "warn", s >= 11 ? "Безотлагательное начало антикоагулянтной терапии" : "");
+
+    card.dataset.copyText =
+      `Модифицированный индекс Geneva от ${today()} — риск ТЭЛА: ${probCopy} (${nf(s)} балл.).`;
+  }
+
+  /* ================= PESI ================= */
+  function computePESI(card){
+    const age = num($("#p-age", card)) || 0;
+    set(card, "p-age-pts", nf(age));
+
+    const s = age + pts(card);
+
+    let cls, mort, mortCopy, range, lvl, note;
+    if (s <= 65){
+      cls = "PESI класс I";   mort = "очень низкая"; mortCopy = "очень низкий";
+      range = "0–1,6%";   lvl = "low";
+      note = "Очень низкий риск: возможно амбулаторное лечение.";
+    } else if (s < 86){
+      cls = "PESI класс II";  mort = "низкая";       mortCopy = "низкий";
+      range = "1,7–3,5%"; lvl = "low";
+      note = "Низкий риск: возможна ранняя выписка.";
+    } else if (s < 106){
+      cls = "PESI класс III"; mort = "умеренная";    mortCopy = "умеренный";
+      range = "3,2–7,1%"; lvl = "mid";
+      note = "Умеренный риск: показана госпитализация.";
+    } else if (s <= 125){
+      cls = "PESI класс IV";  mort = "высокая";      mortCopy = "высокий";
+      range = "4,0–11,4%"; lvl = "high";
+      note = "Высокий риск: госпитализация, интенсивное наблюдение.";
+    } else {
+      cls = "PESI класс V";   mort = "очень высокая"; mortCopy = "очень высокий";
+      range = "10,0–24,5%"; lvl = "high";
+      note = "Очень высокий риск: интенсивное наблюдение, оценка реперфузии.";
+    }
+
+    set(card, "sum", nf(s));
+    pill(card, "cls", cls, lvl);
+    set(card, "mort", mort);
+    set(card, "range", range);
+    set(card, "tactics", note);
+
+    card.dataset.copyText =
+      `Индекс PESI от ${today()} — ${cls}, ${mortCopy} (${nf(s)} балл., ${range}).`;
+  }
+
+  /* ================= ESC (зависит от PESI) ================= */
+  function isPESICalculated(){
+    const pesi = document.getElementById("pesi");
+    if (!pesi) return false;
+    const ageInput = pesi.querySelector("#p-age");
+    return ageInput && ageInput.value.trim() !== "";
+  }
+
+  function computeESC(card){
+    if (!isPESICalculated()){
+      pill(card, "risk", "—", "none");
+      set(card, "tactics", "Сначала рассчитайте индекс PESI (введите возраст).");
+      card.dataset.copyText =
+        `Алгоритм оценки риска смерти при ТЭЛА от ${today()} — PESI не рассчитан.`;
+      return;
+    }
+
+    const unstable = $("#e-unstable", card).checked;
+    const rv       = $("#e-rv", card).checked;
+    const trop     = $("#e-trop", card).checked;
+
+    let risk, riskCopy, lvl, tact;
+
+    if (unstable){
+      risk = "ВЫСОКИЙ"; riskCopy = "высокий"; lvl = "high";
+      tact = "Реперфузия: системный тромболизис / хирургическая или катетерная эмболэктомия.";
+    } else if (rv && trop){
+      risk = "ПРОМЕЖУТОЧНО-ВЫСОКИЙ"; riskCopy = "промежуточно-высокий"; lvl = "high";
+      tact = "Госпитализация в ОРИТ / палату интенсивного наблюдения, мониторинг, рассмотреть реперфузию.";
+    } else if (rv){
+      risk = "ПРОМЕЖУТОЧНО-НИЗКИЙ"; riskCopy = "промежуточно-низкий"; lvl = "mid";
+      tact = "Госпитализация в терапевтическое / кардиологическое отделение, антикоагулянтная терапия.";
+    } else {
+      risk = "НИЗКИЙ"; riskCopy = "низкий"; lvl = "low";
+      tact = "Ранняя выписка, возможное амбулаторное лечение.";
+    }
+
+    pill(card, "risk", risk, lvl);
+    set(card, "tactics", tact);
+
+    card.dataset.copyText =
+      `Алгоритм оценки риска смерти при ТЭЛА от ${today()} — ${riskCopy}.`;
+  }
+
+  /* ================= YEARS ================= */
+  function computeYEARS(card){
+    const n = ["#y-1", "#y-2", "#y-3"]
+      .map(id => $(id, card))
+      .filter(el => el && el.checked).length;
+
+    const rawVal = num($("#y-dd", card));
+    const concUnit = ($('input[name="y-conc"]:checked', card) || {}).value || "ng_ml";
+    const measUnit = ($('input[name="y-unit"]:checked', card) || {}).value || "ddu";
+
+    let dd_ddu = null;
+    if (rawVal !== null) {
+      let ngml = null;
+      switch(concUnit) {
+        case "ng_ml":  ngml = rawVal; break;
+        case "mkg_l":  ngml = rawVal; break;
+        case "mkg_ml": ngml = rawVal * 1000; break;
+        case "mg_l":   ngml = rawVal * 1000; break;
+      }
+      if (measUnit === "feu") {
+        dd_ddu = ngml * 2;
+      } else {
+        dd_ddu = ngml;
+      }
+    }
+
+    const threshold = n >= 1 ? 500 : 1000;
+    set(card, "cut", nf(threshold) + " нг/мл (DDU)");
+
+    const unitLabel = concUnit === "ng_ml" ? "нг/мл"
+                    : concUnit === "mkg_l" ? "мкг/л"
+                    : concUnit === "mkg_ml" ? "мкг/мл"
+                    : "мг/л";
+    const measLabel = measUnit === "ddu" ? "DDU" : "FEU";
+
+    let res, lvl, copyRes;
+    if (dd_ddu === null){
+      res = "Введите D-димер"; lvl = "none";
+      copyRes = "нет данных D-димера";
+      set(card, "dd-info", "—");
+    } else if (dd_ddu < threshold){
+      res = "ТЭЛА исключена"; lvl = "low";
+      copyRes = "ТЭЛА исключена";
+      set(card, "dd-info", `${nf(rawVal)} ${unitLabel} (${measLabel}) → ${nf(dd_ddu)} нг/мл DDU`);
+    } else {
+      res = "Показана КТ-ангиопульмонография"; lvl = "high";
+      copyRes = "показана КТ-ангиопульмонография";
+      set(card, "dd-info", `${nf(rawVal)} ${unitLabel} (${measLabel}) → ${nf(dd_ddu)} нг/мл DDU`);
+    }
+
+    pill(card, "res", res, lvl);
+
+    card.dataset.copyText =
+      `Алгоритм YEARS (ACC/AHA, 2026) от ${today()} — ${copyRes}.`;
+  }
+
+  /* ================= IMPROVE VTE ================= */
+  function computeIMPROVE(card){
+    const s = pts(card);
+
+    let risk, lvl;
+    if (s < 2){ risk = "НИЗКИЙ"; lvl = "low"; }
+    else if (s < 4){ risk = "СРЕДНИЙ"; lvl = "mid"; }
+    else { risk = "ВЫСОКИЙ"; lvl = "high"; }
+
+    const rates = { 0:"0,4%", 1:"0,6%", 2:"1%", 3:"1,7%", 4:"2,9%" };
+    const rate = s >= 5 ? "7,2%" : rates[s];
+
+    const ac = s < 2 ? "не показаны" : (s < 4 ? "возможны" : "показаны");
+
+    const tact = s < 2
+      ? "Фармакопрофилактика не показана. Ранняя мобилизация."
+      : "Подкожно: гепарин 5000 Ед 2 раза в сутки, эноксапарин 40 мг 1 раз в сутки, " +
+        "дальтепарин 5000 Ед 1 раз в сутки или фондапаринукс 2,5 мг 1 раз в сутки.";
+
+    set(card, "sum", nf(s));
+    pill(card, "risk", risk, lvl);
+    set(card, "rate", rate);
+    set(card, "ac", ac);
+    set(card, "tactics", tact);
+
+    card.dataset.copyText =
+      `Шкала IMPROVE VTE от ${today()} — риск ВТЭ: ${risk} (${nf(s)} балл., ВТЭ за 3 мес. — ${rate}).`;
+  }
+
+  /* ================= DASH ================= */
+  function computeDASH(card){
+    const s = pts(card);
+
+    let risk, riskCopy, lvl, tact;
+    if (s < 2){
+      risk = "НИЗКИЙ"; riskCopy = "низкий"; lvl = "low";
+      tact = "Следует рассмотреть возможность ПРЕКРАЩЕНИЯ приёма антикоагулянтов.";
+    } else {
+      risk = "ВЫСОКИЙ"; riskCopy = "высокий"; lvl = "high";
+      tact = "Следует рассмотреть возможность ПРОДОЛЖЕНИЯ приёма антикоагулянтов (продлённая АКТ).";
+    }
+
+    const rates = {
+      "-2": "1,8%", "-1": "1,0%", "0": "2,4%", "1": "3,9%",
+      "2": "6,3%",  "3": "10,8%", "4": "19,9%"
+    };
+    const rate = rates[String(s)] || "—";
+
+    set(card, "sum", nf(s));
+    pill(card, "risk", risk, lvl);
+    set(card, "rate", rate);
+    set(card, "tactics", tact);
+
+    card.dataset.copyText =
+      `Шкала DASH от ${today()} — риск рецидива ВТЭО: ${riskCopy} (${nf(s)} балл., годовая частота рецидива — ${rate}).`;
+  }
+
+  /* ================= VTE-BLEED ================= */
+  function computeVTE_BLEED(card){
+    const s = pts(card);
+
+    let risk, riskCopy, lvl, tact;
+    if (s < 2){
+      risk = "НИЗКИЙ"; riskCopy = "низкий"; lvl = "low";
+      tact = "Решение о продлении антикоагуляции следует принимать исходя из клинической картины " +
+             "и причины, вызвавшей венозное тромбоэмболическое осложнение.";
+    } else {
+      risk = "ВЫСОКИЙ"; riskCopy = "высокий"; lvl = "high";
+      tact = "Решение о продлении АКТ принимать с учётом баланса риска рецидива ВТЭО и риска кровотечения: " +
+             "более пристальное наблюдение; предпочтение ПОАК перед АВК; коррекция доз " +
+             "(профилактическая / терапевтическая); рассмотреть сокращение длительности АКТ " +
+             "(например, с 6 до 3 мес.); управление модифицируемыми факторами риска; " +
+             "оценка эффективности немедикаментозной профилактики ВТЭО.";
+    }
+
+    set(card, "sum", nf(s));
+    pill(card, "risk", risk, lvl);
+    set(card, "tactics", tact);
+
+    card.dataset.copyText =
+      `Шкала VTE-BLEED от ${today()} — риск кровотечения: ${riskCopy} (${nf(s)} балл.).`;
+  }
+
+  /* ---------- registry ---------- */
+  const SCALES = {
+    wells:    computeWells,
+    geneva:   computeGeneva,
+    pesi:     computePESI,
+    esc:      computeESC,
+    years:    computeYEARS,
+    improve:  computeIMPROVE,
+    dash:     computeDASH,
+    vtebleed: computeVTE_BLEED
+  };
+
+  function refresh(card){
+    const fn = SCALES[card.id];
+    if (fn) fn(card);
+  }
+
+  function refreshAll(){
+    $$(".card").forEach(refresh);
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener("input",  e => {
+    const card = e.target.closest(".card");
+    if (card) refresh(card);
+  });
+  document.addEventListener("change", e => {
+    const card = e.target.closest(".card");
+    if (card) refresh(card);
+  });
+
+  /* ---------- copy ---------- */
+  function fallbackCopy(text){
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "-1000px";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch(_) {}
+    document.body.removeChild(ta);
+  }
+
+  document.addEventListener("click", async e => {
+    const copyBtn = e.target.closest("[data-copy]");
+    if (copyBtn){
+      const card = copyBtn.closest(".card");
+      const text = card.dataset.copyText || "";
+      try {
+        if (navigator.clipboard && window.isSecureContext){
+          await navigator.clipboard.writeText(text);
+        } else {
+          fallbackCopy(text);
+        }
+      } catch(_) {
+        fallbackCopy(text);
+      }
+      const original = copyBtn.textContent;
+      copyBtn.classList.add("done");
+      copyBtn.textContent = "Скопировано ✓";
+      setTimeout(() => {
+        copyBtn.classList.remove("done");
+        copyBtn.textContent = original;
+      }, 1500);
+      return;
+    }
+
+    const resetBtn = e.target.closest("[data-reset]");
+    if (resetBtn){
+      const card = resetBtn.closest(".card");
+      $$("input", card).forEach(inp => {
+        if (inp.type === "checkbox") inp.checked = false;
+        else inp.value = "";
+      });
+      $$("input[type='radio']", card).forEach(inp => {
+        inp.checked = inp.defaultChecked;
+      });
+      refresh(card);
+    }
+  });
+
+  /* ---------- sidebar active state ---------- */
+  const links = $$(".sidebar a");
+  const sections = links.map(a => $(a.getAttribute("href")));
+
+  function updateActiveLink(){
+    let current = "";
+    sections.forEach(sec => {
+      if (!sec) return;
+      const rect = sec.getBoundingClientRect();
+      if (rect.top <= 120) current = sec.id;
+    });
+    links.forEach(a => {
+      a.classList.toggle("active", a.getAttribute("href") === "#" + current);
+    });
+  }
+
+  window.addEventListener("scroll", updateActiveLink, {passive:true});
+  updateActiveLink();
+
+  /* ---------- init ---------- */
+  refreshAll();
+
+  // ESC зависит от PESI: обновляем ESC при изменении PESI
+  const pesiCard = document.getElementById("pesi");
+  if (pesiCard) {
+    pesiCard.addEventListener("input", () => {
+      const esc = document.getElementById("esc");
+      if (esc) refresh(esc);
+    });
+    pesiCard.addEventListener("change", () => {
+      const esc = document.getElementById("esc");
+      if (esc) refresh(esc);
+    });
+  }
+
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="поак.html" title="Сроки антикоагуляции">Операция и ПОАК</a>
+    <a href="af.html" title="Профилактика тромбоэмболий при ФП">ФП · ОАК</a>
+    <a href="аск поак.html" title="Долгосрочная антитромботическая терапия">АСК + ПОАК</a>
+    <a href="операция.html" title="Стратификация перед операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

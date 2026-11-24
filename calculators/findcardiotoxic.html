@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Поиск препарата — кардиоваскулярная токсичность</title>
+<meta name="description" content="Поиск по препарату: что сделать до начала, во время и после противоопухолевой терапии.">
+<style>
+*,*::before,*::after{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+:root{
+  --bg:#eef1f6;--surface:#ffffff;--surface-2:#f7f9fc;--text:#16202f;--text-2:#42536b;
+  --muted:#6b7c93;--border:#dfe6ef;--border-2:#eef2f7;--primary:#b3122b;--primary-2:#8a0d21;
+  --primary-soft:#fdeef1;--accent:#0f7490;--accent-soft:#e6f4f8;
+  --shadow:0 1px 2px rgba(16,32,56,.06),0 8px 24px -12px rgba(16,32,56,.18);
+  --shadow-lg:0 2px 4px rgba(16,32,56,.06),0 24px 48px -20px rgba(16,32,56,.28);
+  --radius:16px;--radius-sm:10px;
+  --risk-low:#1e7a52;
+  --font:'Segoe UI',system-ui,-apple-system,'Helvetica Neue',Arial,sans-serif;
+  --mono:'SFMono-Regular',Consolas,Menlo,monospace;
+}
+html[data-theme="dark"]{
+  --bg:#0d1219;--surface:#151c26;--surface-2:#1b2431;--text:#e8eef6;--text-2:#b6c3d4;
+  --muted:#8b9bb0;--border:#27323f;--border-2:#1f2937;--primary:#ff5470;--primary-2:#ff8095;
+  --primary-soft:#33141c;--accent:#4fc3dd;--accent-soft:#122b33;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 24px -12px rgba(0,0,0,.6);
+  --shadow-lg:0 2px 4px rgba(0,0,0,.4),0 24px 48px -20px rgba(0,0,0,.7);
+  --risk-low:#5fd39a;
+}
+body{margin:0;font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.65;font-size:16px;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s;}
+a{color:var(--primary);text-decoration:none;}
+a:hover{text-decoration:underline;}
+#progress{position:fixed;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,var(--primary),var(--accent));z-index:999;transition:width .1s linear;}
+header.topbar{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);}
+.topbar-inner{max-width:1480px;margin:0 auto;padding:10px 20px;display:flex;align-items:center;gap:16px;}
+.brand{display:flex;align-items:center;gap:12px;min-width:0;flex:1;}
+.brand-logo{width:42px;height:42px;border-radius:12px;flex:none;background:linear-gradient(135deg,var(--primary),#e0566e);display:grid;place-items:center;color:#fff;box-shadow:0 6px 16px -6px var(--primary);}
+.brand-logo svg{width:22px;height:22px;}
+.brand-text{min-width:0;}
+.brand-text b{display:block;font-size:14.5px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.brand-text span{display:block;font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.topbar-actions{display:flex;align-items:center;gap:8px;}
+.icon-btn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface-2);color:var(--text-2);cursor:pointer;display:grid;place-items:center;transition:.18s;}
+.icon-btn:hover{background:var(--primary-soft);color:var(--primary);border-color:var(--primary);}
+.icon-btn svg{width:19px;height:19px;}
+#menuToggle{display:none;}
+.layout{max-width:1480px;margin:0 auto;padding:26px 20px 80px;display:grid;grid-template-columns:276px minmax(0,1fr);gap:30px;align-items:start;}
+.sidebar{position:sticky;top:82px;max-height:calc(100vh - 106px);overflow-y:auto;padding-right:6px;}
+.sidebar::-webkit-scrollbar{width:7px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border);border-radius:99px;}
+.nav-group-title{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:0 12px;margin:22px 0 8px;}
+.nav-group-title:first-child{margin-top:0;}
+.nav-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;}
+.nav-link{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:10px;color:var(--text-2);font-size:13.5px;font-weight:600;text-decoration:none;transition:.16s;border:1px solid transparent;position:relative;}
+.nav-link:hover{background:var(--surface);color:var(--primary);text-decoration:none;}
+.nav-link.active{background:var(--primary-soft);color:var(--primary);border-color:color-mix(in srgb,var(--primary) 25%,transparent);}
+.nav-link.active::before{content:'';position:absolute;left:-1px;top:20%;height:60%;width:3px;background:var(--primary);border-radius:0 3px 3px 0;}
+.nav-icon{flex:none;width:26px;height:26px;border-radius:8px;background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;}
+.nav-icon svg{width:14px;height:14px;color:var(--muted);}
+.nav-link.active .nav-icon{background:var(--primary);border-color:var(--primary);}
+.nav-link.active .nav-icon svg{color:#fff;}
+.content{min-width:0;}
+.page{animation:fadeUp .35s cubic-bezier(.22,.9,.35,1);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:none;}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:26px 30px;margin-bottom:20px;}
+.card.tight{padding:20px 24px;}
+.hero{background:linear-gradient(150deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border);border-radius:var(--radius);padding:32px 34px;margin-bottom:22px;box-shadow:var(--shadow);position:relative;overflow:hidden;}
+.hero::after{content:'';position:absolute;right:-90px;top:-90px;width:290px;height:290px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--primary) 14%,transparent),transparent 70%);pointer-events:none;}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;}
+.chip{font-size:11.5px;font-weight:700;letter-spacing:.02em;padding:5px 11px;border-radius:99px;background:var(--surface-2);border:1px solid var(--border);color:var(--text-2);}
+.chip-journal{background:var(--primary-soft);border-color:color-mix(in srgb,var(--primary) 30%,transparent);color:var(--primary);}
+.chip-type{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 30%,transparent);color:var(--accent);}
+.hero h1{font-size:clamp(22px,2.9vw,32px);line-height:1.28;margin:0 0 12px;letter-spacing:-.4px;font-weight:800;}
+.hero .subtitle{font-size:15.5px;color:var(--text-2);margin:0 0 6px;font-weight:600;}
+h2.sec-title{font-size:22px;font-weight:800;letter-spacing:-.3px;margin:0 0 16px;display:flex;align-items:center;gap:12px;line-height:1.3;}
+h2.sec-title::before{content:'';width:5px;height:24px;border-radius:3px;flex:none;background:linear-gradient(180deg,var(--primary),var(--accent));}
+p{margin:0 0 14px;color:var(--text-2);}
+p:last-child{margin-bottom:0;}
+.callout{border-left:4px solid var(--primary);background:var(--primary-soft);border-radius:0 var(--radius-sm) var(--radius-sm) 0;padding:15px 19px;margin:18px 0;font-size:14.5px;color:var(--text-2);}
+.callout.accent{border-left-color:var(--accent);background:var(--accent-soft);}
+.callout b{color:var(--text);}
+.callout.warn{border-left-color:#b7791f;background:color-mix(in srgb,#b7791f 12%,transparent);}
+
+/* SEARCH */
+.search-card{background:linear-gradient(140deg,var(--surface) 0%,var(--surface-2) 100%);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px;margin-bottom:20px;position:relative;overflow:hidden;}
+.search-card::after{content:'';position:absolute;right:-60px;top:-60px;width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%);pointer-events:none;}
+.search-wrap{position:relative;}
+.search-icon{position:absolute;left:18px;top:50%;transform:translateY(-50%);width:20px;height:20px;color:var(--muted);pointer-events:none;transition:.18s;}
+.search-wrap input[type="search"]{width:100%;padding:15px 18px 15px 52px;border:1.5px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-family:var(--font);font-size:16px;font-weight:600;transition:.18s;}
+.search-wrap input[type="search"]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;width:16px;height:16px;background:transparent;cursor:pointer;}
+.search-wrap input[type="search"]:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 15%,transparent);}
+.search-wrap input[type="search"]:focus ~ .search-icon{color:var(--accent);}
+.search-hint{font-size:12.5px;color:var(--muted);margin-top:10px;font-weight:500;}
+.search-hint b{color:var(--text-2);font-weight:700;}
+
+/* DRUG CARDS */
+#results{display:flex;flex-direction:column;gap:18px;}
+.drug-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;transition:box-shadow .2s,border-color .2s;}
+.drug-card:hover{box-shadow:var(--shadow-lg);border-color:color-mix(in srgb,var(--accent) 35%,var(--border));}
+.drug-card-head{padding:18px 22px;border-bottom:1px solid var(--border);background:linear-gradient(140deg,var(--surface) 0%,var(--surface-2) 100%);position:relative;}
+.drug-card-head::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--primary),var(--accent));}
+.drug-card-head .class-label{font-size:10.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.drug-card-head .class-name{font-size:18px;font-weight:800;color:var(--text);margin-top:3px;letter-spacing:-.2px;line-height:1.3;}
+.drug-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.drug-chips span{font-size:11.5px;font-weight:700;padding:3px 9px;border-radius:6px;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:.15s;}
+.drug-chips span.hit{background:var(--accent-soft);color:var(--accent);border-color:color-mix(in srgb,var(--accent) 35%,transparent);font-weight:800;}
+.phases{display:grid;grid-template-columns:repeat(3,1fr);}
+.phase{padding:18px 22px;}
+.phase + .phase{border-left:1px solid var(--border-2);}
+.phase h3{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;margin:0 0 12px;display:flex;align-items:center;gap:8px;line-height:1.4;}
+.phase h3::before{content:'';width:8px;height:8px;border-radius:50%;flex:none;}
+.phase.before h3{color:#1d4ed8;}
+.phase.before h3::before{background:#3b82f6;}
+.phase.during h3{color:#b45309;}
+.phase.during h3::before{background:#f59e0b;}
+.phase.after h3{color:var(--risk-low);}
+.phase.after h3::before{background:var(--risk-low);}
+html[data-theme="dark"] .phase.before h3{color:#60a5fa;}
+html[data-theme="dark"] .phase.during h3{color:#fbbf24;}
+.phase ul{margin:0;padding-left:18px;}
+.phase li{font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:8px;}
+.phase li:last-child{margin-bottom:0;}
+.phase li::marker{color:var(--muted);}
+
+/* EMPTY */
+.empty-card{text-align:center;padding:40px 24px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);}
+.empty-card .empty-icon{width:56px;height:56px;border-radius:16px;margin:0 auto 14px;background:linear-gradient(135deg,var(--primary-soft),var(--accent-soft));display:grid;place-items:center;color:var(--primary);}
+.empty-card .empty-icon svg{width:28px;height:28px;}
+.empty-card h2{font-size:20px;font-weight:800;margin:0 0 8px;color:var(--text);}
+.empty-card p{font-size:14px;color:var(--muted);max-width:620px;margin:0 auto 20px;}
+.suggestion-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;}
+.suggestion-chips button{font-family:var(--font);font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;border:1px solid var(--border);background:var(--surface-2);color:var(--accent);cursor:pointer;transition:.15s;}
+.suggestion-chips button:hover{border-color:var(--accent);background:var(--accent-soft);}
+.general-block{text-align:left;max-width:680px;margin:0 auto;padding:18px 22px;border-radius:var(--radius-sm);background:var(--surface-2);border:1px solid var(--border);}
+.general-block h3{font-size:13px;font-weight:800;color:var(--text);margin:0 0 10px;letter-spacing:.02em;}
+.general-block ul{margin:0;padding-left:20px;}
+.general-block li{font-size:13px;color:var(--text-2);line-height:1.55;margin-bottom:7px;}
+.general-block li:last-child{margin-bottom:0;}
+
+/* MISC */
+.badge-linked{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:800;padding:10px 18px;border-radius:10px;background:var(--accent-soft);color:var(--accent);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);text-decoration:none;transition:.18s;margin-top:14px;}
+.badge-linked:hover{background:color-mix(in srgb,var(--accent) 18%,transparent);text-decoration:none;}
+.badge-linked svg{width:16px;height:16px;}
+#toTop{position:fixed;right:22px;bottom:22px;width:46px;height:46px;border-radius:14px;background:var(--primary);color:#fff;border:none;cursor:pointer;display:grid;place-items:center;box-shadow:0 10px 24px -8px var(--primary);opacity:0;visibility:hidden;transform:translateY(14px);transition:.25s;z-index:90;}
+#toTop.show{opacity:1;visibility:visible;transform:none;}
+#toTop:hover{background:var(--primary-2);}
+#toTop svg{width:20px;height:20px;}
+#overlay{position:fixed;inset:0;background:rgba(10,18,30,.5);backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:.25s;z-index:110;}
+#overlay.show{opacity:1;visibility:visible;}
+footer.site-footer{border-top:1px solid var(--border);background:var(--surface);padding:28px 20px;margin-top:20px;}
+.footer-inner{max-width:1480px;margin:0 auto;display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-items:flex-start;font-size:12.5px;color:var(--muted);}
+.footer-inner a{color:var(--text-2);}
+.footer-copy{line-height:1.7;max-width:860px;}
+.footer-copy .foot-title{font-weight:800;color:var(--text);display:block;margin-bottom:3px;}
+
+@media (max-width:1080px){
+  .layout{grid-template-columns:240px minmax(0,1fr);gap:24px;}
+}
+@media (max-width:900px){
+  #menuToggle{display:grid;}
+  .layout{grid-template-columns:minmax(0,1fr);padding:20px 16px 70px;}
+  .sidebar{position:fixed;top:0;left:0;height:100vh;width:290px;max-height:none;background:var(--surface);border-right:1px solid var(--border);padding:22px 16px;z-index:120;transform:translateX(-102%);transition:transform .3s cubic-bezier(.22,.9,.35,1);box-shadow:var(--shadow-lg);}
+  .sidebar.open{transform:none;}
+  .card,.hero,.search-card{padding:22px 20px;}
+  .phases{grid-template-columns:1fr;}
+  .phase + .phase{border-left:0;border-top:1px solid var(--border-2);}
+}
+@media (max-width:560px){
+  body{font-size:15px;}
+  .card,.hero,.search-card{padding:18px 15px;}
+  .hero h1{font-size:22px;}
+  .phase{padding:14px 16px;}
+  .drug-card-head{padding:14px 16px;}
+  .search-wrap input[type="search"]{font-size:15px;padding:13px 16px 13px 46px;}
+  .search-icon{left:15px;width:18px;height:18px;}
+  .suggestion-chips button{font-size:12px;padding:6px 12px;}
+}
+@media print{
+  header.topbar,.sidebar,#toTop,#progress,.search-card,.suggestion-chips{display:none!important;}
+  .layout{grid-template-columns:1fr;padding:0;}
+  .card,.hero,.drug-card{box-shadow:none;border-color:#ccc;break-inside:avoid;}
+  .phases{grid-template-columns:1fr;}
+  .phase + .phase{border-left:0;border-top:1px solid #ddd;}
+}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <button class="icon-btn" id="menuToggle" aria-label="Меню">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+    </button>
+    <div class="brand">
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+      </div>
+      <div class="brand-text">
+        <b>Кардиоонкология · Поиск по препарату</b>
+        <span>© Врач-кардиолог, к.м.н. Синкевич Д.А., Иркутск, 2026</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <a class="icon-btn" href="CardioToxic.html#/" title="К калькуляторам" aria-label="К калькуляторам">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20z"/><path d="M9 21.5V14h6v7.5"/></svg>
+      </a>
+      <a class="icon-btn" href="https://doi.org/10.15829/1728-8800-2023-3684" target="_blank" rel="noopener" title="DOI 3684" aria-label="DOI 3684">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+      </a>
+      <a class="icon-btn" href="https://doi.org/10.15829/1728-8800-2023-3685" target="_blank" rel="noopener" title="DOI 3685" aria-label="DOI 3685">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7"/><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7"/></svg>
+      </a>
+      <button class="icon-btn" id="themeToggle" title="Сменить тему" aria-label="Сменить тему">
+        <svg id="iconSun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2"/><path d="M12 2v2.2M12 19.8V22M4.2 4.2l1.6 1.6M18.2 18.2l1.6 1.6M2 12h2.2M19.8 12H22M4.2 19.8l1.6-1.6M18.2 5.8l1.6-1.6"/></svg>
+        <svg id="iconMoon" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      </button>
+      <button class="icon-btn" onclick="window.print()" title="Печать" aria-label="Печать">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div id="overlay"></div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="content" id="content">
+
+    <section class="hero page">
+      <div class="chips">
+        <span class="chip chip-journal">Кардиоонкология</span>
+        <span class="chip chip-type">Поиск по препарату</span>
+      </div>
+      <h1>Кардиоваскулярная токсичность</h1>
+      <p class="subtitle">Что сделать <b>до начала</b>, <b>во время</b> и <b>после</b> противоопухолевой терапии — по каждому классу препаратов.</p>
+      <a class="badge-linked" href="CardioToxic.html#/">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20z"/><path d="M9 21.5V14h6v7.5"/></svg>
+        Перейти к калькуляторам риска
+      </a>
+    </section>
+
+    <section class="search-card">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Введите название препарата, например: тамоксифен"
+               autocomplete="off" autofocus aria-label="Поиск препарата">
+      </div>
+      <div class="search-hint">Можно вводить <b>название препарата</b> (доксорубицин), <b>класс</b> (антрациклины, фторпиримидины) или часть слова.</div>
+    </section>
+
+    <div id="results" aria-live="polite"></div>
+
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-copy">
+      <div class="foot-block">
+        <span class="foot-title">Источник:</span>
+        Виценя М.В., Полтавская М.Г., Потиевская В.И., Агеев Ф.Т. и соавт.
+        Кардиоваскулярная токсичность. Клинические рекомендации RUSSCO, часть 2.
+        Злокачественные опухоли 2025;15(3s2):104–132.
+        DOI: 10.18027/2224-5057-2025-15-3s2-2-07.
+      </div>
+      <div class="foot-block" style="margin-top:8px">
+        Приложение носит справочный характер и не заменяет клинические рекомендации и решение лечащего врача.
+      </div>
+    </div>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<script>
+/* ICONS */
+const ICONS = {
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21.2l7.8-7.8 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1.5 1.5 0 0 1-1.5 1.5h-15A1.5 1.5 0 0 1 3 20z"/><path d="M9 21.5V14h6v7.5"/></svg>',
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h7a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-7a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h8z"/></svg>',
+  clipboard:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="18" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1M9 10h6M9 14h6M9 18h4"/></svg>',
+  drop:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6.5 7 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.7 12 2.7 12 2.7z"/></svg>',
+  microscope:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 18h12M9 18v3M15 18v3M6 18a8 8 0 0 1 12-10M12 8V4M9 4h6"/><circle cx="12" cy="11" r="2"/></svg>',
+  pill:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="20" height="12" rx="3"/><path d="M7 8V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3M12 12v4"/></svg>',
+  flask:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v6L4 19a2 2 0 0 0 1.8 3h12.4A2 2 0 0 0 20 19l-6-10V3"/></svg>',
+  lungs:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4v8a4 4 0 0 0 4 4h1V4zM18 4v8a4 4 0 0 1-4 4h-1V4z"/></svg>',
+  target:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></svg>',
+  scale:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M7 7l-4 8a4 4 0 0 0 8 0zM17 7l-4 8a4 4 0 0 0 8 0z"/></svg>'
+};
+
+/* DATA — без изменений (полностью сохранена исходная база) */
+const DATA = [
+  {
+    name: "Антрациклины",
+    drugs: ["доксорубицин","даунорубицин","эпирубицин","идарубицин","митоксантрон","акларубицин"],
+    before: [
+      "Жалобы, анамнез (СН, ССЗ), осмотр с измерением АД",
+      "Эхо-КГ: ФВ ЛЖ и GLS; ЭКГ с расчётом QTc",
+      "Биохимия: липиды, глюкоза, креатинин/СКФ, калий, натрий, АСТ, АЛТ",
+      "Тропонин и BNP/NT-proBNP при высоком и очень высоком риске",
+      "Оценка риска кардиоваскулярной токсичности",
+      "Коррекция факторов риска и лечение имеющихся ССЗ",
+      "Рассмотреть иАПФ/БРА, бета-блокаторы, статины при высоком риске и дислипидемии",
+      "Лимит кумулятивной дозы: доксорубицин < 360 мг/м², эпирубицин < 720 мг/м², даунорубицин < 800 мг/м², идарубицин < 150 мг/м², митоксантрон < 160 мг/м²",
+      "Дексразоксан при доступности: метастатический РМЖ с дозой доксорубицина > 300 мг/м² или эпирубицина > 540 мг/м², а также при исходном поражении сердца"
+    ],
+    during: [
+      "Опрос и осмотр перед каждым циклом ХТ",
+      "Эхо-КГ по завершении терапии, если доза доксорубицина ≤ 250 мг/м²",
+      "При дозе > 250 мг/м² — Эхо-КГ после каждого повышения дозы примерно на 100 мг/м² (или 200 мг/м² эпирубицина)",
+      "Биомаркеры с той же периодичностью при высоком риске",
+      "Акларубицин: контроль QTc по протоколу препарата",
+      "Симптомная тяжёлая дисфункция — терапию прекратить",
+      "Симптомная умеренная дисфункция — приостановить, направить к кардиологу; возобновление — по решению мультидисциплинарной команды"
+    ],
+    after: [
+      "Эхо-КГ через 12 мес. после завершения лечения",
+      "Высокий и очень высокий риск — Эхо-КГ через 3 и 12 мес.",
+      "Далее без симптомов СН — через 3, 5 лет и каждые 5 лет",
+      "При выявленной дисфункции сердца — более частое наблюдение у кардиолога"
+    ]
+  },
+  {
+    name: "Анти-HER2-терапия",
+    drugs: ["трастузумаб","пертузумаб"],
+    before: [
+      "Жалобы, анамнез, осмотр",
+      "Эхо-КГ (ФВ ЛЖ, GLS), ЭКГ",
+      "Биохимия, тропонин и BNP/NT-proBNP при высоком риске",
+      "Оценка риска кардиоваскулярной токсичности",
+      "Избегать одновременного назначения с антрациклинами"
+    ],
+    during: [
+      "Эхо-КГ каждые 3 мес. в процессе терапии и по её завершении",
+      "Метастатический рак — Эхо-КГ каждые 3 мес. в течение 1 года, далее каждые 6 мес.",
+      "Симптомная умеренная или тяжёлая дисфункция — приостановить и направить к кардиологу",
+      "Бессимптомная умеренная дисфункция — продолжить на фоне более частого мониторинга, рассмотреть иАПФ/БРА и бета-блокаторы",
+      "Бессимптомная тяжёлая дисфункция — приостановить и направить к кардиологу",
+      "Бессимптомная лёгкая дисфункция — можно продолжить при более частом мониторинге, рассмотреть иАПФ/БРА и бета-блокаторы"
+    ],
+    after: [
+      "Эхо-КГ через 12 мес. после завершения лечения",
+      "Высокий риск — Эхо-КГ через 3 и 12 мес.",
+      "Далее без симптомов — через 3, 5 лет и каждые 5 лет",
+      "При выявленной дисфункции — более частое наблюдение у кардиолога"
+    ]
+  },
+  {
+    name: "Анти-VEGF-терапия",
+    drugs: ["бевацизумаб","сунитиниб","сорафениб","пазопаниб","вандетаниб"],
+    before: [
+      "Анамнез (АГ, ССЗ), осмотр с измерением АД; СМАД по показаниям",
+      "ЭКГ (гипертрофия ЛЖ, QTc), Эхо-КГ",
+      "Биохимия: креатинин/СКФ, калий, натрий, липиды, глюкоза",
+      "Общий анализ мочи с оценкой протеинурии",
+      "УЗИ почек и почечных артерий по показаниям",
+      "Коррекция факторов риска; цель АД < 140/90 мм рт. ст."
+    ],
+    during: [
+      "АД на каждом визите",
+      "Домашнее измерение АД на первом цикле, после каждого повышения дозы, далее не реже 1 раза в 2–3 недели",
+      "Общий анализ мочи с протеинурией; микроальбуминурия при доступности",
+      "Высокий риск — Эхо-КГ каждые 3 мес. в течение 1 года, далее 1 раз в 6–12 мес.",
+      "Сунитиниб, пазопаниб, вандетаниб — контроль QTc",
+      "АД ≥ 180/110 мм рт. ст. или осложнённая АГ — приостановить терапию или уменьшить дозу",
+      "После снижения АД < 160/100 мм рт. ст. — возобновление под тщательным мониторингом"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится — продолжайте контроль АД и факторов риска ССЗ"
+    ]
+  },
+  {
+    name: "Фторпиримидины",
+    drugs: ["5-фторурацил","фторурацил","капецитабин","гемцитабин"],
+    before: [
+      "Жалобы (симптомы стенокардии), анамнез, осмотр",
+      "ЭКГ, Эхо-КГ",
+      "Нагрузочные пробы, Холтер, КАГ или МСКТ коронарных артерий по показаниям",
+      "Клинический и биохимический анализ крови: липиды, глюкоза, трансаминазы, КК, креатинин/СКФ, калий, натрий",
+      "Коррекция факторов риска и оптимизация терапии ССЗ",
+      "При ИБС по возможности избегать продолжительной и высокодозной терапии"
+    ],
+    during: [
+      "Опрос о симптомах стенокардии перед каждым циклом",
+      "ЭКГ перед каждым циклом и при появлении симптомов",
+      "Ишемия миокарда — приостановить терапию, нитраты, тщательный мониторинг",
+      "ОКС или нестабильная стенокардия — экстренная госпитализация; аспирин 500 мг разжевать, нитроглицерин под язык",
+      "Документированный вазоспазм — возобновление только при отсутствии альтернативы, на фоне профилактики и ЭКГ-мониторинга в день введения",
+      "При возобновлении предпочтительны болюсные схемы; рассмотреть 3-дневный курс нитратов или антагонистов кальция"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Таксаны",
+    drugs: ["паклитаксел","доцетаксел"],
+    before: [
+      "Жалобы (симптомы стенокардии), анамнез, осмотр",
+      "ЭКГ, Эхо-КГ",
+      "Нагрузочные пробы, Холтер, КАГ или МСКТ коронарных артерий по показаниям",
+      "Клинический и биохимический анализ крови",
+      "Коррекция факторов риска и оптимизация терапии ССЗ"
+    ],
+    during: [
+      "Опрос о симптомах стенокардии",
+      "ЭКГ перед каждым циклом и при появлении симптомов",
+      "Ишемия миокарда — приостановить терапию, нитраты, мониторинг"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Препараты платины",
+    drugs: ["цисплатин","карбоплатин","оксалиплатин"],
+    before: [
+      "Жалобы (симптомы стенокардии), анамнез, осмотр",
+      "ЭКГ, Эхо-КГ",
+      "Нагрузочные пробы, Холтер, КАГ или МСКТ коронарных артерий по показаниям",
+      "Клинический и биохимический анализ крови",
+      "Коррекция факторов риска и оптимизация терапии ССЗ"
+    ],
+    during: [
+      "ЭКГ перед каждым циклом и при появлении симптомов",
+      "Оксалиплатин — контроль QTc по протоколу препарата",
+      "Ишемия миокарда — приостановить терапию, нитраты, мониторинг"
+    ],
+    after: [
+      "Пожизненно повышен риск ИБС",
+      "Ежегодное кардиологическое обследование: опрос, осмотр, ЭКГ, нагрузочные тесты по показаниям, лодыжечно-плечевой индекс",
+      "УЗИ магистральных артерий головы — 1 раз в 2 года",
+      "Рекомендации по образу жизни и коррекции факторов риска ССЗ"
+    ]
+  },
+  {
+    name: "Алкилирующие агенты",
+    drugs: ["циклофосфамид","ифосфамид","темозоломид","прокарбазин"],
+    before: [
+      "Оценка ССЗ и факторов риска",
+      "Измерение АД, ЭКГ",
+      "Биохимия крови"
+    ],
+    during: [
+      "Контроль АД",
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Алкалоиды барвинка и другие алкалоиды",
+    drugs: ["винкристин","винбластин","винорелбин","иринотекан","этопозид"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска",
+      "ЭКГ, Эхо-КГ по показаниям"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы mTOR",
+    drugs: ["эверолимус","темсиролимус"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Интерферон-альфа",
+    drugs: ["интерферон альфа"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Пожизненно повышен риск ИБС",
+      "Ежегодное кардиологическое обследование: опрос, осмотр, ЭКГ, нагрузочные тесты по показаниям, лодыжечно-плечевой индекс",
+      "УЗИ магистральных артерий головы — 1 раз в 2 года"
+    ]
+  },
+  {
+    name: "Ингибиторы контрольных точек иммунного ответа",
+    drugs: ["ниволумаб","пембролизумаб","пролголимаб","ипилимумаб","авелумаб","атезолизумаб","дурвалумаб"],
+    before: [
+      "Жалобы, анамнез (ССЗ и факторы риска), осмотр",
+      "ЭКГ, Эхо-КГ",
+      "Биохимия, липидный профиль",
+      "Тропонин, BNP/NT-proBNP при доступности"
+    ],
+    during: [
+      "Опрос о симптомах: слабость, миалгии, боль в груди, одышка, отёки, перебои, синкопе",
+      "Без симптомов: ЭКГ и тропонин перед 2, 3, 4-й дозами, затем после каждых 3 доз",
+      "Физикальное обследование и липидный профиль — после каждых 3 доз",
+      "При длительной терапии > 12 мес. — осмотр, ЭКГ, липиды, BNP/NT-proBNP каждые 6–12 мес.",
+      "Новые симптомы, изменения ЭКГ или рост тропонина — немедленно кардиолог, тропонин, BNP, Эхо-КГ с GLS, МРТ при подозрении на миокардит",
+      "Миокардит — прервать ИКТИ, госпитализация; метилпреднизолон в высоких дозах"
+    ],
+    after: [
+      "После миокардита возобновление, как правило, противопоказано; возможно в отдельных случаях без комбинации ИКТИ",
+      "После невоспалительной дисфункции ЛЖ/СН — зависит от тяжести",
+      "После тяжёлой АВ-блокады или желудочковой тахикардии — возобновления избегать",
+      "После синдрома такоцубо — можно после восстановления функции миокарда",
+      "После ОКС — можно рассмотреть",
+      "Решение принимает мультидисциплинарная команда"
+    ]
+  },
+  {
+    name: "Андрогенная депривационная терапия",
+    drugs: ["гозерелин","абиратерон","апалутамид","бикалутамид","бусерелин","дегареликс","лейпрорелин","трипторелин","флутамид","энзалутамид"],
+    before: [
+      "Оценка ССЗ и факторов риска",
+      "При ИБС рассмотреть наименее кардиотоксичный препарат: предпочтительны антагонисты ГРГ; кардиотоксичность агониста ГРГ лейпрорелина не превышает таковую антагонистов"
+    ],
+    during: [
+      "Мониторинг симптомов ИБС",
+      "ЭКГ по показаниям"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Антиэстрогены",
+    drugs: ["тамоксифен","фулвестрант","торемифен"],
+    before: [
+      "Оценка риска венозных тромбоэмболий и факторов риска",
+      "ЭКГ с QTc (торемифен)"
+    ],
+    during: [
+      "Наблюдение за признаками тромбоза",
+      "Торемифен — контроль QTc по протоколу препарата"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы ароматаз",
+    drugs: ["анастрозол","летрозол"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы CDK4/6",
+    drugs: ["рибоциклиб","палбоциклиб","абемациклиб"],
+    before: [
+      "ЭКГ с расчётом QTc",
+      "Коррекция электролитных нарушений и пересмотр QT-удлиняющей сопутствующей терапии",
+      "QTc > 480 мс — рассмотреть альтернативу; QTc ≥ 500 мс — выбрать альтернативный препарат"
+    ],
+    during: [
+      "Рибоциклиб: ЭКГ с QTc по протоколу, если QTc ≤ 480 мс",
+      "QTc > 480 мс — ЭКГ еженедельно",
+      "ЭКГ при каждом повышении дозы",
+      "Бессимптомное QTc ≥ 500 мс — приостановить, устранить причины, ЭКГ каждые 24 ч",
+      "Возобновление: QTc < 480 мс — в прежней дозе; QTc 480–500 мс — в редуцированной; QTc ≥ 500 мс — обсудить альтернативу"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы RAF и MEK",
+    drugs: ["дабрафениб","траметиниб","вемурафениб","кобиметиниб","энкорафениб","биниметиниб"],
+    before: [
+      "Оценка риска кардиоваскулярной токсичности, в том числе по шкале HFA-ICOS",
+      "Эхо-КГ, ЭКГ"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ",
+      "Эхо-КГ по показаниям"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы ALK",
+    drugs: ["алектиниб","кризотиниб","церитиниб"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Анти-EGFR-терапия",
+    drugs: ["панитумумаб","цетуксимаб","осимертиниб","афатиниб","гефитиниб","эрлотиниб"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Ингибиторы тирозинкиназы Bcr-Abl",
+    drugs: ["иматиниб"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Другие противоопухолевые антибиотики",
+    drugs: ["блеомицин","митомицин","иксабепилон"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Блеомицин: пожизненно повышен риск ИБС",
+      "Ежегодное кардиологическое обследование: опрос, осмотр, ЭКГ, нагрузочные тесты по показаниям, лодыжечно-плечевой индекс",
+      "УЗИ магистральных артерий головы — 1 раз в 2 года"
+    ]
+  },
+  {
+    name: "Аналоги фолиевой кислоты",
+    drugs: ["метотрексат","пеметрексед"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Прочие противоопухолевые препараты",
+    drugs: ["эрибулин"],
+    before: [
+      "Стандартная оценка ССЗ и факторов риска"
+    ],
+    during: [
+      "Наблюдение за симптомами ССЗ"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Препараты, удлиняющие интервал QT",
+    drugs: ["триоксид мышьяка","нилотиниб"],
+    before: [
+      "ЭКГ с расчётом QTc по формуле Фредерика",
+      "Коррекция электролитных нарушений и пересмотр QT-удлиняющей сопутствующей терапии",
+      "QTc > 480 мс — рассмотреть альтернативу; QTc ≥ 500 мс — выбрать альтернативный препарат"
+    ],
+    during: [
+      "ЭКГ с QTc по протоколу, если QTc ≤ 480 мс",
+      "QTc > 480 мс — ЭКГ еженедельно",
+      "ЭКГ при каждом повышении дозы",
+      "Бессимптомное QTc ≥ 500 мс — приостановить, устранить причины, ЭКГ каждые 24 ч",
+      "Возобновление: QTc < 480 мс — в прежней дозе; QTc 480–500 мс — в редуцированной; QTc ≥ 500 мс — обсудить альтернативу"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  },
+  {
+    name: "Препараты с риском фибрилляции предсердий",
+    drugs: ["ингибиторы протеосом","иммуномодулирующие препараты","ингибиторы гистон деацетилазы","CAR-T"],
+    before: [
+      "Оценка риска инсульта и кровотечений (CHA₂DS₂-VA, HAS-BLED)",
+      "ЭКГ, Эхо-КГ"
+    ],
+    during: [
+      "Наблюдение за ритмом; при фибрилляции — консультация кардиолога и решение мультидисциплинарной команды",
+      "Оценка необходимости антикоагулянтов с учётом риска кровотечений"
+    ],
+    after: [
+      "Специальных рекомендаций в источнике не приводится"
+    ]
+  }
+];
+
+/* SIDEBAR — перекрёстные ссылки на CardioToxic.html */
+const CALC_ROUTES = [
+  {route:'/mayo-clinic',title:'MAYO CLINIC (Larsen)',icon:'clipboard',href:'CardioToxic.html#/mayo-clinic'},
+  {route:'/khorana',title:'Khorana — риск ВТЭО',icon:'drop',href:'CardioToxic.html#/khorana'},
+  {route:'/curigliano',title:'ESMO — оценка на ХТ',icon:'microscope',href:'CardioToxic.html#/curigliano'},
+  {route:'/anthracyclines',title:'Антрациклины',icon:'drop',href:'CardioToxic.html#/anthracyclines'},
+  {route:'/bcr-abl',title:'Ингибиторы BCR-ABL',icon:'pill',href:'CardioToxic.html#/bcr-abl'},
+  {route:'/myeloma',title:'Множественная миелома',icon:'flask',href:'CardioToxic.html#/myeloma'},
+  {route:'/her2',title:'HER2-таргетная терапия',icon:'target',href:'CardioToxic.html#/her2'},
+  {route:'/vegf',title:'Ингибиторы VEGF',icon:'lungs',href:'CardioToxic.html#/vegf'},
+  {route:'/braf-mek',title:'BRAF + MEK ингибиторы',icon:'scale',href:'CardioToxic.html#/braf-mek'}
+];
+
+function renderSidebar(){
+  const nav = [
+    {group:'Навигация',items:[
+      {href:'CardioToxic.html#/',title:'Обзор',icon:'home'},
+      {href:'CardioToxic.html#/about',title:'Методика расчёта',icon:'book'},
+      {href:'findcardiotoxic.html',title:'Поиск по препарату',icon:'search',active:true}
+    ]},
+    {group:'Общие шкалы',items:CALC_ROUTES.slice(0,3)},
+    {group:'Препарат-специфичные',items:CALC_ROUTES.slice(3)}
+  ];
+  document.getElementById('sidebar').innerHTML = nav.map(g=>`
+    <div class="nav-group-title">${g.group}</div>
+    <ul class="nav-list">
+      ${g.items.map(it=>`
+        <li><a class="nav-link${it.active?' active':''}" href="${it.href}">
+          <span class="nav-icon">${ICONS[it.icon]||ICONS.heart}</span>
+          <span>${it.title}</span>
+        </a></li>`).join('')}
+    </ul>`).join('');
+}
+
+/* SEARCH LOGIC */
+const input = document.getElementById("q");
+const results = document.getElementById("results");
+
+const norm = (s) => s.toLowerCase().replace(/ё/g, "е").replace(/\s+/g, " ").trim();
+const esc = (s) => s.replace(/[&<>"']/g, (c) => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+
+const SUGGESTIONS = ["тамоксифен","трастузумаб","доксорубицин","капецитабин","иматиниб","ниволумаб"];
+
+function suggestionsHTML(){
+  return `<div class="suggestion-chips">${SUGGESTIONS.map(d=>`<button type="button" data-drug="${d}">${d}</button>`).join("")}</div>`;
+}
+
+function bindSuggestionChips(root){
+  root.querySelectorAll("button[data-drug]").forEach((btn)=>{
+    btn.addEventListener("click",()=>{
+      input.value = btn.dataset.drug;
+      render(btn.dataset.drug);
+      input.focus();
+    });
+  });
+}
+
+function renderEmpty(){
+  results.innerHTML = `
+    <div class="empty-card">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      </div>
+      <h2>С чего начать</h2>
+      <p>Введите название препарата — откроются рекомендации по трём этапам терапии. Если препарат не найден, ориентируйтесь на общие меры профилактики.</p>
+      ${suggestionsHTML()}
+      <div class="general-block">
+        <h3>Общие меры профилактики</h3>
+        <ul>
+          <li>Здоровый образ жизни: отказ от курения, здоровое питание, физическая активность ≥ 150 мин в неделю</li>
+          <li>Контроль АД, липидов, глюкозы и веса до, в процессе и после лечения</li>
+          <li>Целевые уровни: АД &lt; 140/90 мм рт. ст., ХС ЛПНП &lt; 1,8 ммоль/л (высокий риск) или &lt; 1,4 ммоль/л (очень высокий риск), HbA1c &lt; 7 %</li>
+          <li>Лечение имеющихся ССЗ по действующим рекомендациям</li>
+          <li>Консультация кардиолога — при симптомах или анамнезе ССЗ, высоком риске кардиотоксичности, плохо контролируемых факторах риска, значимом повышении биомаркеров или патологии на ЭКГ/Эхо-КГ</li>
+        </ul>
+      </div>
+    </div>`;
+  bindSuggestionChips(results);
+}
+
+function cardHTML(cls, query){
+  const chips = cls.drugs.map((d)=>{
+    const hit = query && norm(d).includes(query);
+    return `<span class="${hit ? "hit" : ""}">${esc(d)}</span>`;
+  }).join("");
+  const list = (items) => `<ul>${items.map((i)=>`<li>${esc(i)}</li>`).join("")}</ul>`;
+  return `
+    <article class="drug-card">
+      <div class="drug-card-head">
+        <div class="class-label">Класс препаратов</div>
+        <div class="class-name">${esc(cls.name)}</div>
+        <div class="drug-chips">${chips}</div>
+      </div>
+      <div class="phases">
+        <section class="phase before">
+          <h3>До начала</h3>
+          ${list(cls.before)}
+        </section>
+        <section class="phase during">
+          <h3>Во время</h3>
+          ${list(cls.during)}
+        </section>
+        <section class="phase after">
+          <h3>После</h3>
+          ${list(cls.after)}
+        </section>
+      </div>
+    </article>`;
+}
+
+function render(raw){
+  const query = norm(raw || "");
+  if (query.length < 2){ renderEmpty(); return; }
+
+  const matches = DATA.filter((cls)=>{
+    if (norm(cls.name).includes(query)) return true;
+    return cls.drugs.some((d)=>norm(d).includes(query));
+  });
+
+  matches.sort((a,b)=>{
+    const aDrug = a.drugs.some((d)=>norm(d).includes(query)) ? 0 : 1;
+    const bDrug = b.drugs.some((d)=>norm(d).includes(query)) ? 0 : 1;
+    return aDrug - bDrug || a.name.localeCompare(b.name, "ru");
+  });
+
+  if (!matches.length){
+    results.innerHTML = `
+      <div class="empty-card">
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        </div>
+        <h2>Препарат не найден</h2>
+        <p>Проверьте написание или введите название класса, например «антрациклины», «фторпиримидины», «ИКТИ».</p>
+        ${suggestionsHTML()}
+        <div class="callout warn" style="text-align:left;max-width:680px;margin:0 auto">
+          <b>Напоминание.</b> Если препарат не указан в базе, ориентируйтесь на общие меры профилактики и решение мультидисциплинарной команды.
+        </div>
+      </div>`;
+    bindSuggestionChips(results);
+    return;
+  }
+
+  results.innerHTML = matches.map((cls)=>cardHTML(cls, query)).join("");
+}
+
+/* UI INIT */
+function setTheme(theme){
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  const sun = document.getElementById('iconSun'), moon = document.getElementById('iconMoon');
+  if (theme === 'dark'){ sun.style.display='none'; moon.style.display='block'; }
+  else { sun.style.display='block'; moon.style.display='none'; }
+}
+
+function updateProgress(){
+  const h = document.documentElement;
+  const s = h.scrollTop || document.body.scrollTop;
+  const height = h.scrollHeight - h.clientHeight;
+  document.getElementById('progress').style.width = (height>0 ? (s/height)*100 : 0) + '%';
+}
+
+function initUI(){
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  setTheme(savedTheme);
+
+  document.getElementById('themeToggle').addEventListener('click', ()=>{
+    const cur = document.documentElement.getAttribute('data-theme');
+    setTheme(cur === 'dark' ? 'light' : 'dark');
+  });
+
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('overlay');
+  document.getElementById('menuToggle').addEventListener('click', ()=>{
+    sidebar.classList.toggle('open');
+    overlay.classList.toggle('show');
+  });
+  overlay.addEventListener('click', ()=>{
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+  });
+
+  const toTop = document.getElementById('toTop');
+  window.addEventListener('scroll', ()=>{
+    toTop.classList.toggle('show', window.scrollY > 400);
+    updateProgress();
+  }, {passive:true});
+  toTop.addEventListener('click', ()=>window.scrollTo({top:0, behavior:'smooth'}));
+}
+
+/* DEBOUNCE SEARCH */
+let timer;
+input.addEventListener("input", ()=>{
+  clearTimeout(timer);
+  timer = setTimeout(()=>render(input.value), 90);
+});
+input.addEventListener("keydown", (e)=>{
+  if (e.key === "Enter"){ e.preventDefault(); render(input.value); }
+});
+
+/* BOOT */
+window.addEventListener('DOMContentLoaded', ()=>{
+  renderSidebar();
+  initUI();
+  render("");
+  updateProgress();
+});
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="CardioToxic.html" title="Стратификация кардиотоксичности">Кардиоонкология — риск</a>
+    <a href="qt.html" title="Влияние препаратов на QT">Интервал QT</a>
+    <a href="ХСН.html" title="Диагностика ХСН">СНсФВ</a>
+    
+  </div>
+</div>
+</body>
+</html>

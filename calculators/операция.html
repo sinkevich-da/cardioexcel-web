@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькулятор периоперационного риска</title>
+<style>
+:root{--ink:#132039;--muted:#64748b;--line:#e8eef7;--accent:#2563eb}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 600px at 8% -12%, #e0ecff 0%, transparent 58%),
+    radial-gradient(900px 520px at 102% -6%, #e6fbf5 0%, transparent 55%),
+    #f6f8fc;
+  min-height:100vh;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1200px;margin:0 auto;padding:30px 18px 40px}
+
+.hero h1{font-size:30px;margin:0 0 8px;letter-spacing:-.6px;line-height:1.15}
+.hero p{margin:0;color:var(--muted);font-size:15px;max-width:760px;line-height:1.55}
+.hero .pill{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.06em;
+  text-transform:uppercase;color:#1d4ed8;background:#e5edff;border:1px solid #cddcff;
+  padding:5px 12px;border-radius:99px;margin-bottom:14px}
+
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0 20px;align-items:center}
+.tab{border:1px solid #e2e8f0;background:#fff;color:#475569;padding:10px 17px;
+  border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;
+  transition:all .18s ease;font-family:inherit}
+.tab:hover{border-color:#bfdbfe;color:#1d4ed8;transform:translateY(-1px)}
+.tab.active{background:linear-gradient(135deg,#2563eb,#0ea5e9);color:#fff;border-color:transparent;
+  box-shadow:0 10px 22px -10px rgba(37,99,235,.85)}
+
+.copy-tab{
+  display:inline-flex;align-items:center;gap:8px;
+  padding:10px 18px;border:none;border-radius:999px;cursor:pointer;
+  background:linear-gradient(135deg,#0f766e,#14b8a6);color:#fff;
+  font-size:14px;font-weight:600;font-family:inherit;letter-spacing:-.1px;
+  box-shadow:0 10px 22px -10px rgba(20,184,166,.85);
+  transition:transform .15s ease, box-shadow .15s ease, background .25s ease;
+  white-space:nowrap;
+}
+.copy-tab:hover{transform:translateY(-1px);box-shadow:0 14px 26px -10px rgba(20,184,166,.95)}
+.copy-tab:active{transform:translateY(0)}
+.copy-tab.ok{background:linear-gradient(135deg,#16a34a,#22c55e);
+  box-shadow:0 10px 22px -10px rgba(22,163,74,.85)}
+
+.panel{display:none}
+.panel.active{display:block;animation:fade .28s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.grid{display:grid;grid-template-columns:1fr 350px;gap:22px;align-items:start}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 18px 40px -30px rgba(16,24,40,.35)}
+.card h2{margin:0 0 6px;font-size:17px;letter-spacing:-.2px}
+.card .hint{margin:0 0 16px;color:var(--muted);font-size:13px;line-height:1.55}
+
+.toast{
+  position:fixed;left:50%;bottom:32px;transform:translateX(-50%) translateY(20px);
+  background:#0f172a;color:#fff;padding:13px 22px;border-radius:12px;
+  font-size:14px;font-weight:600;letter-spacing:-.1px;
+  box-shadow:0 20px 40px -12px rgba(15,23,42,.7);
+  opacity:0;pointer-events:none;transition:opacity .25s ease, transform .25s ease;
+  z-index:10000;max-width:90vw;text-align:center;
+}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border:1px solid var(--line);
+  border-radius:12px;margin-bottom:8px;cursor:pointer;transition:all .15s ease;background:#fbfcfe}
+.check:hover{border-color:#bfdbfe;background:#f5f9ff}
+.check input{width:18px;height:18px;margin:2px 0 0;accent-color:#2563eb;cursor:pointer;flex:none}
+.check-body{display:flex;flex-direction:column;gap:3px;flex:1}
+.ct{font-size:14px;font-weight:600;color:#1e293b;line-height:1.4}
+.ct-only{font-size:14px;line-height:1.4;flex:1}
+.cd{font-size:12px;color:#64748b;line-height:1.5}
+.check.on{border-color:#93c5fd;background:#eff6ff;box-shadow:inset 3px 0 0 #2563eb}
+.check .pts{margin-left:auto;font-size:12px;font-weight:700;color:#2563eb;flex:none;
+  background:#e8f0ff;border-radius:99px;padding:2px 9px;align-self:center}
+
+.radio-group{display:flex;flex-wrap:wrap;gap:8px}
+.radio-group.cols-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.radio-group.asa-cols{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  grid-template-rows:repeat(3,auto);
+  grid-auto-flow:column;
+  gap:8px;
+}
+.radio-group.surg-cols{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  grid-template-rows:repeat(7,auto);
+  grid-auto-flow:column;
+  gap:8px;
+}
+.radio-group.surg-cols .radio-opt{font-size:12.5px;padding:9px 11px;line-height:1.3}
+
+@media(max-width:760px){
+  .radio-group.surg-cols{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(11,auto)}
+}
+@media(max-width:520px){
+  .radio-group.cols-2,.radio-group.asa-cols,.radio-group.surg-cols{
+    grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row;
+  }
+}
+
+.radio-opt{display:flex;align-items:center;gap:9px;padding:10px 14px;border:1px solid var(--line);
+  border-radius:11px;cursor:pointer;font-size:13.5px;line-height:1.35;
+  background:#fbfcfe;transition:all .15s ease;color:#334155;position:relative}
+.radio-opt:hover{border-color:#bfdbfe;background:#f5f9ff}
+.radio-opt input{accent-color:#2563eb;width:16px;height:16px;margin:0;cursor:pointer;flex:none}
+.radio-opt.on{border-color:#93c5fd;background:#eff6ff;box-shadow:inset 3px 0 0 #2563eb;
+  font-weight:600;color:#1d4ed8}
+
+.has-tip::after{
+  content:'ⓘ';
+  position:absolute;top:6px;right:8px;
+  font-size:11px;color:#94a3b8;font-weight:700;
+  pointer-events:none;transition:color .15s;
+}
+.has-tip:hover::after{color:#2563eb}
+
+.tip{
+  position:fixed;z-index:9999;max-width:340px;
+  padding:12px 15px;background:#0f172a;color:#e2e8f0;
+  border-radius:12px;font-size:12.5px;line-height:1.55;font-weight:400;
+  box-shadow:0 20px 40px -12px rgba(15,23,42,.7);
+  border:1px solid rgba(255,255,255,.08);
+  pointer-events:none;opacity:0;transform:translateY(-4px);
+  transition:opacity .15s ease, transform .15s ease;
+}
+.tip.on{opacity:1;transform:translateY(0)}
+.tip b{color:#fff;font-weight:700}
+
+.field{margin-bottom:15px}
+.field>label{display:block;font-size:13px;font-weight:600;color:#475569;margin-bottom:7px}
+.field input[type=number],.field select{
+  width:100%;padding:11px 13px;border:1px solid #dbe3ef;border-radius:11px;font-size:14px;
+  background:#fff;color:var(--ink);outline:none;transition:all .15s;font-family:inherit}
+.field input[type=number]::placeholder{color:#b5c0d0}
+.field input[type=number]:focus,.field select:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+
+.result{position:sticky;top:20px;border-radius:18px;padding:24px;
+  background:linear-gradient(165deg,#0f172a 0%,#1e293b 100%);
+  color:#fff;box-shadow:0 28px 50px -30px rgba(15,23,42,.9);
+  border:1px solid rgba(255,255,255,.06)}
+@media(max-width:900px){.result{position:static}}
+.result .rl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;font-weight:800}
+.result .big{font-size:50px;font-weight:800;line-height:1;margin:12px 0 6px;letter-spacing:-2px}
+.result .sub{color:#cbd5e1;font-size:14px;line-height:1.4}
+.badge{display:inline-block;padding:7px 14px;border-radius:99px;font-size:13px;font-weight:700;margin-top:14px}
+.meter{height:8px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden;margin-top:18px}
+.meter i{display:block;height:100%;border-radius:99px;transition:width .4s ease, background .4s ease}
+.facts{list-style:none;padding:16px 0 0;margin:18px 0 0;border-top:1px solid rgba(255,255,255,.12)}
+.facts li{display:flex;justify-content:space-between;gap:12px;font-size:13px;color:#94a3b8;padding:6px 0}
+.facts li b{color:#fff;font-weight:600;text-align:right}
+.rec{margin-top:16px;padding:13px 15px;border-radius:13px;
+  background:rgba(37,99,235,.18);border:1px solid rgba(96,165,250,.45);
+  font-size:13px;line-height:1.5;color:#dbeafe}
+.rec b{color:#fff}
+
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px}
+.sumcard{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;
+  box-shadow:0 1px 2px rgba(16,24,40,.04), 0 16px 34px -28px rgba(16,24,40,.4)}
+.sumname{font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#94a3b8}
+.sumval{font-size:29px;font-weight:800;margin:8px 0 4px;letter-spacing:-1px}
+.sumsub{font-size:13px;color:var(--muted);line-height:1.45;min-height:36px}
+.summeter{height:6px;border-radius:99px;background:#eef2f8;overflow:hidden;margin-top:12px}
+.summeter i{display:block;height:100%;border-radius:99px;transition:width .4s ease}
+
+.note{margin-top:22px;font-size:12.5px;color:#8593a8;line-height:1.6;
+  background:#fff;border:1px dashed #dde5f0;border-radius:14px;padding:16px 18px}
+.note b{color:#475569}
+
+.foot{margin-top:38px;padding-top:22px;border-top:1px solid #e3eaf4;
+  text-align:center;color:#8593a8;font-size:12.5px;line-height:1.7}
+.foot .name{font-weight:700;color:#475569}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="pill">Периоперационная оценка</div>
+    <h1>Калькулятор операционного риска</h1>
+    <p>Шесть валидированных шкал для оценки кардиального и почечного риска при несердечных
+       оперативных вмешательствах: RCRI, DASI, Gupta MICA (NSQIP), AUB-HAS2, VSG-CRI и SPARK.</p>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-panel="p-gupta">Gupta MICA</button>
+    <button class="tab" data-panel="p-has2">AUB-HAS2</button>
+    <button class="tab" data-panel="p-dasi">DASI</button>
+    <button class="tab" data-panel="p-rcri">RCRI</button>
+       <button class="tab" data-panel="p-vsg">VSG-CRI</button>
+    <button class="tab" data-panel="p-spark">SPARK · ОПП</button>
+    <button class="tab" data-panel="p-sum">Сводка</button>
+    <button class="copy-tab" id="copy-btn" type="button">
+      <span id="copy-icon">📋</span><span id="copy-label">Копировать результат</span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ================= RCRI ================= -->
+    <section class="panel" id="p-rcri">
+      <div class="grid">
+        <div class="card">
+          <h2>Индекс RCRI*</h2>
+          <p class="hint">Revised Cardiac Risk Index. Отметьте все имеющиеся у пациента факторы.
+             Каждый критерий — 1 балл.</p>
+          <div id="rcri-list"></div>
+        </div>
+        <div class="result" id="rcri-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= DASI ================= -->
+    <section class="panel" id="p-dasi">
+      <div class="grid">
+        <div class="card">
+          <h2>DASI — Duke Activity Status Index</h2>
+          <p class="hint">Отметьте виды активности, которые пациент <b>способен выполнить</b> в настоящее время.
+             Сумма весов → индекс DASI → пиковое VO₂ и METs.</p>
+          <div id="dasi-list"></div>
+        </div>
+        <div class="result" id="dasi-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= GUPTA MICA ================= -->
+    <section class="panel active" id="p-gupta">
+      <div class="grid">
+        <div class="card">
+          <h2>Gupta MICA — NSQIP</h2>
+          <p class="hint">Вероятность инфаркта миокарда или остановки сердца в течение 30 дней
+             после несердечной операции (модель NSQIP MICA).</p>
+
+          <div class="field">
+            <label for="g-age">Возраст, лет</label>
+            <input type="number" id="g-age" value="" placeholder="Введите возраст" min="18" max="120" step="1">
+          </div>
+
+          <div class="field">
+            <label>Функциональный статус</label>
+            <div class="radio-group" id="g-fs"></div>
+          </div>
+
+          <div class="field">
+            <label>Класс ASA <span style="color:#94a3b8;font-weight:400">(наведите курсор — расшифровка)</span></label>
+            <div class="radio-group asa-cols" id="g-asa"></div>
+          </div>
+
+          <div class="field">
+            <label>Креатинин</label>
+            <div class="radio-group" id="g-cr"></div>
+          </div>
+
+          <div class="field">
+            <label>Тип оперативного вмешательства</label>
+            <div class="radio-group surg-cols" id="g-surg"></div>
+          </div>
+        </div>
+        <div class="result" id="gupta-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= AUB-HAS2 ================= -->
+    <section class="panel" id="p-has2">
+      <div class="grid">
+        <div class="card">
+          <h2>Индекс AUB-HAS2</h2>
+          <p class="hint">The American University of Beirut (AUB)-HAS2 Cardiovascular Risk Index.</p>
+
+          <div class="row2">
+            <div class="field">
+              <label for="h-age">Возраст, лет</label>
+              <input type="number" id="h-age" value="" placeholder="Возраст" min="18" max="120" step="1">
+            </div>
+            <div class="field">
+              <label for="h-hgb">Гемоглобин, г/л</label>
+              <input type="number" id="h-hgb" value="" placeholder="Гемоглобин" min="30" max="220" step="1">
+            </div>
+          </div>
+
+          <div id="has2-list"></div>
+
+          <div class="field">
+            <label>Хирургия:</label>
+            <div class="radio-group cols-2" id="h-surg"></div>
+          </div>
+        </div>
+        <div class="result" id="has2-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= VSG-CRI ================= -->
+    <section class="panel" id="p-vsg">
+      <div class="grid">
+        <div class="card">
+          <h2>Оценка сердечного риска некоронарной сосудистой хирургии</h2>
+          <p class="hint">Vascular Study Group Cardiac Risk Index (VSG-CRI).</p>
+
+          <div class="row2">
+            <div class="field">
+              <label for="v-age">Возраст, лет</label>
+              <input type="number" id="v-age" value="" placeholder="Возраст" min="18" max="120" step="1">
+            </div>
+            <div class="field">
+              <label for="v-cr">Креатинин, мкмоль/л</label>
+              <input type="number" id="v-cr" value="" placeholder="Креатинин" min="20" max="1200" step="1">
+            </div>
+          </div>
+
+          <div id="vsg-list"></div>
+        </div>
+        <div class="result" id="vsg-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= SPARK ================= -->
+    <section class="panel" id="p-spark">
+      <div class="grid">
+        <div class="card">
+          <h2>SPARK — Simple Postoperative AKI Risk</h2>
+          <p class="hint">Оценка риска острого почечного повреждения (ОПП) после несердечных
+             оперативных вмешательств.</p>
+
+          <div class="row2">
+            <div class="field">
+              <label for="s-sex">Пол</label>
+              <select id="s-sex">
+                <option value="" selected disabled>— выберите —</option>
+                <option value="0">Мужской</option>
+                <option value="1">Женский</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="s-age">Возраст, лет</label>
+              <input type="number" id="s-age" value="" placeholder="Возраст" min="18" max="120" step="1">
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label for="s-egfr">рСКФ, мл/мин/1,73 м²</label>
+              <input type="number" id="s-egfr" value="" placeholder="рСКФ" min="1" max="200" step="1">
+            </div>
+            <div class="field">
+              <label for="s-dur">Длительность операции, ч</label>
+              <input type="number" id="s-dur" value="" placeholder="Часы" min="0" max="24" step="0.5">
+            </div>
+          </div>
+
+          <div id="spark-list"></div>
+        </div>
+        <div class="result" id="spark-res"></div>
+      </div>
+    </section>
+
+    <!-- ================= SUMMARY ================= -->
+    <section class="panel" id="p-sum">
+      <div class="card" style="margin-bottom:20px">
+        <h2>Сводная оценка риска</h2>
+        <p class="hint" style="margin-bottom:0">Все шкалы рассчитываются одновременно по мере ввода данных.
+           Кнопка «Копировать результат» — в верхней панели рядом с вкладкой «Сводка».</p>
+      </div>
+      <div class="sum-grid" id="sum-grid"></div>
+      <div class="note">
+        <b>Важно.</b> Калькулятор предназначен для образовательных и вспомогательных целей
+        и не заменяет клиническое суждение. Все коэффициенты и пороговые значения перенесены
+        из исходного файла <i>операция.xlsx</i>; интерпретация результатов должна проводиться
+        лечащим врачом с учётом индивидуальных особенностей пациента.
+      </div>
+    </section>
+
+  </main>
+
+ 
+</div>
+
+<div class="tip" id="tip"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   ДАННЫЕ
+   ========================================================= */
+
+const RCRI_ITEMS = [
+  {t:'Хирургия высокого риска',
+   d:'Грудная клетка, брюшная полость, сосуды выше паха'},
+  {t:'Коронарная болезнь',
+   d:'Перенесённый ранее ИМ, клиника стенокардии, приём нитроглицерина, патологический зубец Q на ЭКГ, положительный нагрузочный тест. ВАЖНО! Если после АКШ или ЧКВ нет клиники стенокардии, пациент учитывается как не имеющий ИБС.'},
+  {t:'Сердечная недостаточность',
+   d:'Анамнез сердечной недостаточности, отёка лёгких, приступы сердечной астмы в анамнезе, ритм галопа, двусторонние хрипы в лёгких, застой в малом круге кровообращения при рентгенологическом исследовании.'},
+  {t:'ТИА, инсульт',
+   d:'Перенесённые ранее транзиторная ишемическая атака (ТИА) или инсульт.'},
+  {t:'Сахарный диабет'},
+  {t:'Креатинин более 177 мкмоль/л'}
+];
+
+const DASI_ITEMS = [
+  {t:'Самообслуживание (еда, одевание, купание, посещение туалета)', w:2.75},
+  {t:'Ходьба по дому', w:1.75},
+  {t:'Ходьба по ровной местности 1–2 квартала', w:2.75},
+  {t:'Подъём по лестнице или в гору', w:5.50},
+  {t:'Бег на короткую дистанцию', w:8.00},
+  {t:'Лёгкая работа по дому (протереть пыль, помыть посуду)', w:2.70},
+  {t:'Умеренная работа по дому (пылесос, перенос продуктов)', w:3.50},
+  {t:'Тяжёлая работа по дому (мытьё полов, подъём тяжестей)', w:8.00},
+  {t:'Работа в саду / огороде (грабли, прополка, косилка)', w:4.50},
+  {t:'Сексуальная активность', w:5.25},
+  {t:'Умеренные рекреационные нагрузки (гольф, боулинг, танцы, парный теннис)', w:6.00},
+  {t:'Интенсивные виды спорта (плавание, одиночный теннис, лыжи)', w:7.50}
+];
+
+const HAS2_ITEMS = [
+  {t:'Сердечные заболевания в анамнезе',
+   d:'Перенесённый ИМ, сердечная недостаточность, коронарная ангиопластика, кардиохирургия, фибрилляция предсердий или заболевание клапанов средней/тяжёлой степени, подтверждённые Эхо-КГ.'},
+  {t:'Стенокардия или одышка'},
+  {t:'Сосудистая хирургия'}
+];
+
+const VSG_ITEMS = [
+  {t:'Коронарная болезнь', w:2,
+   d:'Перенесённый ранее ИМ, клиника стенокардии, приём нитроглицерина, патологический зубец Q на ЭКГ, положительный нагрузочный тест.'},
+  {t:'Застойная сердечная недостаточность', w:2,
+   d:'Анамнез сердечной недостаточности, отёка лёгких, ритм галопа, двусторонние хрипы в лёгких, приступы сердечной астмы в анамнезе, застой в малом круге кровообращения при рентгенологическом исследовании.'},
+  {t:'Хроническая обструктивная болезнь лёгких', w:2},
+  {t:'Курение', w:1},
+  {t:'Инсулинозависимый сахарный диабет', w:1},
+  {t:'Длительный приём β-блокаторов', w:1},
+  {t:'АКШ или ЧКВ в анамнезе', w:-1}
+];
+
+const SPARK_ITEMS = [
+  {t:'Экстренное вмешательство', w:6},
+  {t:'Сахарный диабет', w:7},
+  {t:'Хроническая сердечная недостаточность', w:4},
+  {t:'ХОБЛ', w:6},
+  {t:'Анемия', w:8},
+  {t:'Артериальная гипертензия', w:4},
+  {t:'Протеинурия / альбуминурия', w:3}
+];
+
+const GUPTA_FS = [
+  {t:'Независимый',          v:0},
+  {t:'Частично зависимый',   v:0.6496},
+  {t:'Полностью зависимый',  v:1.0269}
+];
+
+const GUPTA_ASA = [
+  {t:'ASA I — здоровый пациент', v:-5.1735,
+   tip:'<b>ASA I.</b> Здоровый, некурящий, не употребляющий или минимально употребляющий алкоголь пациент.'},
+  {t:'ASA II — лёгкая болезнь', v:-3.2895,
+   tip:'<b>ASA II.</b> Незначительные заболевания без существенных функциональных отклонений. Пациент курит, алкоголь употребляет умеренно. Ожирение (30 < ИМТ < 40 кг/м²). Хорошо контролируемые сахарный диабет / артериальная гипертензия. Незначительное лёгочное заболевание.'},
+  {t:'ASA III — тяжёлая болезнь', v:-1.9227,
+   tip:'<b>ASA III.</b> Значительные функциональные ограничения. Одно или несколько заболеваний от средней до тяжёлой степени. Нелеченые сахарный диабет или артериальная гипертензия, ХОБЛ, морбидное ожирение (ИМТ ≥ 40 кг/м²), активный гепатит, алкогольная зависимость или злоупотребление алкоголем, имплантированный кардиостимулятор, умеренное снижение фракции выброса, терминальная почечная недостаточность с регулярно проводимым плановым диализом, наличие в анамнезе (> 3 мес) инфаркта миокарда или коронарного стентирования, инсульта, транзиторной ишемической атаки.'},
+  {t:'ASA IV — болезнь с угрозой жизни', v:-0.9527,
+   tip:'<b>ASA IV.</b> Недавние (< 3 мес) инфаркт миокарда или коронарное стентирование, инсульт, транзиторная ишемическая атака, сохраняющаяся ишемия миокарда или тяжёлая дисфункция клапанов сердца, значительное снижение фракции выброса, шок, сепсис, синдром диссеминированного внутрисосудистого свёртывания, респираторный дистресс-синдром или терминальная почечная недостаточность с нерегулярным диализом.'},
+  {t:'ASA V — не выжить без операции', v:0,
+   tip:'<b>ASA V.</b> Разрыв брюшной / грудной аневризмы, политравма, интракраниальное кровоизлияние со смещением структур головного мозга, ишемия кишечника при сопутствующей выраженной кардиальной патологии или мультиорганной / системной дисфункции.'}
+];
+
+const GUPTA_CR = [
+  {t:'Нормальный (< 133 мкмоль/л)',  v:0},
+  {t:'Аномальный (≥ 133 мкмоль/л)',  v:0.612},
+  {t:'Отсутствует',                  v:-0.952}
+];
+
+const GUPTA_SURG = [
+  ['Аорта', 1.6],
+  ['Бариатрия', -0.25],
+  ['Вены', -1.09],
+  ['Гепато-панкреато-билиарная область', 1.39],
+  ['Грудная клетка', 0.4],
+  ['Грыжи (вентральные, паховые, бедренные)', 0],
+  ['Другие области живота', 1.13],
+  ['Желчный пузырь, надпочечники, селезёнка, аппендикс', 0.59],
+  ['Женские органы', 0.76],
+  ['Кишечник', 1.14],
+  ['Кожа', 0.54],
+  ['ЛОР', 0.71],
+  ['Мозг', 1.4],
+  ['Молочная железа', -1.61],
+  ['Ортопедия', 0.8],
+  ['Периферические сосуды', 0.86],
+  ['Прямая кишка', -0.16],
+  ['Сердце', 1.01],
+  ['Спина', 0.21],
+  ['Урология', -0.26],
+  ['Шея (щитовидная, паращитовидные железы)', 0.18]
+];
+
+/* =========================================================
+   СОСТОЯНИЕ
+   ========================================================= */
+const S = {
+  rcri:  new Array(RCRI_ITEMS.length).fill(false),
+  dasi:  new Array(DASI_ITEMS.length).fill(false),
+  has2:  new Array(HAS2_ITEMS.length).fill(false),
+  vsg:   new Array(VSG_ITEMS.length).fill(false),
+  spark: new Array(SPARK_ITEMS.length).fill(false)
+};
+const R = {};
+const COL = ['#22c55e', '#f59e0b', '#ef4444'];
+const COL_GRAY = '#94a3b8';
+const $ = id => document.getElementById(id);
+
+/* =========================================================
+   TOOLTIP
+   ========================================================= */
+const tipEl = document.getElementById('tip');
+let currentTipTarget = null;
+
+function positionTip(target) {
+  if (!tipEl.classList.contains('on')) return;
+  const rect = target.getBoundingClientRect();
+  const tw = tipEl.offsetWidth;
+  const th = tipEl.offsetHeight;
+  const pad = 10;
+  let left = rect.left + rect.width / 2 - tw / 2;
+  if (left < pad) left = pad;
+  if (left + tw > window.innerWidth - pad) left = window.innerWidth - tw - pad;
+  let top = rect.top - th - 8;
+  if (top < pad) top = rect.bottom + 8;
+  tipEl.style.left = left + 'px';
+  tipEl.style.top  = top + 'px';
+}
+function showTip(target, html) {
+  tipEl.innerHTML = html;
+  tipEl.classList.add('on');
+  currentTipTarget = target;
+  requestAnimationFrame(() => positionTip(target));
+}
+function hideTip() { tipEl.classList.remove('on'); currentTipTarget = null; }
+function attachTip(el, html) {
+  el.classList.add('has-tip');
+  el.addEventListener('mouseenter', () => showTip(el, html));
+  el.addEventListener('mouseleave', hideTip);
+  el.addEventListener('focus',      () => showTip(el, html));
+  el.addEventListener('blur',       hideTip);
+}
+window.addEventListener('scroll', () => { if (currentTipTarget) positionTip(currentTipTarget); }, true);
+window.addEventListener('resize', () => { if (currentTipTarget) positionTip(currentTipTarget); });
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+let toastTimer = null;
+function showToast(msg){
+  const t = $('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+/* =========================================================
+   ПОСТРОЕНИЕ ИНТЕРФЕЙСА
+   ========================================================= */
+function buildCheckList(containerId, items, stateArr, withPoints) {
+  const box = $(containerId);
+  box.innerHTML = '';
+  items.forEach((it, i) => {
+    const text = (typeof it === 'object') ? it.t : it;
+    const desc = (typeof it === 'object') ? (it.d || '') : '';
+    let ptsText = '';
+    if (withPoints && typeof it === 'object' && it.w !== undefined) {
+      ptsText = (it.w > 0 ? '+' : '−') + Math.abs(it.w).toFixed(it.w % 1 === 0 ? 0 : 2);
+    }
+    const label = document.createElement('label');
+    label.className = 'check';
+    let inner = `<input type="checkbox">`;
+    if (desc) {
+      inner += `<div class="check-body"><span class="ct">${text}</span><span class="cd">${desc}</span></div>`;
+    } else {
+      inner += `<span class="ct-only">${text}</span>`;
+    }
+    if (ptsText) inner += `<span class="pts">${ptsText}</span>`;
+    label.innerHTML = inner;
+    const cb = label.querySelector('input');
+    cb.checked = stateArr[i];
+    label.classList.toggle('on', cb.checked);
+    cb.addEventListener('change', () => {
+      stateArr[i] = cb.checked;
+      label.classList.toggle('on', cb.checked);
+      recalc();
+    });
+    box.appendChild(label);
+  });
+}
+
+function buildRadioGroup(containerId, name, options, withTips) {
+  const box = $(containerId);
+  box.innerHTML = '';
+  options.forEach(o => {
+    const label = document.createElement('label');
+    label.className = 'radio-opt';
+    label.innerHTML = `<input type="radio" name="${name}" value="${o.v}"><span>${o.t}</span>`;
+    box.appendChild(label);
+    if (withTips && o.tip) attachTip(label, o.tip);
+  });
+  box.addEventListener('change', () => {
+    box.querySelectorAll('.radio-opt').forEach(l =>
+      l.classList.toggle('on', l.querySelector('input').checked));
+    recalc();
+  });
+}
+
+function radioVal(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? parseFloat(el.value) : null;
+}
+function radioText(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.parentElement.querySelector('span').textContent : '— не выбрано —';
+}
+
+/* =========================================================
+   РАСЧЁТЫ
+   ========================================================= */
+
+function calcRCRI() {
+  const s = S.rcri.filter(Boolean).length;
+  let cat, pct, lvl;
+  if (s >= 3)      { cat = 'ОЧЕНЬ ВЫСОКИЙ'; pct = '11 %';  lvl = 2; }
+  else if (s === 2){ cat = 'ВЫСОКИЙ';       pct = '6,6 %'; lvl = 2; }
+  else if (s === 1){ cat = 'СРЕДНИЙ';       pct = '0,9 %'; lvl = 1; }
+  else             { cat = 'НИЗКИЙ';        pct = '0,4 %'; lvl = 0; }
+  const test = s >= 2 ? 'показан' : 'не нужен';
+  return {
+    key:'rcri', label:'RCRI', display:`${s} балл.`, value:s, level:lvl,
+    sub:`Риск: ${cat.toLowerCase()}`,
+    badge:`Сердечные события ≈ ${pct}`,
+    color:COL[lvl], pct:(s / 6) * 100,
+    facts:[
+      ['RCRI, баллы', String(s)],
+      ['Риск', cat],
+      ['Сердечные события', pct],
+      ['Функциональный тест', test]
+    ]
+  };
+}
+
+function calcDASI() {
+  const cnt = S.dasi.filter(Boolean).length;
+
+  if (cnt === 0) {
+    return {
+      key:'dasi', label:'DASI', display:'—', value:0, level:0, empty:true,
+      mets: null,
+      sub:'Не заполнено',
+      badge:'Отметьте выполнимые виды активности',
+      color:COL_GRAY, pct:0,
+      facts:[
+        ['Индекс DASI', '—'],
+        ['Пиковое VO₂', '—'],
+        ['МЕТs', '—'],
+        ['Класс', '—'],
+        ['Выполнимых пунктов', '0 из 12']
+      ]
+    };
+  }
+
+  const score = DASI_ITEMS.reduce((a, it, i) => a + (S.dasi[i] ? it.w : 0), 0);
+  const vo2   = 0.43 * score + 9.6;
+  const mets  = vo2 / 3.5;
+
+  let cls, lvl;
+  if (mets < 4)       { cls = 'Неудовлетворительный'; lvl = 2; }
+  else if (mets < 7)  { cls = 'Умеренный';            lvl = 1; }
+  else if (mets <= 10){ cls = 'Хороший';              lvl = 0; }
+  else                { cls = 'Отличный';             lvl = 0; }
+
+  return {
+    key:'dasi', label:'DASI', display:`${score.toFixed(1)}`, value:score, level:lvl, empty:false,
+    mets: mets,
+    sub:`Функциональный статус: ${cls.toLowerCase()}`,
+    badge:`VO₂max ${vo2.toFixed(1)} мл/кг/мин · ${mets.toFixed(1)} МЕТ`,
+    color:COL[lvl], pct:(score / 58.2) * 100,
+    facts:[
+      ['Индекс DASI', score.toFixed(1) + ' из 58,2'],
+      ['Пиковое VO₂', vo2.toFixed(1) + ' мл/кг/мин'],
+      ['МЕТs', mets.toFixed(1)],
+      ['Класс', cls],
+      ['Выполнимых пунктов', `${cnt} из 12`]
+    ]
+  };
+}
+
+function calcGupta() {
+  const age  = num('g-age');
+  const fs   = radioVal('g-fs');
+  const asa  = radioVal('g-asa');
+  const cr   = radioVal('g-cr');
+  const surg = radioVal('g-surg');
+
+  const hasAll = (age !== null && fs !== null && asa !== null && cr !== null && surg !== null);
+  const logit = hasAll ? age * 0.0198 + fs + asa + cr + surg - 5.2529 : null;
+  const risk  = logit !== null ? 1 / (1 + Math.pow(Math.E, -logit)) : null;
+  const pct   = risk !== null ? risk * 100 : null;
+
+  let lvl = 0, cat = '—';
+  if (pct !== null) {
+    if (pct < 1)      { lvl = 0; cat = 'Низкий'; }
+    else if (pct < 2)   { lvl = 1; cat = 'Умеренный'; }
+    else                { lvl = 2; cat = 'Высокий'; }
+  }
+  const recommend = (pct !== null && pct >= 1)
+    ? 'Оцените функциональный статус (индекс DASI)' : '';
+
+  return {
+    key:'gupta', label:'Gupta MICA',
+    display: pct !== null ? pct.toFixed(2).replace('.', ',') + ' %' : '—',
+    value: pct,
+    level: lvl,
+    cat,
+    complete: hasAll,
+    sub: 'Вероятность ИМ или остановки сердца за 30 дней',
+    badge: pct !== null ? `Риск: ${cat}` : 'Заполните все поля',
+    recommend, color: COL[lvl],
+    pct: pct !== null ? Math.min(100, pct * 8) : 0,
+    facts: [
+      ['Возраст', age !== null ? age + ' лет' : '— не указан —'],
+      ['Функциональный статус', radioText('g-fs')],
+      ['Класс ASA', radioText('g-asa')],
+      ['Креатинин', radioText('g-cr')],
+      ['Тип операции', radioText('g-surg')],
+      ['Риск MICA (30 дней)', pct !== null ? pct.toFixed(2).replace('.', ',') + ' %' : '—']
+    ]
+  };
+}
+
+function calcHAS2() {
+  const age = num('h-age');
+  const hgb = num('h-hgb');
+  const surgVal = radioVal('h-surg');
+
+  const complete = (age !== null && hgb !== null && surgVal !== null);
+
+  let score = 0;
+  if (age !== null && age >= 75) score += 1;
+  if (hgb !== null && hgb < 120) score += 1;
+  if (S.has2[0]) score += 1;
+  if (S.has2[1]) score += 1;
+  if (S.has2[2]) score += 1;
+  if (surgVal === 0) score += 1;
+
+  let pct;
+  if (score === 0)      pct = '0,3 %';
+  else if (score === 1) pct = '1,6 %';
+  else if (score === 2) pct = '5,6 %';
+  else if (score === 3) pct = '11 %';
+  else                  pct = '17,5 %';
+
+  const cat = score < 2 ? 'Низкий' : (score < 4 ? 'Промежуточный' : 'Высокий');
+  const lvl = score < 2 ? 0 : (score < 4 ? 1 : 2);
+  const recommend = score > 1 ? 'Оцените функциональный статус (индекс DASI)' : '';
+
+  return {
+    key:'has2', label:'AUB-HAS2', display:`${score} балл.`, value:score, level:lvl,
+    cat, complete,
+    sub: complete ? `Риск: ${cat.toLowerCase()}` : 'Заполните все поля',
+    badge:`30-дневные события ≈ ${pct}`,
+    recommend, color:COL[lvl], pct:(score / 6) * 100,
+    facts:[
+      ['Возраст', age !== null ? age + ' лет' + (age >= 75 ? ' (≥ 75: +1)' : '') : '— не указан —'],
+      ['Гемоглобин', hgb !== null ? hgb + ' г/л' + (hgb < 120 ? ' (< 120: +1)' : '') : '— не указан —'],
+      ['Хирургия', radioText('h-surg')],
+      ['AUB-HAS2, баллы', String(score)],
+      ['Категория', cat],
+      ['Смерть / ИМ / инсульт 30 дн.', pct]
+    ]
+  };
+}
+
+function calcVSG() {
+  const age = num('v-age');
+  const cr  = num('v-cr');
+  let score = 0;
+
+  if (age !== null) {
+    if (age < 70)        score += 2;
+    else if (age < 80)   score += 3;
+    else                 score += 4;
+  }
+  if (cr !== null && cr > 159) score += 2;
+
+  VSG_ITEMS.forEach((it, i) => { if (S.vsg[i]) score += it.w; });
+
+  let cat, pct, lvl;
+  if (score <= 3)      { cat = 'Низкий';      pct = '2,6 %';  lvl = 0; }
+  else if (score === 4){ cat = 'Умеренный';   pct = '3,5 %';  lvl = 1; }
+  else if (score === 5){ cat = 'Умеренный';   pct = '6,0 %';  lvl = 1; }
+  else if (score === 6){ cat = 'Умеренный';   pct = '6,6 %';  lvl = 1; }
+  else if (score === 7){ cat = 'Высокий';     pct = '8,9 %';  lvl = 2; }
+  else                 { cat = 'Высокий';     pct = '14,3 %'; lvl = 2; }
+
+  return {
+    key:'vsg', label:'VSG-CRI', display:`${score} балл.`, value:score, level:lvl, cat,
+    sub:`Риск ${cat.toLowerCase()} (${pct})`,
+    badge:`MACE ≈ ${pct}`,
+    color:COL[lvl], pct:Math.max(3, Math.min(100, (score / 14) * 100)),
+    facts:[
+      ['Возраст', age !== null ? age + ' лет' : '— не указан —'],
+      ['Креатинин', cr !== null ? cr + ' мкмоль/л' + (cr > 159 ? ' (> 159: +2)' : '') : '— не указан —'],
+      ['Сумма баллов', String(score)],
+      ['Категория', cat],
+      ['Основные кардиальные события', pct]
+    ]
+  };
+}
+
+function calcSPARK() {
+  const sex  = $('s-sex').value === '' ? null : parseInt($('s-sex').value, 10);
+  const age  = num('s-age');
+  const egfr = num('s-egfr');
+  const dur  = num('s-dur');
+
+  let score = 0;
+  const parts = [];
+
+  if (sex === 1) { score += 8; parts.push(['Женский пол', '+8']); }
+  else if (sex === 0) parts.push(['Мужской пол', '0']);
+  else parts.push(['Пол', '— не указан —']);
+
+  if (age !== null) {
+    let aPts = 0;
+    if (age >= 80) aPts = 13;
+    else if (age >= 60) aPts = 9;
+    else if (age >= 40) aPts = 6;
+    score += aPts;
+    parts.push(['Возраст ' + age + ' лет', '+' + aPts]);
+  } else parts.push(['Возраст', '— не указан —']);
+
+  if (egfr !== null) {
+    let ePts = 0;
+    if (egfr < 30) ePts = 22;
+    else if (egfr < 45) ePts = 15;
+    else if (egfr < 60) ePts = 8;
+    score += ePts;
+    parts.push(['рСКФ ' + egfr + ' мл/мин', '+' + ePts]);
+  } else parts.push(['рСКФ', '— не указана —']);
+
+  if (dur !== null) {
+    const dPts = dur * 5;
+    score += dPts;
+    parts.push(['Длительность ' + dur + ' ч', '+' + dPts.toFixed(0)]);
+  } else parts.push(['Длительность операции', '— не указана —']);
+
+  SPARK_ITEMS.forEach((it, i) => {
+    if (S.spark[i]) { score += it.w; parts.push([it.t, '+' + it.w]); }
+  });
+
+  let cls, sub, lvl;
+  if (score < 20)      { cls = 'Класс A'; sub = 'риск ОПП < 2 %, критического ОПП < 2 %'; lvl = 0; }
+  else if (score <= 39){ cls = 'Класс B'; sub = 'риск ОПП ≥ 2 %, критического ОПП < 2 %'; lvl = 1; }
+  else if (score <= 59){ cls = 'Класс C'; sub = 'риск ОПП ≥ 10 %, критического ОПП ≥ 2 %'; lvl = 2; }
+  else                 { cls = 'Класс D'; sub = 'риск ОПП ≥ 20 %, критического ОПП ≥ 10 %'; lvl = 2; }
+
+  return {
+    key:'spark', label:'SPARK', display:`${score.toFixed(0)} балл.`, value:score, level:lvl,
+    sub:`${cls} — ${sub}`,
+    badge:`Острый почечный риск: ${cls}`,
+    color:COL[lvl], pct:Math.min(100, (score / 100) * 100),
+    facts:parts.map(([k, v]) => [k, v])
+  };
+}
+
+/* =========================================================
+   РЕНДЕР
+   ========================================================= */
+function resultHTML(r) {
+  return `
+    <div class="rl">${r.label}</div>
+    <div class="big" style="color:${r.color}">${r.display}</div>
+    <div class="sub">${r.sub}</div>
+    <div class="badge" style="background:${r.color}22;color:${r.color};border:1px solid ${r.color}55">
+      ${r.badge}
+    </div>
+    <div class="meter"><i style="width:${Math.max(3, Math.min(100, r.pct))}%;background:${r.color}"></i></div>
+    <ul class="facts">
+      ${r.facts.map(([k, v]) => `<li><span>${k}</span><b>${v}</b></li>`).join('')}
+    </ul>
+    ${r.recommend ? `<div class="rec"><b>Рекомендация.</b> ${r.recommend}</div>` : ''}`;
+}
+
+function renderSummary() {
+  const box = $('sum-grid');
+  const order = ['rcri', 'dasi', 'gupta', 'has2', 'vsg', 'spark'];
+  box.innerHTML = order.filter(k => R[k]).map(k => {
+    const r = R[k];
+    return `
+      <div class="sumcard">
+        <div class="sumname">${r.label}</div>
+        <div class="sumval" style="color:${r.color}">${r.display}</div>
+        <div class="sumsub">${r.sub}</div>
+        <div class="summeter"><i style="width:${Math.max(3, Math.min(100, r.pct))}%;background:${r.color}"></i></div>
+      </div>`;
+  }).join('');
+}
+
+/* =========================================================
+   ПЕРЕСЧЁТ
+   ========================================================= */
+function num(id) {
+  const raw = $(id).value;
+  if (raw === '' || raw === null || raw === undefined) return null;
+  const v = parseFloat(raw);
+  return isNaN(v) ? null : v;
+}
+
+function recalc() {
+  R.rcri  = calcRCRI();   $('rcri-res').innerHTML  = resultHTML(R.rcri);
+  R.dasi  = calcDASI();   $('dasi-res').innerHTML  = resultHTML(R.dasi);
+  R.gupta = calcGupta();  $('gupta-res').innerHTML = resultHTML(R.gupta);
+  R.has2  = calcHAS2();   $('has2-res').innerHTML  = resultHTML(R.has2);
+  R.vsg   = calcVSG();    $('vsg-res').innerHTML   = resultHTML(R.vsg);
+  R.spark = calcSPARK();  $('spark-res').innerHTML = resultHTML(R.spark);
+  renderSummary();
+}
+
+/* =========================================================
+   СБОРКА ТЕКСТА ДЛЯ КОПИРОВАНИЯ
+   ========================================================= */
+function plural(n, one, few, many) {
+  const m10 = n % 10, m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return few;
+  return many;
+}
+
+function overallRiskLevel() {
+  let max = 0;
+
+  const r = R.rcri ? R.rcri.value : 0;
+  max = Math.max(max, r === 0 ? 0 : r === 1 ? 1 : 2);
+
+  if (R.has2 && R.has2.complete) {
+    max = Math.max(max, R.has2.level);
+  }
+
+  if (R.gupta && R.gupta.complete) {
+    max = Math.max(max, R.gupta.level);
+  }
+
+  if (R.vsg) max = Math.max(max, R.vsg.level);
+
+  if (R.dasi && !R.dasi.empty) {
+    max = Math.max(max, R.dasi.level);
+  }
+
+  return ['низкий','умеренный','высокий'][max];
+}
+
+function shouldOmitDASI() {
+  if (!R.dasi || R.dasi.empty || R.dasi.value === 0) return true;
+  const level = overallRiskLevel();
+  return level === 'низкий';
+}
+
+function buildSummaryText() {
+  const level = overallRiskLevel();
+  const parts = [];
+
+  if (R.has2 && R.has2.complete) {
+    const s = R.has2.value;
+    parts.push(`индекс AUB-HAS2 - ${s} ${plural(s, 'балл', 'балла', 'баллов')}`);
+  }
+
+  const gPct = (R.gupta && R.gupta.value !== null)
+    ? R.gupta.value.toFixed(2).replace('.', ',') + ' %'
+    : '—';
+  parts.push(`индекс Gupta MICA - ${gPct}`);
+
+  if (!shouldOmitDASI()) {
+    const dasiVal = R.dasi.value.toFixed(1).replace('.', ',');
+    const dasiFs  = R.dasi.sub.replace(/^Функциональный статус:\s*/i, '');
+    const metsVal = (R.dasi.mets !== null && R.dasi.mets !== undefined)
+      ? R.dasi.mets.toFixed(1).replace('.', ',')
+      : null;
+    const metsPart = metsVal !== null ? ` (${metsVal} METs)` : '';
+    parts.push(`индекс активности DASI - ${dasiVal}${metsPart}. Функциональный статус - ${dasiFs}`);
+  }
+
+  const inner = parts.join('; ');
+
+  return `Предоперационная оценка: риск сердечно-сосудистых осложнений ${level} (${inner}).\n` +
+         `В соответствии с Рекомендациями по оценке и коррекции сердечно-сосудистых рисков при несердечных операциях (РКО, Москва, 2023) - противопоказания для оперативного лечения на момент осмотра не выявлены.`;
+}
+
+/* =========================================================
+   КОПИРОВАНИЕ
+   ========================================================= */
+async function copyResult() {
+  const text = buildSummaryText();
+  const btn = $('copy-btn');
+  const lbl = $('copy-label');
+  const ico = $('copy-icon');
+
+  const markOk = () => {
+    btn.classList.add('ok');
+    ico.textContent = '✓';
+    lbl.textContent = 'Скопировано';
+    setTimeout(() => {
+      btn.classList.remove('ok');
+      ico.textContent = '📋';
+      lbl.textContent = 'Копировать результат';
+    }, 1800);
+  };
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      throw new Error('no clipboard api');
+    }
+    markOk();
+    showToast('Результат скопирован в буфер обмена');
+  } catch (e) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.top = '0';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, ta.value.length);
+      const ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      if (ok) { markOk(); showToast('Результат скопирован в буфер обмена'); }
+      else showToast('Не удалось скопировать — скопируйте вручную');
+    } catch (_) {
+      showToast('Не удалось скопировать — скопируйте вручную');
+    }
+  }
+}
+
+/* =========================================================
+   ИНИЦИАЛИЗАЦИЯ
+   ========================================================= */
+function init() {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.querySelectorAll('.panel').forEach(p =>
+        p.classList.toggle('active', p.id === t.dataset.panel));
+      hideTip();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  buildCheckList('rcri-list',  RCRI_ITEMS,  S.rcri,  false);
+  buildCheckList('dasi-list',  DASI_ITEMS,  S.dasi,  true);
+  buildCheckList('has2-list',  HAS2_ITEMS,  S.has2,  false);
+  buildCheckList('vsg-list',   VSG_ITEMS,   S.vsg,   true);
+  buildCheckList('spark-list', SPARK_ITEMS, S.spark, true);
+
+  buildRadioGroup('g-fs',   'g-fs',   GUPTA_FS);
+  buildRadioGroup('g-asa',  'g-asa',  GUPTA_ASA, true);
+  buildRadioGroup('g-cr',   'g-cr',   GUPTA_CR);
+  buildRadioGroup('g-surg', 'g-surg', GUPTA_SURG.map(s => ({t:s[0], v:s[1]})));
+
+  buildRadioGroup('h-surg', 'h-surg', [
+    {t:'Экстренная', v:0},
+    {t:'Плановая',   v:1}
+  ]);
+
+  $('copy-btn').addEventListener('click', copyResult);
+
+  document.querySelectorAll('input[type="number"], select').forEach(el => {
+    el.addEventListener('input', recalc);
+    el.addEventListener('change', recalc);
+  });
+
+  recalc();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="поак.html" title="Сроки отмены/возобновления антикоагулянтов">Операция и ПОАК</a>
+    <a href="ХСН.html" title="Диагностика ХСН перед операцией">СНсФВ (H2FPEF)</a>
+    <a href="ARC-HBR.html" title="Риск кровотечений">ARC-HBR</a>
+    <a href="mehran2.html" title="Риск контраст-нефропатии">Мехран-2</a>
+    
+  </div>
+</div>
+</body>
+</html>

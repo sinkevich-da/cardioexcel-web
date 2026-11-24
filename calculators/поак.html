@@ -1,0 +1,1604 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Операция и ПОАК · Периоперационное ведение с антикоагулянтами</title>
+<style>
+  :root{
+    --bg:#eef2f7;
+    --card:#ffffff;
+    --ink:#0f2430;
+    --muted:#5b7285;
+    --line:#dde6ee;
+    --brand:#0e7490;
+    --brand-2:#0891b2;
+    --ok:#047857;
+    --warn:#b45309;
+    --danger:#b91c1c;
+    --info:#1d4ed8;
+    --radius:14px;
+    --shadow:0 1px 2px rgba(15,36,48,.05), 0 8px 24px -12px rgba(15,36,48,.18);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:
+      radial-gradient(1200px 600px at 100% -10%, #d9ecf2 0%, transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, #e4e9f7 0%, transparent 55%),
+      var(--bg);
+    color:var(--ink);line-height:1.55;-webkit-font-smoothing:antialiased;min-height:100vh;
+  }
+  .wrap{max-width:1240px;margin:0 auto;padding:28px 20px 60px}
+
+  /* ── HERO ── */
+  .hero{
+    background:linear-gradient(135deg,#0b5563 0%,#0e7490 45%,#0891b2 100%);
+    color:#fff;border-radius:22px;padding:30px 34px 28px;
+    box-shadow:0 18px 40px -22px rgba(14,116,144,.85);
+    position:relative;overflow:hidden;
+  }
+  .hero::after{content:"";position:absolute;right:-70px;top:-70px;width:260px;height:260px;border-radius:50%;background:rgba(255,255,255,.08)}
+  .hero::before{content:"";position:absolute;right:60px;bottom:-110px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06)}
+  .hero-badge{display:inline-block;font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  .hero h1{margin:0 0 8px;font-size:clamp(24px,3.4vw,36px);line-height:1.15;letter-spacing:-.02em;font-weight:800}
+  .hero p{margin:0;max-width:760px;font-size:15px;color:rgba(255,255,255,.88)}
+  .hero-author{margin-top:18px;font-size:12.5px;color:rgba(255,255,255,.75);display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center}
+
+  /* ── LAYOUT ── */
+  .grid{display:grid;grid-template-columns:minmax(0,470px) minmax(0,1fr);gap:22px;margin-top:22px;align-items:start}
+  @media(max-width:1000px){.grid{grid-template-columns:1fr}}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .panel-head{padding:16px 20px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .panel-head h2{margin:0;font-size:14px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:var(--brand)}
+  .panel-body{padding:20px}
+
+  .side{position:sticky;top:20px}
+  @media(max-width:1000px){.side{position:static}}
+
+  /* ── FIELDS ── */
+  .group{margin-bottom:22px}
+  .group:last-child{margin-bottom:0}
+  .group-title{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:0 0 10px;display:flex;align-items:center;gap:8px}
+  .group-title-text{flex-shrink:0;display:flex;align-items:baseline;gap:6px;flex-wrap:wrap}
+  .group-title-note{font-size:10.5px;font-weight:600;letter-spacing:0;text-transform:none;color:#94a8b8}
+  .group-title::after{content:"";flex:1;height:1px;background:var(--line);order:3}
+
+  .info-btn{flex-shrink:0;order:4;width:20px;height:20px;border-radius:50%;border:1.5px solid var(--brand-2);background:#fff;color:var(--brand-2);font-weight:800;font-size:11px;font-family:inherit;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center;transition:.15s;line-height:1}
+  .info-btn:hover{background:var(--brand-2);color:#fff;transform:scale(1.08)}
+
+  .seg{display:flex;gap:6px;background:#f1f5f9;padding:5px;border-radius:11px;border:1px solid var(--line)}
+  .seg.wrap3{display:grid;grid-template-columns:repeat(3,1fr)}
+  .seg-btn{flex:1;appearance:none;border:0;background:transparent;cursor:pointer;padding:9px 8px;border-radius:8px;font-size:13px;font-weight:600;color:var(--muted);font-family:inherit;transition:all .16s ease;line-height:1.25;text-align:center}
+  .seg-btn:hover{color:var(--ink);background:rgba(255,255,255,.7)}
+  .seg-btn.active{background:#fff;color:var(--brand);box-shadow:0 1px 3px rgba(15,36,48,.14);outline:1.5px solid rgba(14,116,144,.35)}
+  .seg-btn small{display:block;font-weight:500;font-size:10.5px;color:var(--muted);margin-top:1px}
+  .seg-btn.active small{color:var(--brand-2)}
+
+  /* ── RISK SELECTOR (dropdown with radios) ── */
+  .risk-selector{position:relative;width:100%}
+  .risk-trigger{
+    width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:11px;
+    background:#fbfdff;font-family:inherit;font-size:13.5px;font-weight:600;color:var(--ink);
+    text-align:left;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;
+    transition:.15s;
+  }
+  .risk-trigger:hover{border-color:var(--brand-2);background:#fff}
+  .risk-selector.open .risk-trigger,
+  .risk-selector:hover .risk-trigger{border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(8,145,178,.1);background:#fff}
+  .risk-trigger-label{display:flex;align-items:center;gap:9px;flex:1;min-width:0}
+  .risk-trigger-label.empty{color:var(--muted);font-weight:500}
+  .risk-trigger-arrow{color:var(--muted);font-size:11px;flex-shrink:0;transition:transform .2s}
+  .risk-selector.open .risk-trigger-arrow,
+  .risk-selector:hover .risk-trigger-arrow{transform:rotate(180deg);color:var(--brand-2)}
+
+  .trigger-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;box-shadow:0 0 0 3px currentColor;opacity:.7}
+  .trigger-dot-1{background:#0284c7;color:#0284c7}
+  .trigger-dot-2{background:#15803d;color:#15803d}
+  .trigger-dot-3{background:#b91c1c;color:#b91c1c}
+  .trigger-dot-4{background:#7c3aed;color:#7c3aed}
+  .trigger-dot-warn{background:#b45309;color:#b45309}
+
+  .risk-dropdown{
+    position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:60;
+    background:#fff;border:1px solid var(--line);border-radius:14px;
+    box-shadow:0 24px 56px -16px rgba(15,36,48,.4), 0 0 0 1px rgba(15,36,48,.04);
+    max-height:520px;overflow-y:auto;padding:8px;
+    opacity:0;visibility:hidden;transform:translateY(-6px);
+    transition:opacity .18s ease, visibility .18s ease, transform .18s ease;
+    pointer-events:none;
+  }
+  .risk-selector:hover .risk-dropdown,
+  .risk-selector.open .risk-dropdown{opacity:1;visibility:visible;transform:translateY(0);pointer-events:auto}
+
+  .risk-option{
+    display:flex;gap:11px;padding:11px 13px;border-radius:10px;cursor:pointer;
+    transition:.15s;border:1.5px solid transparent;user-select:none;
+  }
+  .risk-option + .risk-option{margin-top:3px}
+  .risk-option:hover{background:#f5f9fc}
+  .risk-option.selected{background:#f0f9ff;border-color:#bae6fd}
+  .risk-option.selected[data-value="2"]{background:#f0fdf4;border-color:#bbf7d0}
+  .risk-option.selected[data-value="3"]{background:#fef2f2;border-color:#fecaca}
+  .risk-option.selected[data-value="warn"]{background:#fffbeb;border-color:#fde68a}
+
+  .risk-radio{
+    width:16px;height:16px;border-radius:50%;border:2px solid #cbd5e1;
+    flex-shrink:0;margin-top:3px;transition:.15s;position:relative;background:#fff;
+  }
+  .risk-option.selected .risk-radio::after{
+    content:"";position:absolute;inset:2px;border-radius:50%;
+  }
+  .risk-option.selected[data-value="1"] .risk-radio{border-color:#0284c7}
+  .risk-option.selected[data-value="1"] .risk-radio::after{background:#0284c7}
+  .risk-option.selected[data-value="2"] .risk-radio{border-color:#15803d}
+  .risk-option.selected[data-value="2"] .risk-radio::after{background:#15803d}
+  .risk-option.selected[data-value="3"] .risk-radio{border-color:#b91c1c}
+  .risk-option.selected[data-value="3"] .risk-radio::after{background:#b91c1c}
+  .risk-option.selected[data-value="warn"] .risk-radio{border-color:#b45309}
+  .risk-option.selected[data-value="warn"] .risk-radio::after{background:#b45309}
+
+  .risk-body{flex:1;min-width:0}
+  .risk-name{font-size:13px;font-weight:800;margin-bottom:6px;line-height:1.3}
+  .risk-option[data-value="1"] .risk-name{color:#0369a1}
+  .risk-option[data-value="2"] .risk-name{color:#15803d}
+  .risk-option[data-value="3"] .risk-name{color:#b91c1c}
+  .risk-option[data-value="warn"] .risk-name{color:#b45309}
+
+  .risk-list{margin:0;padding-left:17px;font-size:12px;line-height:1.5;color:#3b5365}
+  .risk-list li{margin-bottom:3px}
+  .risk-list li:last-child{margin-bottom:0}
+  .risk-list li::marker{color:#9ab0c0}
+
+  /* ── INFO callout ── */
+  .info-callout{
+    display:flex;gap:11px;padding:13px 15px;border-radius:11px;
+    background:#eef6ff;border:1px solid #cfe0f7;color:#1e4d8c;font-size:12.5px;line-height:1.55;
+  }
+  .info-callout-icon{font-size:16px;line-height:1;flex-shrink:0;margin-top:1px}
+  .info-callout b{color:#0c2f5e}
+
+  .hint-callout{
+    display:flex;gap:11px;padding:14px 16px;border-radius:11px;
+    background:#fffbeb;border:1px solid #fde68a;color:#78350f;font-size:13.5px;line-height:1.55;
+    margin-bottom:12px;
+  }
+  .hint-callout-icon{font-size:18px;line-height:1;flex-shrink:0;margin-top:1px}
+  .hint-callout b{color:#78350f}
+
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+  .field{display:flex;flex-direction:column;gap:6px}
+  .field-label{font-size:12px;font-weight:600;color:var(--muted)}
+  .field-input{
+    width:100%;padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;
+    font-size:15px;font-family:inherit;font-weight:600;color:var(--ink);background:#fbfdff;
+    transition:border-color .15s, box-shadow .15s;
+  }
+  .field-input:focus{outline:none;border-color:var(--brand-2);box-shadow:0 0 0 3px rgba(8,145,178,.13);background:#fff}
+  .field-input::placeholder{color:#a9b8c6;font-weight:500}
+  .field-unit{font-size:11.5px;color:var(--muted);font-weight:500}
+
+  .unit-toggle{display:inline-flex;background:#f1f5f9;border:1px solid var(--line);border-radius:8px;padding:3px;gap:3px;margin-left:auto}
+  .unit-toggle button{border:0;background:transparent;font-family:inherit;font-size:11px;font-weight:700;color:var(--muted);padding:4px 9px;border-radius:6px;cursor:pointer;transition:.15s}
+  .unit-toggle button.active{background:#fff;color:var(--brand);box-shadow:0 1px 2px rgba(15,36,48,.12)}
+
+  .reset-btn{appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);font-family:inherit;font-size:12px;font-weight:600;padding:7px 13px;border-radius:9px;cursor:pointer;transition:.15s}
+  .reset-btn:hover{color:var(--danger);border-color:#f0c4c4;background:#fff7f7}
+
+  /* ── COPY ROW ── */
+  .copy-row{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+  .copy-btn{
+    appearance:none;border:1px solid var(--brand-2);background:#fff;color:var(--brand);
+    font-family:inherit;font-size:12.5px;font-weight:700;padding:8px 15px;border-radius:9px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;transition:.15s;line-height:1.2;
+  }
+  .copy-btn:hover{background:#e6f7fb;border-color:var(--brand)}
+  .copy-btn:active{transform:translateY(1px)}
+  .copy-btn:disabled{opacity:.45;cursor:not-allowed;border-color:var(--line);color:var(--muted);background:#f8fafc}
+  .copy-status{font-size:12px;font-weight:700;color:var(--ok);opacity:0;transition:opacity .2s;line-height:1.2}
+  .copy-status.show{opacity:1}
+
+  /* ── RESULTS ── */
+  .locked{border:2px dashed #cfdce6;border-radius:var(--radius);padding:56px 24px;text-align:center;color:var(--muted);background:rgba(255,255,255,.55)}
+  .locked-icon{font-size:32px;opacity:.5;margin-bottom:10px}
+  .locked h3{margin:0 0 6px;font-size:16px;color:var(--ink);font-weight:700}
+  .locked p{margin:0;font-size:13.5px;max-width:420px;margin-inline:auto}
+
+  .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+  @media(max-width:720px){.metrics{grid-template-columns:1fr}}
+  .metric{border:1px solid var(--line);border-radius:12px;padding:14px 15px;background:#fbfdff;border-top:3px solid var(--brand-2)}
+  .metric-label{font-size:11px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .metric-value{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:4px 0 2px;line-height:1.1;color:var(--ink)}
+  .metric-value span{font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:0}
+  .metric-stage{font-size:12px;font-weight:700;margin-top:6px;display:inline-block;padding:2px 9px;border-radius:999px}
+  .stage-1{background:#e7f6ef;color:#047857}
+  .stage-2{background:#eaf4e7;color:#3f7a1f}
+  .stage-3{background:#fdf6e3;color:#a16207}
+  .stage-4{background:#fdeee3;color:#c2410c}
+  .stage-5{background:#fdecec;color:#b91c1c}
+
+  .rec{border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;background:#fff;border-left:4px solid var(--info)}
+  .rec.tone-ok{border-left-color:var(--ok);background:#e7f6ef}
+  .rec.tone-warn{border-left-color:var(--warn);background:#fdf3e3}
+  .rec.tone-danger{border-left-color:var(--danger);background:#fdecec}
+  .rec.tone-info{border-left-color:var(--info);background:#eaeffd}
+
+  .rec-head{display:flex;align-items:center;gap:9px;font-size:11.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .rec.tone-ok .rec-head{color:var(--ok)}
+  .rec.tone-warn .rec-head{color:var(--warn)}
+  .rec.tone-danger .rec-head{color:var(--danger)}
+  .rec.tone-info .rec-head{color:var(--info)}
+  .rec-icon{font-size:15px}
+  .rec-title{font-size:18px;font-weight:800;letter-spacing:-.01em;margin:0 0 6px;line-height:1.25}
+  .rec-text{margin:0;font-size:14px;color:#2c4254}
+  .rec ul{margin:10px 0 0;padding-left:18px;font-size:13.5px;color:#3b5365}
+  .rec ul li{margin-bottom:5px}
+  .rec ul li::marker{color:var(--brand-2)}
+
+  .summary-pills{font-size:12px;color:var(--muted);text-align:right;line-height:1.35}
+
+  /* ── FOOTER INFO ── */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+  @media(max-width:820px){.info-grid{grid-template-columns:1fr}}
+  .info-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow)}
+  .info-card h3{margin:0 0 12px;font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--brand)}
+  .info-card ul{margin:0;padding-left:16px;font-size:13px;color:#3b5365;line-height:1.65}
+  .info-card li{margin-bottom:4px}
+  .info-card li b{color:var(--ink)}
+
+  .disclaimer{margin-top:22px;background:#fff8f0;border:1px solid #f2ddc2;border-radius:var(--radius);padding:16px 20px;font-size:13px;color:#8a5a12;display:flex;gap:12px;align-items:flex-start}
+  .disclaimer b{color:#7a4c08}
+
+  .copyright{margin-top:26px;text-align:center;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:20px}
+  .copyright strong{color:var(--ink);font-weight:700}
+
+  /* ── MODAL ── */
+  .modal{position:fixed;inset:0;background:rgba(15,36,48,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;animation:fadeIn .18s ease}
+  .modal.open{display:flex}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal-content{background:#fff;border-radius:18px;max-width:820px;width:100%;max-height:88vh;overflow-y:auto;padding:26px 28px;position:relative;box-shadow:0 30px 80px -20px rgba(15,36,48,.55);animation:slideUp .22s ease}
+  @keyframes slideUp{from{transform:translateY(14px);opacity:.5}to{transform:translateY(0);opacity:1}}
+  .modal-close{position:absolute;top:14px;right:16px;width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:#fff;color:var(--muted);font-size:19px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:.15s;font-family:inherit}
+  .modal-close:hover{background:#f1f5f9;color:var(--ink)}
+  .modal-content h3{margin:0 0 18px;font-size:16px;font-weight:800;color:var(--ink);padding-right:40px;line-height:1.35}
+  .modal-section{border-radius:12px;padding:14px 16px;margin-bottom:12px;border-left:4px solid;font-size:13px;line-height:1.55}
+  .modal-section h4{margin:0 0 8px;font-size:12.5px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}
+  .modal-section ul{margin:0;padding-left:18px}
+  .modal-section li{margin-bottom:4px}
+  .modal-section.ms-1{background:#f0f9ff;border-color:#0284c7;color:#0c4a6e}
+  .modal-section.ms-1 h4{color:#0284c7}
+  .modal-section.ms-2{background:#f0fdf4;border-color:#15803d;color:#14532d}
+  .modal-section.ms-2 h4{color:#15803d}
+  .modal-section.ms-3{background:#fef2f2;border-color:#b91c1c;color:#7f1d1d}
+  .modal-section.ms-3 h4{color:#b91c1c}
+  .modal-section.ms-warn{background:#fffbeb;border-color:#b45309;color:#78350f}
+  .modal-section.ms-warn h4{color:#b45309}
+
+  /* ── TABS (клинические ситуации) ── */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+  .tab-btn{
+    appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);
+    font-family:inherit;font-size:13px;font-weight:700;padding:10px 16px;border-radius:10px;
+    cursor:pointer;transition:.15s;line-height:1.2;display:inline-flex;align-items:center;gap:8px;
+  }
+  .tab-btn:hover{color:var(--brand);border-color:var(--brand-2)}
+  .tab-btn.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 4px 14px -6px rgba(14,116,144,.6)}
+  .tab-btn small{font-size:11px;font-weight:600;opacity:.75}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+
+  /* ── Связанные калькуляторы ── */
+  .note{background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:14px 16px;font-size:13px;color:#334;line-height:1.6}
+  .srch-link{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid var(--line);border-radius:999px;color:var(--brand);font-weight:600;text-decoration:none;font-size:12px;transition:.15s}
+  .srch-link:hover{background:var(--brand);color:#fff;border-color:var(--brand)}
+
+  @media print{
+    body{background:#fff}
+    .side{position:static}
+    .hero{box-shadow:none}
+    .modal{display:none !important}
+    .risk-dropdown{display:none !important}
+    .copy-row{display:none !important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-badge">Клинический калькулятор</div>
+    <h1>Периоперационное ведение: медикаменты</h1>
+    <p>Сроки и правила временной отмены, продолжения и возобновления ключевых сердечно-сосудистых препаратов перед несердечными операциями — по AHA/ACC 2024.</p>
+ 
+  </header>
+
+  <div class="tabs" id="situationTabs">
+    <button type="button" class="tab-btn active" data-tab="anticoag">Антикоагулянты<small>ПОАК и варфарин</small></button>
+    <button type="button" class="tab-btn" data-tab="antiplatelet">Антиагреганты<small>ЧКВ и отмена</small></button>
+    <button type="button" class="tab-btn" data-tab="sglt2">иНГЛТ-2</button>
+    <button type="button" class="tab-btn" data-tab="raas">иАПФ/БРА<small>РААС</small></button>
+    <button type="button" class="tab-btn" data-tab="statins">Статины<small>липиды</small></button>
+  </div>
+
+  <!-- ================= ВКЛАДКА: АНТИКОАГУЛЯНТЫ ================= -->
+  <div class="tab-panel active" data-panel="anticoag">
+  <div class="grid">
+
+    <!-- ══════════ ВВОД ══════════ -->
+    <section class="panel side">
+      <div class="panel-head">
+        <h2>Параметры пациента</h2>
+        <button class="reset-btn" id="resetBtn" type="button">Сбросить</button>
+      </div>
+      <div class="panel-body">
+
+        <div class="group">
+          <p class="group-title"><span class="group-title-text">Антикоагулянт</span></p>
+          <div class="seg wrap3" data-name="drug" id="segDrug">
+            <button type="button" class="seg-btn" data-value="dabigatran">Дабигатран<small>Прадакса</small></button>
+            <button type="button" class="seg-btn" data-value="xa">Ингибиторы Xa<small>ривароксабан · апиксабан · эдоксабан</small></button>
+            <button type="button" class="seg-btn" data-value="warfarin">Варфарин<small>АВК</small></button>
+          </div>
+        </div>
+
+        <!-- Поля, разные для ПОАК и Варфарина: показываются под выбранной группой -->
+        <div id="renalSection" data-needs-renal="1">
+          <div class="group" id="renalFields">
+            <p class="group-title"><span class="group-title-text">Демография и функция почек</span></p>
+            <div class="seg" data-name="sex" id="segSex">
+              <button type="button" class="seg-btn" data-value="m">Мужчина</button>
+              <button type="button" class="seg-btn" data-value="f">Женщина</button>
+            </div>
+          </div>
+
+          <div class="group" id="renalAgeWeight">
+            <div class="row2">
+              <label class="field">
+                <span class="field-label">Возраст, лет</span>
+                <input class="field-input" type="number" id="age" min="18" max="120" step="1" placeholder="—">
+              </label>
+              <label class="field">
+                <span class="field-label">Масса тела, кг</span>
+                <input class="field-input" type="number" id="weight" min="20" max="300" step="0.1" placeholder="—">
+              </label>
+            </div>
+          </div>
+
+          <div class="group" id="renalCreat">
+            <label class="field">
+              <span class="field-label" style="display:flex;align-items:center">
+                Креатинин сыворотки
+                <span class="unit-toggle" id="unitToggle">
+                  <button type="button" data-unit="umol" class="active">мкмоль/л</button>
+                  <button type="button" data-unit="mgdl">мг/дл</button>
+                </span>
+              </span>
+              <input class="field-input" type="number" id="creat" min="0.1" max="30" step="0.01" placeholder="—">
+              <span class="field-unit" id="creatHint">Введите значение в мкмоль/л</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- РИСК КРОВОТЕЧЕНИЯ — выпадающий список с радиоточками -->
+        <div class="group">
+          <p class="group-title">
+            <span class="group-title-text">Риск кровотечения (операция)</span>
+            <button class="info-btn" type="button" data-modal="bleedModal" title="Полная классификация вмешательств">?</button>
+          </p>
+          <div class="risk-selector" data-name="bleed" id="bleedSelector">
+            <button class="risk-trigger" type="button" aria-haspopup="listbox">
+              <span class="risk-trigger-label empty">Выберите степень риска</span>
+              <span class="risk-trigger-arrow">▾</span>
+            </button>
+            <div class="risk-dropdown" role="listbox"></div>
+          </div>
+        </div>
+
+        <!-- РИСК ТРОМБОЗА — только для Варфарина -->
+        <div class="group">
+          <p class="group-title">
+            <span class="group-title-text">
+              Риск тромбоза
+              <span class="group-title-note">(только для Варфарина)</span>
+            </span>
+            <button class="info-btn" type="button" data-modal="thrombosisModal" title="Полная классификация риска тромбоза">?</button>
+          </p>
+
+          <!-- Информационный блок, если выбран не Варфарин -->
+          <div class="info-callout" id="thrombosisInfo" hidden>
+            <span class="info-callout-icon">ℹ️</span>
+            <div id="thrombosisInfoText"></div>
+          </div>
+
+          <!-- Селектор, если выбран Варфарин -->
+          <div class="risk-selector" data-name="thrombosis" id="thrombosisSelector" hidden>
+            <button class="risk-trigger" type="button" aria-haspopup="listbox">
+              <span class="risk-trigger-label empty">Выберите степень риска</span>
+              <span class="risk-trigger-arrow">▾</span>
+            </button>
+            <div class="risk-dropdown" role="listbox"></div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ══════════ РЕЗУЛЬТАТ ══════════ -->
+    <section id="resultsArea">
+      <div class="locked" id="lockedBox">
+        <div class="locked-icon">🩺</div>
+        <h3>Заполните параметры</h3>
+        <p>Укажите пол, возраст, массу тела, креатинин и выберите препарат и риски — расчёт появится автоматически.</p>
+      </div>
+
+      <div id="contentBox" hidden>
+        <div class="panel" style="margin-bottom:18px">
+          <div class="panel-head">
+            <h2>Расчётная функция почек</h2>
+          </div>
+          <div class="panel-body">
+            <div class="metrics" id="metrics"></div>
+            <div id="gfrInfo" class="info-callout" hidden>
+              <span class="info-callout-icon">ℹ️</span>
+              <div>
+                <b>При приёме варфарина функция почек не используется.</b>
+                Периоперационная тактика при варфарине определяется только риском кровотечения (вмешательство) и риском
+                тромбоза (мост-терапия). Креатинин, возраст и масса тела требуются лишь для расчёта КлКр у ПОАК —
+                на варфарин они не влияют.
+              </div>
+            </div>
+            <div id="cockNote" style="font-size:12px;color:var(--muted);margin-top:2px">
+              Для периоперационного решения используется <b style="color:var(--ink)">клиренс креатинина по Cockcroft–Gault</b> —
+              именно он лежит в основе стратификации в рекомендациях EHRA и инструкциях к препаратам.
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-head">
+            <h2>Рекомендации</h2>
+            <span class="summary-pills" id="summaryPills"></span>
+          </div>
+          <div class="panel-body">
+            <div class="copy-row">
+              <button class="copy-btn" id="copyBtn" type="button" disabled>📋 Копировать</button>
+              <span class="copy-status" id="copyStatus"></span>
+            </div>
+
+            <div id="hintArea"></div>
+
+            <div class="rec" id="recStop">
+              <div class="rec-head"><span class="rec-icon">⏱</span> Отмена препарата перед операцией</div>
+              <h3 class="rec-title" id="stopTitle"></h3>
+              <p class="rec-text" id="stopText"></p>
+              <ul id="stopList"></ul>
+            </div>
+
+            <div class="rec" id="recResume">
+              <div class="rec-head"><span class="rec-icon">▶</span> Возобновление приёма после операции</div>
+              <h3 class="rec-title" id="resumeTitle"></h3>
+              <p class="rec-text" id="resumeText"></p>
+              <ul id="resumeList"></ul>
+            </div>
+
+            <div class="rec tone-info" id="recAntidote">
+              <div class="rec-head"><span class="rec-icon">💉</span> Экстренная реверсия</div>
+              <p class="rec-text" id="antidoteText"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ══════════ СПРАВКА ══════════ -->
+  <div class="info-grid">
+    <div class="info-card">
+      <h3>Сокращения</h3>
+      <ul>
+        <li><b>ПОАК</b> — пероральные антикоагулянты (прямые пероральные антикоагулянты)</li>
+        <li><b>АВК</b> — антагонисты витамина К</li>
+        <li><b>НМГ</b> — низкомолекулярный гепарин</li>
+        <li><b>НФГ</b> — нефракционированный гепарин</li>
+        <li><b>МНО</b> — международное нормализованное отношение</li>
+        <li><b>СКФ / рСКФ</b> — (расчётная) скорость клубочковой фильтрации</li>
+        <li><b>КлКр</b> — клиренс креатинина</li>
+        <li><b>ХБП</b> — хроническая болезнь почек</li>
+        <li><b>КПК</b> — концентрат протромбинового комплекса</li>
+        <li><b>СЗП</b> — свежезамороженная плазма</li>
+        <li><b>rFVIIa</b> — рекомбинантный активированный фактор свёртывания VII</li>
+        <li><b>ВТЭО</b> — венозные тромбоэмболические осложнения</li>
+        <li><b>ТИА</b> — транзиторная ишемическая атака</li>
+        <li><b>ОП</b> — операция (в контексте «ОП с ревматическим клапанным заболеванием»)</li>
+        <li><b>АФС</b> — антифосфолипидный синдром</li>
+        <li><b>в/в</b> — внутривенно</li>
+        <li><b>EKFC</b> — European Kidney Function Consortium</li>
+        <li><b>CKD-EPI</b> — Chronic Kidney Disease Epidemiology Collaboration</li>
+        <li><b>EHRA</b> — European Heart Rhythm Association</li>
+        <li><b>ESC</b> — European Society of Cardiology</li>
+        <li><b>KDIGO</b> — Kidney Disease: Improving Global Outcomes</li>
+      </ul>
+    </div>
+
+    <div class="info-card">
+      <h3>Источники</h3>
+      <ul>
+        <li>Thompson A., Fleischmann K.E., Smilowitz N.R. et al. <b>2024 AHA/ACC/ACS/ASNC/HRS/SCA/SCCT/SCMR/SVM Guideline for Perioperative Cardiovascular Management for Noncardiac Surgery.</b> J Am Coll Cardiol. 2024 Nov;84(19):1869–1969. doi:10.1016/j.jacc.2024.06.013.</li>
+        <li>Budiarto R.M., Luthfah N., Saputra P.B.T. et al. <b>Contemporary approaches to perioperative anticoagulant management in surgical patients: a literature review.</b> Curr Med Res Opin. 2026;42(1):179–189. doi:10.1080/03007995.2026.2627734.</li>
+        <li>Steffel J. et al. <b>EHRA Practical Guide</b> on the use of non-vitamin K antagonist oral anticoagulants in patients with atrial fibrillation. Europace, 2021.</li>
+        <li>Hindricks G. et al. <b>2020 ESC Guidelines</b> for the diagnosis and management of atrial fibrillation. Eur Heart J, 2021.</li>
+        <li>Van Gelder I.C. et al. <b>2024 ESC Guidelines</b> for the management of atrial fibrillation. Eur Heart J, 2024.</li>
+        <li>Douketis J.D. et al. Perioperative Management of Antithrombotic Therapy: <b>CHEST Guideline</b>. Chest, 2022.</li>
+        <li><b>KDIGO 2024</b> Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int, 2024.</li>
+        <li>Pottel H. et al. Development and validation of a new equation for estimating GFR — <b>EKFC</b>, 2021.</li>
+        <li>Inker L.A. et al. New creatinine- and cystatin C–based equations to estimate GFR without race — <b>CKD-EPI 2021</b>. N Engl J Med, 2021;385:1737–1749.</li>
+        <li>Cockcroft D.W., Gault M.H. Prediction of creatinine clearance from serum creatinine. Nephron, 1976;16:31–41.</li>
+        <li>Инструкции по медицинскому применению: <b>Прадакса</b> (дабигатрана этексилат), <b>Ксарелто</b> (ривароксабан), <b>Эликвис</b> (апиксабан), <b>Ликсана</b> (эдоксабан).</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <span style="font-size:18px;line-height:1">⚠️</span>
+    <div>
+      <b>Имеются противопоказания. Необходима консультация специалиста.</b><br>
+      Калькулятор носит справочно-образовательный характер и не заменяет клиническое решение врача.
+      Индивидуальная тактика определяется с учётом характера вмешательства, сопутствующей патологии,
+      функции почек и действующих инструкций к лекарственным препаратам.
+    </div>
+  </div>
+
+  </div><!-- /tab-panel anticoag -->
+
+  <!-- ================= ВКЛАДКА: АНТИАГРЕГАНТЫ ================= -->
+  <div class="tab-panel" data-panel="antiplatelet">
+    <div class="info-callout" style="margin-bottom:14px">
+      <span class="info-callout-icon">🎯</span>
+      <div>
+        Управление антиагрегантной терапией перед несердечной операцией. Решение всегда принимает
+        <b>мультидисциплинарная команда</b> (AHA/ACC 2024 §7.5, COR 1), взвешивая риск кровотечения,
+        тромбоза и последствий отсрочки операции.
+      </div>
+    </div>
+    <div class="rec note-rec" style="border-left-color:#0e7490;background:#eaf5fa;padding:12px 14px;border-radius:10px;font-size:12.5px;color:#14532d;margin-bottom:14px">
+      <b>Расшифровка сокращений:</b> ГМС — голометаллический стент (BMS, без покрытия); СЕС — стент с лекарственным покрытием (DES, drug-eluting stent); ЧКВ — чрескожное коронарное вмешательство; ОКС — острый коронарный синдром; ИБС — ишемическая болезнь сердца; MACE — большие неблагоприятные сердечно-сосудистые события; АСК — ацетилсалициловая кислота; ОАК — пероральный антикоагулянт. Тайм-сенситивная операция — операция, которую можно отложить до 3 месяцев без ухудшения исходов (по AHA/ACC 2024). Элективная — плановая, может быть отложена для полного предоперационного обследования.
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Сроки несердечной операции после ЧКВ</h2></div>
+      <div class="panel-body">
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">🕐</span> Баллонная ангиопластика без стента</div>
+          <h3 class="rec-title">Не ранее 14 дней</h3>
+          <p class="rec-text">Элективную операцию следует отложить минимум на 14 дней (COR 1, C-LD).</p>
+        </div>
+        <div class="rec tone-info">
+          <div class="rec-head"><span class="rec-icon">🕐</span> ЧКВ со стентом СЕС (лекарственное покрытие) по поводу ОКС</div>
+          <h3 class="rec-title">Идеально ≥ 12 месяцев</h3>
+          <p class="rec-text">Если планируется перерыв ≥1 антиагреганта — операцию отложить ≥12 мес (COR 1, B-NR).</p>
+        </div>
+        <div class="rec tone-info">
+          <div class="rec-head"><span class="rec-icon">🕐</span> ЧКВ со стентом СЕС по поводу хронической ИБС</div>
+          <h3 class="rec-title">Разумно ≥ 6 месяцев</h3>
+          <p class="rec-text">При перерыве ≥1 антиагреганта оправдано ≥6 мес после ЧКВ (COR 2a, B-NR).</p>
+        </div>
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">🕐</span> ЧКВ со стентом СЕС, тайм-сенситивная операция</div>
+          <h3 class="rec-title">Можно ≥ 3 месяцев</h3>
+          <p class="rec-text">Если риск отсрочки операции выше риска MACE (COR 2b, B-NR).</p>
+        </div>
+        <div class="rec tone-danger">
+          <div class="rec-head"><span class="rec-icon">⛔</span> ГМС (голометаллический стент) или СЕС ≤ 30 дней</div>
+          <h3 class="rec-title">Элективная операция потенциально вредна</h3>
+          <p class="rec-text">Высокий риск тромбоза стента и ишемических осложнений (COR 3: Harm, B-NR).</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="margin-top:18px">
+      <div class="panel-head"><h2>Периоперационное ведение антиагрегантов</h2></div>
+      <div class="panel-body">
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">✅</span> После ЧКВ</div>
+          <h3 class="rec-title">Продолжать АСК 75–100 мг, если возможно</h3>
+          <p class="rec-text">Снижает риск сердечных событий (COR 1, B-R). Если АСК непереносима или риск кровотечения высок — можно P2Y12-монотерапией.</p>
+        </div>
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">💊</span> ОАК-монотерапия прервана</div>
+          <h3 class="rec-title">Заменить на АСК, когда возможно</h3>
+          <p class="rec-text">Если пероральный антикоагулянт необходимо прервать — назначить АСК, пока ОАК нельзя безопасно возобновить.</p>
+        </div>
+        <div class="rec tone-info">
+          <div class="rec-head"><span class="rec-icon">⏱</span> Минимальные интервалы отмены до операции</div>
+          <h3 class="rec-title">Восстановление функции тромбоцитов</h3>
+          <p class="rec-text">Аспирин — 4 дня; клопидогрел — 5–7 дней; прасугрел — 7–10 дней; тикагрелор — 3–5 дней (AHA/ACC 2024, таблица 12).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ВКЛАДКА: иНГЛТ-2 ================= -->
+  <div class="tab-panel" data-panel="sglt2">
+    <div class="info-callout" style="margin-bottom:14px">
+      <span class="info-callout-icon">🧬</span>
+      <div>
+        Ингибиторы натрий-глюкозного котранспортёра 2 (иНГЛТ-2) при ХСН/СД. Риск периоперационного
+        <b>метаболического ацидоза и эугликемического кетоацидоза</b> снижается при своевременной отмене (AHA/ACC 2024 §6.3, Rec 1, COR 1).
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Отмена иНГЛТ-2 перед операцией</h2></div>
+      <div class="panel-body">
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">⏸</span> Все иНГЛТ-2</div>
+          <h3 class="rec-title">Отменить за 3–4 дня до операции</h3>
+          <p class="rec-text">Остановить при плановой элективной операции, когда это возможно, для снижения риска периоперационного метаболического ацидоза (COR 1, C-LD).</p>
+        </div>
+        <div class="rec tone-info">
+          <div class="rec-head"><span class="rec-icon">💊</span> Конкретные препараты</div>
+          <h3 class="rec-title">Разный срок отмены</h3>
+          <p class="rec-text">
+            <b>Канаглифлозин, дапаглифлозин, эмпаглифлозин</b> — прекратить за ≥3 дней; <b>эртуглифлозин</b> — за ≥4 дней до плановой операции (FDA / AHA 2024).</p>
+        </div>
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">⚠️</span> Настороженность</div>
+          <h3 class="rec-title">Симптомы кетоацидоза могут быть неспецифичны</h3>
+          <p class="rec-text">Тошнота, боль в животе, одышка при <b>нормальном или слегка повышенном уровне глюкозы</b>. Заподозрить при анионной щели + кетонах в крови/моче.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ВКЛАДКА: иАПФ/БРА ================= -->
+  <div class="tab-panel" data-panel="raas">
+    <div class="info-callout" style="margin-bottom:14px">
+      <span class="info-callout-icon">🩸</span>
+      <div>
+        Ингибиторы РААС (иАПФ/БРА) перед операцией. Тактика зависит от показания: при <b>гипертонии</b> возможен пропуск
+        утренней дозы, при <b>СНнФВ</b> — препарат обычно продолжают (AHA/ACC 2024 §7.2).
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Периоперационное ведение иАПФ/БРА</h2></div>
+      <div class="panel-body">
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">⏸</span> Гипертония · elevated-risk операция</div>
+          <h3 class="rec-title">Пропуск за 24 часа возможен</h3>
+          <p class="rec-text">У отобранных пациентов с контролируемым АД пропуск иАПФ/БРА за 24 ч до операции может ограничить интраоперационную гипотензию (COR 2b, B-R). Раннее возобновление после операции снижает риск.</p>
+        </div>
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">✅</span> СНнФВ (ХСН со сниженной ФВ)</div>
+          <h3 class="rec-title">Продолжение разумно</h3>
+          <p class="rec-text">При хроническом приёме РААС-ингибиторов по поводу СНнФВ периоперационное продолжение оправдано (COR 2a, C-EO). Прерывание без показаний ассоциировано с ростом смертности.</p>
+        </div>
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">⚠️</span> Сакубитрил/валсартан</div>
+          <h3 class="rec-title">Данных недостаточно</h3>
+          <p class="rec-text">Нет данных о пользе/вреде периоперационной отмены ангиотензиновых рецептор-неприлизиновых ингибиторов (sacubitril/valsartan). Индивидуальный подход.</p>
+        </div>
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">↩️</span> Возобновление</div>
+          <h3 class="rec-title">Как можно раньше после операции</h3>
+          <p class="rec-text">Хронические антигипертензивные средства (включая иАПФ/БРА) возобновить как можно раньше для профилактики послеоперационной гипертензии (COR 1, C-EO).</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= ВКЛАДКА: СТАТИНЫ ================= -->
+  <div class="tab-panel" data-panel="statins">
+    <div class="info-callout" style="margin-bottom:14px">
+      <span class="info-callout-icon">📉</span>
+      <div>
+        Статины в периоперационном периоде. Доказано продолжение и периоперационный старт при наличии
+        показаний по АССЗ; эффект «ударной» нагрузки в первые дни сомнителен (AHA/ACC 2024 §7.1).
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Периоперационное ведение статинов</h2></div>
+      <div class="panel-body">
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">✅</span> Уже принимает статин</div>
+          <h3 class="rec-title">Продолжать приём</h3>
+          <p class="rec-text">Продолжение статинотерапии у пациентов, принимающих статины, рекомендуется для снижения риска MACE (COR 1, B-NR).</p>
+        </div>
+        <div class="rec tone-ok">
+          <div class="rec-head"><span class="rec-icon">➕</span> Не принимает, но есть показания</div>
+          <h3 class="rec-title">Периоперационный старт с долгосрочной целью</h3>
+          <p class="rec-text">Если есть показания по АССЗ или риску — начинать статин при госпитализации с целью долгосрочного приёма (COR 1, B-R).</p>
+        </div>
+        <div class="rec tone-warn">
+          <div class="rec-head"><span class="rec-icon">⚖️</span> «Ударная» доза</div>
+          <h3 class="rec-title">Нагрузочная доза без доказанной пользы</h3>
+          <p class="rec-text">Исследование LOAD (аторвастатин 80 мг) не показало снижения ранних MACE. Не откладывать операцию из-за отсутствия липидограммы; ХС-ЛПНП можно не ждать.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ МОДАЛЬНОЕ ОКНО: РИСК КРОВОТЕЧЕНИЯ ══════════ -->
+<div class="modal" id="bleedModal">
+  <div class="modal-content">
+    <button class="modal-close" type="button" data-close="bleedModal">×</button>
+    <h3>Классификация плановых хирургических вмешательств по риску кровотечений</h3>
+    <div class="modal-section ms-1">
+      <h4>Минимальный риск кровотечений</h4>
+      <ul>
+        <li>Экстракция 1–3 зубов, хирургические вмешательства на пародонте, установка имплантата, поддесневое удаление зубного камня/чистка;</li>
+        <li>Вмешательства по поводу катаракты и глаукомы;</li>
+        <li>Эндоскопия без биопсии или резекции;</li>
+        <li>Хирургические вмешательства с поверхностным доступом (например, вскрытие абсцесса, небольшие дерматологические разрезы, биопсия кожи);</li>
+        <li>Имплантация кардиостимулятора или дефибриллятора (кроме сложных процедур);</li>
+        <li>Рутинное плановое вмешательство на коронарных/периферических артериях (кроме сложных процедур);</li>
+        <li>Внутримышечная инъекция (например, вакцинация);</li>
+      </ul>
+    </div>
+    <div class="modal-section ms-2">
+      <h4>Низкий риск кровотечений</h4>
+      <ul>
+        <li>Сложные стоматологические процедуры;</li>
+        <li>Эндоскопия с простой биопсией;</li>
+        <li>Малые ортопедические вмешательства (стопа, рука, артроскопия и т.д.);</li>
+      </ul>
+    </div>
+    <div class="modal-section ms-3">
+      <h4>Высокий риск кровотечений</h4>
+      <ul>
+        <li>Операции на сердце;</li>
+        <li>Операции по реваскуляризации периферических артерий (например, хирургическое лечение аневризмы аорты, сосудистое шунтирование);</li>
+        <li>Сложные инвазивные кардиологические вмешательства, включая удаление электродов, (эпикардиальную) аблацию при желудочковой тахикардии, чрескожное коронарное вмешательство при тотальной окклюзии и др.;</li>
+        <li>Нейрохирургия;</li>
+        <li>Люмбальная диагностическая пункция;</li>
+        <li>Сложная эндоскопия (например, множественная/обширная полипэктомия, эндоскопическая ретроградная панкреатохолангиография со сфинктеротомией и т.д.);</li>
+        <li>Абдоминальная хирургия (в т.ч. биопсия печени);</li>
+        <li>Торакальная хирургия;</li>
+        <li>Большие урологические вмешательства/биопсия (в т.ч. на почках);</li>
+        <li>Экстракорпоральная ударно-волновая литотрипсия;</li>
+        <li>Большие ортопедические вмешательства;</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ МОДАЛЬНОЕ ОКНО: РИСК ТРОМБОЗА ══════════ -->
+<div class="modal" id="thrombosisModal">
+  <div class="modal-content">
+    <button class="modal-close" type="button" data-close="thrombosisModal">×</button>
+    <h3>Риск тромбозов (если принимает Варфарин)</h3>
+    <div class="modal-section ms-2">
+      <h4>Низкий риск</h4>
+      <ul>
+        <li>ВТЭО &gt;12 мес.</li>
+        <li>CHA₂DS₂-VA — 1–3 балла (без предшествующего анамнеза инсульта)</li>
+        <li>Двустворчатый механический протез аортального клапана без основных факторов риска инсульта</li>
+      </ul>
+    </div>
+    <div class="modal-section ms-warn">
+      <h4>Умеренный риск</h4>
+      <ul>
+        <li>ВТЭО ≤3–12 мес.</li>
+        <li>Рецидивирующая ВТЭО</li>
+        <li>CHA₂DS₂-VA — 4–5 баллов</li>
+        <li>Двустворчатый механический протез аортального клапана с основными факторами риска инсульта</li>
+        <li>Протез митрального клапана без основных факторов риска инсульта</li>
+        <li>Нетяжелая коагулопатия (гетерозиготная мутация фактора V Лейдена или гена протромбина G20210A)</li>
+        <li>Онкологическое заболевание</li>
+      </ul>
+    </div>
+    <div class="modal-section ms-3">
+      <h4>Высокий риск</h4>
+      <ul>
+        <li>Недавняя ВТЭО &lt;3 мес.</li>
+        <li>CHA₂DS₂-VA ≥6 (или 4–5 баллов с недавним инсультом или ТИА)</li>
+        <li>ОП с ревматическим клапанным заболеванием сердца</li>
+        <li>Механический протез митрального клапана</li>
+        <li>Клеточный шаровой или наклоннодисковый протез клапана</li>
+        <li>Механический протез клапана в любой позиции с недавним инсультом или ТИА (&lt;3 мес.)</li>
+        <li>Недавний кардиоэмболический инсульт (&lt;3 мес.)</li>
+        <li>Тромб левого желудочка (в течение последних 3 мес.)</li>
+        <li>Активный рак, связанный с высоким риском ВТЭ</li>
+        <li>Тяжелая тромбофилия</li>
+        <li>Антифосфолипидные антитела</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ─────────────── Переключение вкладок (клинические ситуации) ─────────────── */
+  const tabBtns = document.querySelectorAll('#situationTabs .tab-btn');
+  const tabPanels = document.querySelectorAll('.tab-panel');
+  function activateTab(name){
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+    tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === name));
+    // закрыть модалки/дропдауны при переключении
+    document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open'));
+    document.querySelectorAll('.risk-selector.open').forEach(r => r.classList.remove('open'));
+  }
+  tabBtns.forEach(btn => btn.addEventListener('click', () => activateTab(btn.dataset.tab)));
+
+  /* ─────────────── Состояние ─────────────── */
+  const state = {
+    sex:null, age:null, weight:null, creatUmol:null,
+    drug:null, bleed:null, thrombosis:null
+  };
+  let creatUnit = 'umol';
+
+  /* ─────────────── Данные рисков ─────────────── */
+  const BLEED_OPTIONS = [
+    {
+      value: '1',
+      title: 'Минимальный риск кровотечений',
+      items: [
+        'Экстракция 1–3 зубов, хирургические вмешательства на пародонте, установка имплантата, поддесневое удаление зубного камня/чистка;',
+        'Вмешательства по поводу катаракты и глаукомы;',
+        'Эндоскопия без биопсии или резекции;',
+        'Хирургические вмешательства с поверхностным доступом (например, вскрытие абсцесса, небольшие дерматологические разрезы, биопсия кожи);',
+        'Имплантация кардиостимулятора или дефибриллятора (кроме сложных процедур);',
+        'Рутинное плановое вмешательство на коронарных/периферических артериях (кроме сложных процедур);',
+        'Внутримышечная инъекция (например, вакцинация);'
+      ]
+    },
+    {
+      value: '2',
+      title: 'Низкий риск кровотечений',
+      items: [
+        'Сложные стоматологические процедуры;',
+        'Эндоскопия с простой биопсией;',
+        'Малые ортопедические вмешательства (стопа, рука, артроскопия и т.д.);'
+      ]
+    },
+    {
+      value: '3',
+      title: 'Высокий риск кровотечений',
+      items: [
+        'Операции на сердце;',
+        'Операции по реваскуляризации периферических артерий (например, хирургическое лечение аневризмы аорты, сосудистое шунтирование);',
+        'Сложные инвазивные кардиологические вмешательства, включая удаление электродов, (эпикардиальную) аблацию при желудочковой тахикардии, чрескожное коронарное вмешательство при тотальной окклюзии и др.;',
+        'Нейрохирургия;',
+        'Люмбальная диагностическая пункция;',
+        'Сложная эндоскопия (например, множественная/обширная полипэктомия, эндоскопическая ретроградная панкреатохолангиография со сфинктеротомией и т.д.);',
+        'Абдоминальная хирургия (в т.ч. биопсия печени);',
+        'Торакальная хирургия;',
+        'Большие урологические вмешательства/биопсия (в т.ч. на почках);',
+        'Экстракорпоральная ударно-волновая литотрипсия;',
+        'Большие ортопедические вмешательства;'
+      ]
+    },
+    {
+      value: '4',
+      title: 'Нейроаксиальная анестезия',
+      items: [
+        'Спинномозговая (спинальная) анестезия;',
+        'Эпидуральная анестезия;',
+        'Пункция/катетеризация эпидурального пространства;'
+      ],
+      note: 'Планирование спинального или эпидурального доступа — требует самых длительных интервалов отмены (риск спинальной гематомы).'
+    }
+  ];
+
+  const THROMBOSIS_OPTIONS = [
+    {
+      value: '1',
+      title: 'Низкий риск',
+      items: [
+        'ВТЭО >12 мес.',
+        'CHA₂DS₂-VA — 1–3 балла (без предшествующего анамнеза инсульта)',
+        'Двустворчатый механический протез аортального клапана без основных факторов риска инсульта'
+      ]
+    },
+    {
+      value: '2',
+      title: 'Умеренный риск',
+      items: [
+        'ВТЭО ≤3–12 мес.',
+        'Рецидивирующая ВТЭО',
+        'CHA₂DS₂-VA — 4–5 баллов',
+        'Двустворчатый механический протез аортального клапана с основными факторами риска инсульта',
+        'Протез митрального клапана без основных факторов риска инсульта',
+        'Нетяжелая коагулопатия (гетерозиготная мутация фактора V Лейдена или гена протромбина G20210A)',
+        'Онкологическое заболевание'
+      ]
+    },
+    {
+      value: '3',
+      title: 'Высокий риск',
+      items: [
+        'Недавняя ВТЭО <3 мес.',
+        'CHA₂DS₂-VA ≥6 (или 4–5 баллов с недавним инсультом или ТИА)',
+        'ОП с ревматическим клапанным заболеванием сердца',
+        'Механический протез митрального клапана',
+        'Клеточный шаровой или наклоннодисковый протез клапана',
+        'Механический протез клапана в любой позиции с недавним инсультом или ТИА (<3 мес.)',
+        'Недавний кардиоэмболический инсульт (<3 мес.)',
+        'Тромб левого желудочка (в течение последних 3 мес.)',
+        'Активный рак, связанный с высоким риском ВТЭ',
+        'Тяжелая тромбофилия',
+        'Антифосфолипидные антитела'
+      ]
+    }
+  ];
+
+  /* ─────────────── Элементы ─────────────── */
+  const $ = id => document.getElementById(id);
+  const ageEl = $('age'), weightEl = $('weight'), creatEl = $('creat');
+  const lockedBox = $('lockedBox'), contentBox = $('contentBox');
+
+  /* ═══════════════════════════════════════
+     RISK SELECTOR (dropdown with radios)
+  ═══════════════════════════════════════ */
+  function initRiskSelector(selectorEl, options, name){
+    const trigger = selectorEl.querySelector('.risk-trigger');
+    const triggerLabel = trigger.querySelector('.risk-trigger-label');
+    const dropdown = selectorEl.querySelector('.risk-dropdown');
+
+    // Заполняем содержимым
+    dropdown.innerHTML = options.map(opt => `
+      <div class="risk-option" data-value="${opt.value}" role="option" aria-selected="false">
+        <span class="risk-radio" aria-hidden="true"></span>
+        <div class="risk-body">
+          <div class="risk-name">${opt.title}</div>
+          <ul class="risk-list">${opt.items.map(i => '<li>' + i + '</li>').join('')}</ul>
+        </div>
+      </div>
+    `).join('');
+
+    // Клик по опции
+    dropdown.addEventListener('click', e => {
+      const opt = e.target.closest('.risk-option');
+      if(!opt) return;
+      e.stopPropagation();
+      const value = opt.dataset.value;
+      // toggle: если клик по уже выбранной опции — снять
+      if(state[name] === value){
+        state[name] = null;
+      }else{
+        state[name] = value;
+      }
+      updateRiskSelectorUI(selectorEl, options, name);
+      update();
+      // закрываем
+      selectorEl.classList.remove('open');
+    });
+
+    // Открыть/закрыть по клику на trigger (для тач-устройств)
+    trigger.addEventListener('click', e => {
+      e.stopPropagation();
+      selectorEl.classList.toggle('open');
+    });
+
+    // Закрыть при клике вне
+    document.addEventListener('click', e => {
+      if(!selectorEl.contains(e.target)) selectorEl.classList.remove('open');
+    });
+  }
+
+  function updateRiskSelectorUI(selectorEl, options, name){
+    const triggerLabel = selectorEl.querySelector('.risk-trigger-label');
+    const value = state[name];
+
+    // Подсветка выбранной опции
+    selectorEl.querySelectorAll('.risk-option').forEach(opt => {
+      const isSel = opt.dataset.value === value;
+      opt.classList.toggle('selected', isSel);
+      opt.setAttribute('aria-selected', isSel ? 'true' : 'false');
+    });
+
+    // Обновление триггера
+    if(value){
+      const opt = options.find(o => o.value === value);
+      let dotClass = 'trigger-dot-' + value;
+      if(name === 'thrombosis' && value === '2') dotClass = 'trigger-dot-warn';
+      triggerLabel.className = 'risk-trigger-label';
+      triggerLabel.innerHTML = `<span class="trigger-dot ${dotClass}"></span>${opt.title}`;
+    }else{
+      triggerLabel.className = 'risk-trigger-label empty';
+      triggerLabel.textContent = 'Выберите степень риска';
+    }
+  }
+
+  // Инициализация
+  const bleedSelEl = $('bleedSelector');
+  const thrombosisSelEl = $('thrombosisSelector');
+  initRiskSelector(bleedSelEl, BLEED_OPTIONS, 'bleed');
+  initRiskSelector(thrombosisSelEl, THROMBOSIS_OPTIONS, 'thrombosis');
+
+  /* ─────────────── Переключатели (sex, drug) ─────────────── */
+  document.querySelectorAll('.seg').forEach(seg => {
+    const name = seg.dataset.name;
+    seg.addEventListener('click', e => {
+      const btn = e.target.closest('.seg-btn');
+      if(!btn) return;
+      const wasActive = btn.classList.contains('active');
+      seg.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+      if(wasActive){
+        state[name] = null;
+      }else{
+        btn.classList.add('active');
+        state[name] = btn.dataset.value;
+      }
+      // если ушли с варфарина — сбрасываем риск тромбоза
+      if(name === 'drug' && state.drug !== 'warfarin'){
+        state.thrombosis = null;
+        updateRiskSelectorUI(thrombosisSelEl, THROMBOSIS_OPTIONS, 'thrombosis');
+      }
+      update();
+    });
+  });
+
+  /* ─────────────── Единицы креатинина ─────────────── */
+  $('unitToggle').addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if(!btn || btn.dataset.unit === creatUnit) return;
+    creatUnit = btn.dataset.unit;
+    $('unitToggle').querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+    $('creatHint').textContent = creatUnit === 'umol'
+      ? 'Введите значение в мкмоль/л'
+      : 'Введите значение в мг/дл';
+    creatEl.value = '';
+    state.creatUmol = null;
+    update();
+  });
+
+  /* ─────────────── Числовые поля ─────────────── */
+  [ageEl, weightEl, creatEl].forEach(el => {
+    el.addEventListener('input', () => {
+      const a = parseFloat(ageEl.value);
+      const w = parseFloat(weightEl.value);
+      const c = parseFloat(creatEl.value);
+      state.age = isFinite(a) ? a : null;
+      state.weight = isFinite(w) ? w : null;
+      state.creatUmol = isFinite(c) ? (creatUnit === 'mgdl' ? c * 88.4 : c) : null;
+      update();
+    });
+  });
+
+  /* ─────────────── Сброс ─────────────── */
+  $('resetBtn').addEventListener('click', () => {
+    ageEl.value=''; weightEl.value=''; creatEl.value='';
+    document.querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+    Object.keys(state).forEach(k => state[k] = null);
+    creatUnit = 'umol';
+    $('unitToggle').querySelectorAll('button').forEach(b => b.classList.toggle('active', b.dataset.unit === 'umol'));
+    $('creatHint').textContent = 'Введите значение в мкмоль/л';
+    updateRiskSelectorUI(bleedSelEl, BLEED_OPTIONS, 'bleed');
+    updateRiskSelectorUI(thrombosisSelEl, THROMBOSIS_OPTIONS, 'thrombosis');
+    update();
+  });
+
+  /* ─────────────── Модальные окна ─────────────── */
+  document.querySelectorAll('[data-modal]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const m = $(btn.dataset.modal);
+      if(m) m.classList.add('open');
+    });
+  });
+  document.querySelectorAll('.modal').forEach(m => {
+    m.addEventListener('click', e => { if(e.target === m) m.classList.remove('open'); });
+    const closeBtn = m.querySelector('[data-close]');
+    if(closeBtn) closeBtn.addEventListener('click', () => m.classList.remove('open'));
+  });
+  document.addEventListener('keydown', e => {
+    if(e.key === 'Escape') document.querySelectorAll('.modal.open').forEach(m => m.classList.remove('open'));
+  });
+
+  /* ═══════════════════════════════════════
+     COPY
+  ═══════════════════════════════════════ */
+  let lastCopyText = '';
+  const copyBtn = $('copyBtn');
+  const copyStatus = $('copyStatus');
+  let copyTimer = null;
+
+  function setCopyAvailability(ok){
+    copyBtn.disabled = !ok;
+  }
+
+  function showCopyStatus(msg, isError){
+    copyStatus.textContent = msg;
+    copyStatus.style.color = isError ? 'var(--danger)' : 'var(--ok)';
+    copyStatus.classList.add('show');
+    clearTimeout(copyTimer);
+    copyTimer = setTimeout(() => copyStatus.classList.remove('show'), 2200);
+  }
+
+  function buildCopyText(plan){
+    function stripLeading(title, prefix){
+      let s = (title || '').replace(/[.\s]+$/g, '');
+      if (s.startsWith(prefix)) s = s.slice(prefix.length).trim();
+      // если остаток начинается с заглавной кириллицы — приводим к строчной
+      s = s.replace(/^([А-ЯЁ])/, c => c.toLowerCase());
+      return s;
+    }
+
+    let stopPart   = stripLeading(plan.stop.title,   'Отмена ');
+    let resumePart = stripLeading(plan.resume.title, 'Возобновление ');
+
+    // Крайний случай: тайтл «Приём не возобновляется» — чтобы не было «приём … приём»
+    if (/^приём не возобновляется$/.test(resumePart)) {
+      resumePart = 'не возобновляется';
+    }
+
+    return `Отмена антикоагулянта перед операцией — ${stopPart}.\nВозобновление приёма после операции — ${resumePart}.`;
+  }
+
+  copyBtn.addEventListener('click', async () => {
+    if(!lastCopyText) return;
+    try {
+      if(navigator.clipboard && window.isSecureContext){
+        await navigator.clipboard.writeText(lastCopyText);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = lastCopyText;
+        ta.setAttribute('readonly', '');
+        ta.style.position = 'fixed';
+        ta.style.top = '-1000px';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        const ok = document.execCommand('copy');
+        document.body.removeChild(ta);
+        if(!ok) throw new Error('execCommand failed');
+      }
+      showCopyStatus('Скопировано ✓', false);
+    } catch(err){
+      showCopyStatus('Не удалось скопировать', true);
+    }
+  });
+
+  setCopyAvailability(false);
+
+  /* ─────────────── Формулы ─────────────── */
+  function ekfc(sex, age, scr){
+    let Q;
+    if(age <= 25){
+      if(sex === 'm'){
+        Q = 3.2 + 0.259*age - 0.543*Math.log(age) - 0.00763*age*age + 0.000079*Math.pow(age,3);
+      }else{
+        Q = 3.08 + 0.177*age - 0.223*Math.log(age) - 0.00596*age*age + 0.0000686*Math.pow(age,3);
+      }
+    }else{
+      Q = (sex === 'm') ? 80 : 62;
+    }
+    const r = scr / Q;
+    const base = (r <= 1) ? 107.3 * Math.pow(r, -0.322) : 107.3 * Math.pow(r, -1.132);
+    return (age <= 40) ? base : base * Math.pow(0.99, age - 40);
+  }
+
+  function ckdepi2021(sex, age, scrUmol){
+    const scr = scrUmol * 0.011312;
+    if(sex === 'f'){
+      const r = scr / 0.7;
+      return (r <= 1)
+        ? 142 * Math.pow(r, -0.241) * Math.pow(0.9938, age) * 1.012
+        : 142 * Math.pow(r, -1.2)   * Math.pow(0.9938, age) * 1.012;
+    }else{
+      const r = scr / 0.9;
+      return (r <= 1)
+        ? 142 * Math.pow(r, -0.302) * Math.pow(0.9938, age)
+        : 142 * Math.pow(r, -1.2)   * Math.pow(0.9938, age);
+    }
+  }
+
+  function cockcroft(sex, age, weight, scrUmol){
+    const base = (140 - age) * weight / scrUmol;
+    return sex === 'm' ? base * 1.23 : base * 1.04;
+  }
+
+  function ckdStage(gfr){
+    if(gfr >= 90) return {code:'С1',  icd:'N18.1', cls:'stage-1'};
+    if(gfr >= 60) return {code:'С2',  icd:'N18.2', cls:'stage-2'};
+    if(gfr >= 45) return {code:'С3а', icd:'N18.3', cls:'stage-3'};
+    if(gfr >= 30) return {code:'С3б', icd:'N18.3', cls:'stage-3'};
+    if(gfr >= 15) return {code:'С4',  icd:'N18.4', cls:'stage-4'};
+    return          {code:'С5',  icd:'N18.5', cls:'stage-5'};
+  }
+
+  /* ─────────────── Клиническая логика ─────────────── */
+  function buildPlan(st){
+    const crcl = st.crcl;
+    const b = parseInt(st.bleed, 10);
+    const t = st.thrombosis ? parseInt(st.thrombosis, 10) : null;
+
+    const out = {
+      stop:{tone:'info', title:'', text:'', bullets:[]},
+      resume:{tone:'info', title:'', text:'', bullets:[]},
+      antidote:''
+    };
+
+    /* ВАРФАРИН */
+    if(st.drug === 'warfarin'){
+      out.antidote = 'Для экстренного устранения антикоагуляционной активности варфарина применяют витамин К1 (фитоменадион), концентрат протромбинового комплекса (КПК) и свежезамороженную плазму (СЗП).';
+
+      if(b === 1){
+        out.stop.tone = 'ok';
+        out.stop.title = 'Отмена не требуется';
+        out.stop.text = 'При минимальном риске кровотечения вмешательство может быть выполнено на фоне продолжающегося приёма варфарина.';
+        out.stop.bullets = [
+          'МНО должно находиться в целевом диапазоне (2,0–3,0 для ФП/ВТЭО/тромба ЛЖ; 2,5–3,5 для механического протеза клапана) и быть проконтролировано непосредственно перед процедурой.',
+          'При низком или высоком риске кровотечения — тактика отмены за 5 дней.'
+        ];
+      }else{
+        out.stop.tone = 'warn';
+        out.stop.title = 'Отмена за 5 дней до операции';
+        out.stop.text = 'Варфарин отменяется за 5 дней до планируемого вмешательства.';
+        out.stop.bullets = [
+          'В день накануне операции — контроль МНО.',
+          'При МНО > 1,5 рекомендуется приём 5 мг витамина К1 (фитоменадион, Канеовит).'
+        ];
+        if(t >= 2){
+          out.stop.bullets.push('На 3-й и 2-й день до операции — мост-терапия НМГ или НФГ (умеренный/высокий риск тромбоза).');
+          out.stop.bullets.push('Последнее введение НМГ — за 12 часов, внутривенного НФГ — за 4–5 часов до операции.');
+        }else{
+          out.stop.bullets.push('Мост-терапия НМГ/НФГ — по решению консилиума; при низком риске тромбоза возможна отмена без мост-терапии под контролем МНО.');
+        }
+      }
+
+      out.resume.tone = 'info';
+      out.resume.title = 'Возобновление через 6–48 часов после операции';
+      out.resume.text = 'Приём варфарина возобновляется, как только будет достигнут устойчивый гемостаз.';
+      out.resume.bullets = [
+        'Послеоперационная мост-терапия НМГ/НФГ возобновляется через 6–48 часов после операции.',
+        'Введение НМГ/НФГ продолжают до достижения целевого МНО по результатам двух анализов, взятых с интервалом не менее 12–24 часов.'
+      ];
+    }
+
+    /* ДАБИГАТРАН */
+    else if(st.drug === 'dabigatran'){
+      out.antidote = 'Для экстренного устранения антикоагуляционной активности дабигатрана этексилата (Прадакса) применяется в/в идаруцизумаб (Праксбайнд).';
+
+      if(crcl < 30){
+        out.stop.tone = 'danger';
+        out.stop.title = 'Нет официальных показаний к применению';
+        out.stop.text = 'При КлКр < 30 мл/мин дабигатран не рекомендован. До планового вмешательства следует рассмотреть смену антикоагулянта.';
+        out.resume.tone = 'danger';
+        out.resume.title = 'Приём не возобновляется';
+        out.resume.text = 'Нет официальных показаний к применению дабигатрана при КлКр < 30 мл/мин.';
+      }else if(b === 1){
+        out.stop.tone = 'ok';
+        out.stop.title = 'Отмена не требуется';
+        out.stop.text = 'При минимальном риске кровотечения и КлКр ≥ 30 мл/мин вмешательство возможно без отмены дабигатрана.';
+        out.resume.tone = 'ok';
+        out.resume.title = 'Возобновление в обычном режиме';
+        out.resume.text = 'Приём возобновляется после достижения устойчивого гемостаза.';
+      }else{
+        let hours;
+        if(b === 4){
+          hours = crcl >= 80 ? 72 : crcl >= 50 ? 96 : 120;
+          out.stop.tone = 'warn';
+          out.stop.title = `Отмена ≥ ${hours} часов до операции`;
+          out.stop.text = 'Нейроаксиальная (спинномозговая/эпидуральная) анестезия · риск спинальной гематомы.';
+          out.stop.bullets = [
+            'Дабигатран отменяется за ≥ 96 часов до спинального/эпидурального доступа (при КлКр 50–80 мл/мин) — по ASRA. При КлКр < 50 мл/мин интервал увеличивается.',
+            'Доступ к нейроаксиальной анестезии — только после полного выведения антикоагулянта.'
+          ];
+        }else if(b === 2){
+          hours = crcl >= 80 ? 24 : crcl >= 50 ? 36 : 48;
+          out.stop.text = `КлКр ${crcl.toFixed(0)} мл/мин · низкий риск кровотечения.`;
+        }else{
+          hours = crcl >= 80 ? 48 : crcl >= 50 ? 72 : 96;
+          out.stop.text = `КлКр ${crcl.toFixed(0)} мл/мин · высокий риск кровотечения.`;
+        }
+        if(b !== 4){
+          out.stop.tone = 'warn';
+          out.stop.title = `Отмена ≥ ${hours} часов до операции`;
+          out.stop.bullets = [
+            'Последний приём дабигатрана — не позднее указанного интервала до вмешательства.',
+            'Перед операцией оценить остаточный эффект при высоком риске кровотечения.'
+          ];
+        }
+
+        if(b === 4){
+          out.resume.tone = 'warn';
+          out.resume.title = 'Возобновление после удаления катетера';
+          out.resume.text = 'Приём дабигатрана возможен не ранее 24 часов после удаления спинального/эпидурального катетера при устойчивом гемостазе.';
+        }else if(b === 3){
+          out.resume.tone = 'warn';
+          out.resume.title = 'Возобновление через 48–72 часа';
+          out.resume.text = 'Приём дабигатрана в полной дозе возможен не ранее 48–72 часов после процедуры — при достижении устойчивого гемостаза.';
+        }else{
+          out.resume.tone = 'ok';
+          out.resume.title = 'Возобновление в день процедуры';
+          out.resume.text = 'Приём ПОАК в полной дозе возможно в день выполнения процедуры после достижения гемостаза.';
+        }
+        out.resume.bullets = [
+          'Решение индивидуально — с учётом объёма вмешательства и темпа кровоточивости.',
+          'У хрупких пациентов, пожилых или при нарушении функции почек возобновление может начинаться с профилактической дозы с последующим повышением до терапевтической.'
+        ];
+      }
+    }
+
+    /* ИНГИБИТОРЫ Xa */
+    else{
+      out.antidote = 'Для экстренного устранения антикоагуляционной активности ингибиторов Xa применяется специфический антидот андексагент альфа, а при его недоступности — концентрат протромбинового комплекса (КПК) или рекомбинантный фактор свёртывания крови VIIa (rFVIIa). Андексагент альфа не рекомендуется перед кардиохирургическими и сосудистыми вмешательствами из-за взаимодействия с гепарином.';
+
+      if(crcl < 15){
+        out.stop.tone = 'danger';
+        out.stop.title = 'Нет официальных показаний к применению';
+        out.stop.text = 'При КлКр < 15 мл/мин применение ингибиторов Xa не рекомендовано.';
+        out.resume.tone = 'danger';
+        out.resume.title = 'Приём не возобновляется';
+        out.resume.text = 'Нет официальных показаний к применению при КлКр < 15 мл/мин.';
+        return out;
+      }
+
+      if(b === 1){
+        out.stop.tone = 'ok';
+        out.stop.title = 'Отмена не требуется';
+        out.stop.text = 'При минимальном риске кровотечения вмешательство возможно без отмены ПОАК.';
+      }else if(b === 4){
+        out.stop.tone = 'warn';
+        out.stop.title = 'Отмена ≥ 72 часов до операции';
+        out.stop.text = 'Нейроаксиальная (спинномозговая/эпидуральная) анестезия · риск спинальной гематомы.';
+        out.stop.bullets = [
+          'Ингибиторы Xa отменяются за ≥ 72 часов до спинального/эпидурального доступа (по ASRA).',
+          'При КлКр < 30 мл/мин интервал продлевается до ≥ 96 часов.',
+          'Доступ к нейроаксиальной анестезии — только после полного выведения антикоагулянта.'
+        ];
+      }else if(b === 2){
+        const h = crcl > 30 ? 24 : 36;
+        out.stop.tone = 'warn';
+        out.stop.title = `Отмена ≥ ${h} часов до операции`;
+        out.stop.text = `КлКр ${crcl.toFixed(0)} мл/мин · низкий риск кровотечения.`;
+      }else{
+        let h = 48;
+        if(crcl < 30) h = 96; else if(crcl <= 50) h = 72;
+        out.stop.tone = 'warn';
+        out.stop.title = `Отмена ≥ ${h} часов до операции`;
+        out.stop.text = `КлКр ${crcl.toFixed(0)} мл/мин · высокий риск кровотечения.`;
+      }
+      if(out.stop.bullets.length === 0 && b !== 1){
+        out.stop.bullets = ['Последний приём препарата — не позднее указанного интервала до вмешательства.'];
+      }
+
+      if(b === 4){
+        out.resume.tone = 'warn';
+        out.resume.title = 'Возобновление после удаления катетера';
+        out.resume.text = 'Приём ПОАК возможен не ранее 24 часов после удаления спинального/эпидурального катетера при устойчивом гемостазе.';
+      }else if(b === 3){
+        out.resume.tone = 'warn';
+        out.resume.title = 'Возобновление через 48–72 часа';
+        out.resume.text = 'Приём ПОАК в полной дозе возможен через 48–72 часа после выполнения процедуры.';
+      }else if(b === 2){
+        out.resume.tone = 'ok';
+        out.resume.title = 'Возобновление в день процедуры';
+        out.resume.text = 'Приём ПОАК в полной дозе возможно в день выполнения процедуры.';
+      }else{
+        out.resume.tone = 'ok';
+        out.resume.title = 'Возобновление в обычном режиме';
+        out.resume.text = 'Приём ПОАК возобновляется после достижения устойчивого гемостаза (обычно через 6–24 часа).';
+      }
+      out.resume.bullets = [
+        'Решение индивидуально — с учётом объёма вмешательства и темпа кровоточивости.',
+        'У хрупких пациентов, пожилых или при нарушении функции почек возобновление может начинаться с профилактической дозы с последующим повышением до терапевтической.'
+      ];
+    }
+
+    return out;
+  }
+
+  /* ─────────────── Отрисовка ─────────────── */
+  function metricCard(label, value, unit, stage){
+    return `
+      <div class="metric">
+        <div class="metric-label">${label}</div>
+        <div class="metric-value">${value}<span> ${unit}</span></div>
+        <div class="metric-stage ${stage.cls}">ХБП ${stage.code} · ${stage.icd}</div>
+      </div>`;
+  }
+
+  function renderMetrics(m){
+    $('metrics').innerHTML =
+      metricCard('рСКФ · EKFC', m.ekfc.toFixed(1), 'мл/мин/1,73 м²', m.stageEkfc) +
+      metricCard('рСКФ · CKD-EPI 2021', m.epi.toFixed(1), 'мл/мин/1,73 м²', m.stageEpi) +
+      metricCard('КлКр · Cockcroft–Gault', m.crcl.toFixed(0), 'мл/мин', m.stageCrcl);
+  }
+
+  function fillRec(prefix, rec){
+    const box = $(prefix === 'stop' ? 'recStop' : 'recResume');
+    box.className = 'rec tone-' + rec.tone;
+    $(prefix + 'Title').textContent = rec.title;
+    $(prefix + 'Text').textContent = rec.text;
+    const ul = $(prefix + 'List');
+    ul.innerHTML = '';
+    (rec.bullets || []).forEach(b => {
+      const li = document.createElement('li');
+      li.textContent = b;
+      ul.appendChild(li);
+    });
+    ul.style.display = (rec.bullets && rec.bullets.length) ? '' : 'none';
+  }
+
+  function drugLabel(d){
+    return d === 'dabigatran' ? 'Дабигатран'
+         : d === 'xa' ? 'Ингибитор Xa'
+         : 'Варфарин';
+  }
+  function bleedLabel(v){
+    return v === '1' ? 'минимальный' : v === '2' ? 'низкий' : v === '4' ? 'нейроаксиальная' : 'высокий';
+  }
+  function thrombosisLabel(v){
+    return v === '1' ? 'низкий' : v === '2' ? 'умеренный' : 'высокий';
+  }
+
+  /* ─────────────── Обновление ─────────────── */
+  function update(){
+    const {sex, age, weight, creatUmol, drug, bleed, thrombosis} = state;
+
+    /* Видимость блока «Риск тромбоза» */
+    const thrombosisInfo = $('thrombosisInfo');
+    const thrombosisInfoText = $('thrombosisInfoText');
+
+    if(drug === 'warfarin'){
+      thrombosisInfo.hidden = true;
+      thrombosisSelEl.hidden = false;
+    }else{
+      thrombosisSelEl.hidden = true;
+      thrombosisInfo.hidden = false;
+      if(drug){
+        thrombosisInfoText.innerHTML =
+          `<b>Выбран препарат: ${drugLabel(drug)}.</b> Риск тромбоза влияет на периоперационную тактику только при приёме варфарина (определяет необходимость мост-терапии). ` +
+          `Расчёт для выбранного ПОАК выполняется автоматически на основании риска кровотечения и функции почек — см. результаты справа.`;
+      }else{
+        thrombosisInfoText.innerHTML =
+          `<b>Риск тромбоза учитывается только при приёме варфарина.</b> Сначала выберите антикоагулянт — для ПОАК (дабигатран / ингибиторы Xa) риск тромбоза на периоперационную тактику не влияет.`;
+      }
+    }
+
+    /* Для варфарина ренальные поля ввода (пол/возраст/масса/креатинин) не нужны —
+       скрываем их, чтобы не требовать избыточных данных. Для ПОАК показываем. */
+    const isWarfarin = drug === 'warfarin';
+    const renalSection = $('renalSection');
+    if(renalSection) renalSection.style.display = isWarfarin ? 'none' : '';
+
+    /* Хватает ли базовых параметров:
+       - для варфарина достаточно рисков (кровотечения и тромбоза), ренальные поля не требуются;
+       - для ПОАК обязательны пол, возраст, масса и креатинин (для КлКр). */
+    const renalOk = sex && age >= 18 && age <= 120 && weight >= 20 && weight <= 300
+                   && creatUmol >= 20 && creatUmol <= 3000;
+    const baseOk = isWarfarin || renalOk;
+
+    if(!baseOk){
+      contentBox.hidden = true;
+      lockedBox.hidden = false;
+      lastCopyText = '';
+      setCopyAvailability(false);
+      return;
+    }
+
+    /* Расчёт ренальных показателей выполняется только для ПОАК.
+       Для варфарина они не участвуют в периоперационной тактике. */
+    const gfrInfo = $('gfrInfo');
+    const metricsEl = $('metrics');
+    const cockNote = $('cockNote');
+    let ekfcVal = null, epiVal = null, crclVal = null;
+
+    if(isWarfarin){
+      metricsEl.innerHTML = '';
+      metricsEl.style.display = 'none';
+      if(cockNote) cockNote.style.display = 'none';
+      if(gfrInfo) gfrInfo.hidden = false;
+    }else{
+      ekfcVal = ekfc(sex, age, creatUmol);
+      epiVal  = ckdepi2021(sex, age, creatUmol);
+      crclVal = cockcroft(sex, age, weight, creatUmol);
+
+      renderMetrics({
+        ekfc: ekfcVal, epi: epiVal, crcl: crclVal,
+        stageEkfc: ckdStage(ekfcVal),
+        stageEpi:  ckdStage(epiVal),
+        stageCrcl: ckdStage(crclVal)
+      });
+      metricsEl.style.display = '';
+      if(cockNote) cockNote.style.display = '';
+      if(gfrInfo) gfrInfo.hidden = true;
+    }
+
+    /* Проверка полноты ввода для рекомендаций */
+    const needThrombosis = isWarfarin;
+    const fullOk = drug && bleed && (!needThrombosis || thrombosis);
+
+    const hintArea = $('hintArea');
+    hintArea.innerHTML = '';
+
+    if(!fullOk){
+      // Подсказка в зависимости от того, чего не хватает
+      let hintText = '';
+      let hintIcon = '⚠️';
+      if(!drug){
+        hintText = '<b>Выберите антикоагулянт</b> (дабигатран, ингибиторы Xa или варфарин), чтобы рассчитать периоперационную тактику.';
+      }else if(!bleed){
+        hintText = '<b>Укажите степень риска кровотечения</b> для выбранного вмешательства — это основной параметр для расчёта срока отмены препарата.';
+      }else if(needThrombosis && !thrombosis){
+        hintText = '<b>Укажите степень риска тромбоза.</b> Для приёма варфарина это необходимо для решения о мост-терапии НМГ/НФГ на период отмены.';
+      }
+      hintArea.innerHTML =
+        `<div class="hint-callout">
+           <span class="hint-callout-icon">${hintIcon}</span>
+           <div>${hintText}</div>
+         </div>`;
+
+      // Скрываем блоки рекомендаций
+      $('recStop').style.display = 'none';
+      $('recResume').style.display = 'none';
+      $('recAntidote').style.display = 'none';
+
+      // Копирование недоступно
+      lastCopyText = '';
+      setCopyAvailability(false);
+
+      // Summary pills — показываем текущее состояние
+      const parts = [];
+      if(drug) parts.push(`<b>${drugLabel(drug)}</b>`);
+      if(bleed) parts.push(`кровотечение: <b>${bleedLabel(bleed)}</b>`);
+      if(thrombosis) parts.push(`тромбоз: <b>${thrombosisLabel(thrombosis)}</b>`);
+      if(crclVal !== null) parts.push(`КлКр ${crclVal.toFixed(0)} мл/мин`);
+      $('summaryPills').innerHTML = parts.join(' · ');
+
+      contentBox.hidden = false;
+      lockedBox.hidden = true;
+      return;
+    }
+
+    // Полный расчёт
+    $('recStop').style.display = '';
+    $('recResume').style.display = '';
+    $('recAntidote').style.display = '';
+
+    const plan = buildPlan({
+      drug, bleed, thrombosis: thrombosis || null,
+      crcl: crclVal, ekfc: ekfcVal
+    });
+
+    fillRec('stop', plan.stop);
+    fillRec('resume', plan.resume);
+    $('antidoteText').textContent = plan.antidote;
+
+    // Текст для копирования
+    lastCopyText = buildCopyText(plan);
+    setCopyAvailability(true);
+
+    let summary = `<b>${drugLabel(drug)}</b>`;
+    if(crclVal !== null) summary += ` · КлКр ${crclVal.toFixed(0)} мл/мин`;
+    summary += `<br>кровотечение: <b>${bleedLabel(bleed)}</b>`;
+    if(needThrombosis){
+      summary += ` · тромбоз: <b>${thrombosisLabel(thrombosis)}</b>`;
+    }
+    $('summaryPills').innerHTML = summary;
+
+    contentBox.hidden = false;
+    lockedBox.hidden = true;
+  }
+
+  update();
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="EGFR.html" title="Расчёт рСКФ, стадии ХБП, дозы ПОАК">рСКФ / ХБП</a>
+    <a href="af.html" title="Риск инсульта и кровотечения при ФП">ФП · ОАК</a>
+    <a href="операция.html" title="Кардиальный и почечный риск при операциях">Операционный риск</a>
+    <a href="ХСН.html" title="Диагностика ХСН с сохранённой ФВ">СНсФВ (H2FPEF)</a>
+    <a href="mehran2.html" title="Риск контраст-нефропатии">Мехран-2</a>
+    <a href="bsa.html" title="Антропометрия, площадь поверхности тела">ИМТ и ППТ</a>
+  </div>
+</div>
+</body>
+</html>

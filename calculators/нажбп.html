@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>НАЖБП — калькулятор индексов FIB-4, FLI, CDS, HSI</title>
+<style>
+  :root{
+    --bg:#eef3f6;
+    --card:#ffffff;
+    --ink:#10242e;
+    --muted:#5b7480;
+    --line:#dbe6ec;
+    --accent:#0d7c72;
+    --accent-dark:#0a655d;
+    --accent-soft:#e3f3f1;
+    --ok:#0f8a4d;      --ok-bg:#e7f7ee;
+    --warn:#a86400;    --warn-bg:#fff4e0;
+    --bad:#b3261e;     --bad-bg:#fdecea;
+    --neutral:#4a6572; --neutral-bg:#eef2f5;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+
+  body{
+    margin:0;
+    padding:24px 16px 40px;
+    font-family:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    color:var(--ink);
+    background:
+      radial-gradient(1200px 600px at 12% -10%, #dff1ee 0%, transparent 60%),
+      radial-gradient(1000px 500px at 100% 0%, #e2edf7 0%, transparent 55%),
+      var(--bg);
+    min-height:100vh;
+  }
+
+  .wrap{max-width:1320px;margin:0 auto;}
+
+  /* ---------- Шапка ---------- */
+  .hero{
+    display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+    background:linear-gradient(135deg,#0d7c72 0%,#116b8f 100%);
+    color:#fff;border-radius:18px;padding:22px 26px;
+    box-shadow:0 14px 32px -14px rgba(13,124,114,.6);
+  }
+  .hero-mark{
+    flex:0 0 auto;font-weight:700;letter-spacing:.09em;font-size:19px;
+    background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.35);
+    padding:10px 16px;border-radius:12px;
+  }
+  .hero h1{margin:0 0 3px;font-size:21px;font-weight:600;letter-spacing:-.01em;}
+  .hero p{margin:0;font-size:13.5px;opacity:.88;}
+
+  /* ---------- Инфо-строка ---------- */
+  .notice{
+    margin:16px 0 18px;padding:12px 16px;border-radius:12px;
+    background:var(--card);border:1px solid var(--line);
+    font-size:13.5px;color:var(--muted);
+    display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  }
+  .notice strong{color:var(--ink);font-weight:600;}
+  .notice-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+  .btn{
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:7px 15px;border-radius:9px;font:inherit;font-size:13px;
+    cursor:pointer;transition:.15s;
+  }
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn-primary:hover{background:var(--accent-dark);color:#fff;}
+
+  /* ---------- Основная раскладка: 2 колонки ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+    align-items:start;
+  }
+  .col{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+    min-width:0;
+  }
+  .full{grid-column:1 / -1;}
+
+  /* ---------- Карточка ---------- */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:18px 18px 16px;
+    box-shadow:0 10px 26px -20px rgba(16,36,46,.65);
+    display:flex;flex-direction:column;gap:14px;
+  }
+  .card-head{
+    border-bottom:2px solid var(--accent-soft);
+    padding-bottom:10px;
+  }
+  .card-head-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+  }
+  .card-head h2{margin:0;font-size:17px;font-weight:650;letter-spacing:-.01em;}
+  .card-head p{
+    margin:3px 0 0;font-size:11.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.07em;font-weight:600;
+  }
+  .card-note{
+    margin:0;font-size:12.5px;color:var(--muted);
+    background:#f5f9fa;border-radius:9px;padding:8px 11px;border-left:3px solid var(--accent-soft);
+  }
+
+  /* ---------- Таблицы ---------- */
+  .data-table{width:100%;border-collapse:collapse;}
+  .data-table th,
+  .data-table td{
+    padding:7px 2px;
+    border-bottom:1px dashed var(--line);
+    vertical-align:middle;
+  }
+  .data-table th{
+    text-align:left;font-weight:500;font-size:13.5px;color:#33505c;
+  }
+  .data-table td{
+    text-align:right;font-size:14px;
+    font-variant-numeric:tabular-nums;
+  }
+  .data-table tr:last-child th,
+  .data-table tr:last-child td{border-bottom:none;}
+
+  .calc-table th{color:var(--muted);font-weight:400;font-size:13px;}
+  .calc-table td{font-weight:600;color:var(--ink);}
+
+  .hint{color:var(--muted);font-size:11.5px;font-weight:400;}
+
+  /* ---------- Поля ввода ---------- */
+  .data-table input[type="text"]{
+    width:124px;max-width:44vw;
+    padding:7px 11px;
+    border:1px solid #cfdde5;border-radius:9px;
+    font:inherit;font-size:14px;text-align:right;
+    color:var(--ink);background:#fbfdfe;
+    font-variant-numeric:tabular-nums;
+    transition:.15s;
+  }
+  .data-table input[type="text"]:focus{
+    outline:none;border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(13,124,114,.15);background:#fff;
+  }
+  .data-table input[type="text"]::placeholder{color:#a9bcc6;}
+
+  /* ---------- Переключатель ---------- */
+  .switch{position:relative;display:inline-block;width:46px;height:25px;vertical-align:middle;}
+  .switch input{position:absolute;opacity:0;width:0;height:0;}
+  .slider{
+    position:absolute;inset:0;background:#c9d6dd;border-radius:25px;
+    transition:.2s;cursor:pointer;
+  }
+  .slider::before{
+    content:"";position:absolute;height:19px;width:19px;left:3px;top:3px;
+    background:#fff;border-radius:50%;transition:.2s;
+    box-shadow:0 1px 3px rgba(0,0,0,.28);
+  }
+  .switch input:checked + .slider{background:var(--accent);}
+  .switch input:checked + .slider::before{transform:translateX(21px);}
+  .switch input:focus-visible + .slider{box-shadow:0 0 0 3px rgba(13,124,114,.28);}
+
+  /* ---------- Формула ---------- */
+  .formula{
+    font-family:ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+    font-size:12px;color:var(--muted);
+    background:#f4f8fa;border-radius:9px;padding:9px 11px;
+    line-height:1.5;overflow-wrap:anywhere;
+  }
+
+  /* ---------- Результат ---------- */
+  .result{
+    background:#f7fafb;border:1px solid var(--line);border-radius:12px;
+    padding:12px 14px;display:flex;flex-direction:column;gap:10px;
+  }
+  .result-line{display:flex;align-items:baseline;justify-content:space-between;gap:12px;}
+  .result-label{
+    font-size:11.5px;color:var(--muted);
+    text-transform:uppercase;letter-spacing:.07em;font-weight:600;
+  }
+  .result-value{
+    font-size:25px;font-weight:700;letter-spacing:-.02em;
+    font-variant-numeric:tabular-nums;color:var(--accent);line-height:1.1;
+  }
+
+  .verdict{
+    font-size:13.5px;line-height:1.45;
+    padding:10px 12px;border-radius:10px;
+    border-left:4px solid currentColor;
+    background:var(--neutral-bg);color:var(--neutral);
+    transition:.15s;
+  }
+  .verdict[data-state="ok"]{background:var(--ok-bg);color:var(--ok);}
+  .verdict[data-state="warn"]{background:var(--warn-bg);color:var(--warn);}
+  .verdict[data-state="bad"]{background:var(--bad-bg);color:var(--bad);}
+
+  .note-small{font-size:12px;color:var(--muted);line-height:1.5;}
+
+  /* ---------- Кнопка копирования (выделена цветом) ---------- */
+  .btn-copy{
+    font-size:12px;
+    padding:4px 10px;
+    border-radius:7px;
+    white-space:nowrap;
+    flex:0 0 auto;
+    background:var(--accent-soft);
+    border:1px solid var(--accent);
+    color:var(--accent-dark);
+    font-weight:600;
+  }
+  .btn-copy:hover{
+    background:var(--accent);
+    border-color:var(--accent);
+    color:#fff;
+  }
+  .btn-copy.copied{
+    background:var(--ok-bg);
+    color:var(--ok);
+    border-color:var(--ok);
+  }
+
+  /* ---------- Справочные блоки ---------- */
+  .two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:0 30px;}
+  .ref-table{width:100%;border-collapse:collapse;font-size:13px;}
+  .ref-table td{padding:5px 0;border-bottom:1px dashed var(--line);vertical-align:top;}
+  .ref-table tr:last-child td{border-bottom:none;}
+  .ref-table td:first-child{width:96px;font-weight:600;color:var(--accent);white-space:nowrap;padding-right:10px;}
+  .ref-table td:last-child{color:#33505c;}
+
+  ol.sources{margin:0;padding-left:22px;font-size:13px;color:#33505c;line-height:1.6;}
+  ol.sources li{margin-bottom:7px;}
+  ol.sources li::marker{color:var(--accent);font-weight:600;}
+
+  /* ---------- Подвал ---------- */
+  .footer{
+    margin-top:26px;padding:18px 8px 6px;text-align:center;
+    font-size:12.5px;color:var(--muted);
+    border-top:1px solid var(--line);
+  }
+  .footer strong{color:#33505c;font-weight:600;}
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .full{grid-column:auto;}
+  }
+
+  @media (max-width:560px){
+    .hero{padding:18px;}
+    .hero h1{font-size:18px;}
+    .data-table input[type="text"]{width:104px;}
+    .result-value{font-size:22px;}
+    .card-head-row{flex-direction:column;align-items:flex-start;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-mark">НАЖБП</div>
+    <div>
+      <h1>Неинвазивная оценка стеатоза и фиброза печени</h1>
+      <p>Индексы FIB-4 · FLI · CDS · HSI — неалкогольная жировая болезнь печени</p>
+    </div>
+  </header>
+
+  <div class="notice">
+    <span>Введите данные пациента — расчёт выполняется мгновенно, в браузере, без передачи данных.</span>
+    <span class="notice-actions">
+      <button class="btn btn-primary" type="button" id="btn-clear">Очистить</button>
+    </span>
+  </div>
+
+  <main class="layout">
+
+    <!-- ========== ЛЕВАЯ КОЛОНКА: FIB-4 + CDS ========== -->
+    <div class="col">
+
+      <!-- ================= FIB-4 ================= -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2>Индекс FIB-4</h2>
+              <p>Индекс фиброза печени</p>
+            </div>
+            <button class="btn btn-copy" type="button" data-copy="fib4">Копировать</button>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <th scope="row">Возраст, годы</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fib4-age" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">АЛТ, Ед/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fib4-alt" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">АСТ, Ед/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fib4-ast" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">Тромбоциты, ×10⁹/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fib4-plt" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">МНО <span class="hint">(для шкалы CDS)</span></th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fib4-inr" placeholder=""></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="formula">FIB-4 = (возраст × АСТ) / (тромбоциты × √АЛТ)</div>
+
+        <div class="result">
+          <div class="result-line">
+            <span class="result-label">Индекс FIB-4</span>
+            <span class="result-value" id="fib4-value">—</span>
+          </div>
+          <div class="verdict" id="fib4-verdict" data-state="empty" role="status" aria-live="polite">
+            Заполните все поля блока.
+          </div>
+        </div>
+      </article>
+
+      <!-- ================= CDS ================= -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2>Шкала CDS</h2>
+              <p>Cirrhosis Discriminant Score</p>
+            </div>
+            <button class="btn btn-copy" type="button" data-copy="cds">Копировать</button>
+          </div>
+        </div>
+
+        <div class="result">
+          <div class="result-line">
+            <span class="result-label">Шкала CDS, баллы</span>
+            <span class="result-value" id="cds-value">—</span>
+          </div>
+          <div class="verdict" id="cds-verdict" data-state="empty" role="status" aria-live="polite">
+            Заполните АЛТ, АСТ, тромбоциты и МНО в блоке FIB-4.
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- ========== ПРАВАЯ КОЛОНКА: FLI + HSI ========== -->
+    <div class="col">
+
+      <!-- ================= FLI ================= -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2>Индекс FLI</h2>
+              <p>Fatty Liver Index — индекс стеатоза печени</p>
+            </div>
+            <button class="btn btn-copy" type="button" data-copy="fli">Копировать</button>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <th scope="row">Рост, см</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-height" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">Масса тела, кг</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-weight" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">ИМТ, кг/м² <span class="hint">(если известен)</span></th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-bmi" placeholder="авто"></td>
+            </tr>
+            <tr>
+              <th scope="row">Объём талии, см</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-waist" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">ГГТП, Ед/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-ggt" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">Триглицериды, ммоль/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="fli-tg" placeholder=""></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="data-table calc-table">
+          <tbody>
+            <tr><th>ИМТ, используемый в расчёте</th><td id="fli-bmi-out">—</td></tr>
+            <tr><th>ТГ, мг/дл (ммоль/л × 38,66)</th><td id="fli-tgmg-out">—</td></tr>
+            <tr><th>LP — линейный предиктор</th><td id="fli-lp-out">—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="formula">LP = 0,953·ln(ТГ мг/дл) + 0,139·ИМТ + 0,718·ln(ГГТП) + 0,053·талия − 15,745<br>FLI = e<sup>LP</sup> / (1 + e<sup>LP</sup>) × 100</div>
+
+        <div class="result">
+          <div class="result-line">
+            <span class="result-label">Индекс FLI</span>
+            <span class="result-value" id="fli-value">—</span>
+          </div>
+          <div class="verdict" id="fli-verdict" data-state="empty" role="status" aria-live="polite">
+            Заполните все поля блока.
+          </div>
+        </div>
+      </article>
+
+      <!-- ================= HSI ================= -->
+      <article class="card">
+        <div class="card-head">
+          <div class="card-head-row">
+            <div>
+              <h2>Индекс HSI</h2>
+              <p>Hepatic Steatosis Index</p>
+            </div>
+            <button class="btn btn-copy" type="button" data-copy="hsi">Копировать</button>
+          </div>
+        </div>
+
+        <table class="data-table">
+          <tbody>
+            <tr>
+              <th scope="row">ИМТ, кг/м²</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="hsi-bmi" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">АЛТ, Ед/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="hsi-alt" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">АСТ, Ед/л</th>
+              <td><input type="text" inputmode="decimal" autocomplete="off" id="hsi-ast" placeholder=""></td>
+            </tr>
+            <tr>
+              <th scope="row">Женский пол <span class="hint">(+2 балла)</span></th>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="hsi-female" aria-label="Женский пол">
+                  <span class="slider"></span>
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Сахарный диабет <span class="hint">(+2 балла)</span></th>
+              <td>
+                <label class="switch">
+                  <input type="checkbox" id="hsi-dm" aria-label="Сахарный диабет">
+                  <span class="slider"></span>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="data-table calc-table">
+          <tbody>
+            <tr><th>АЛТ / АСТ</th><td id="hsi-ratio">—</td></tr>
+          </tbody>
+        </table>
+
+        <div class="formula">HSI = 8 × (АЛТ/АСТ) + ИМТ + 2 (женский пол) + 2 (СД)</div>
+
+        <div class="result">
+          <div class="result-line">
+            <span class="result-label">Индекс HSI, баллы</span>
+            <span class="result-value" id="hsi-value">—</span>
+          </div>
+          <div class="verdict" id="hsi-verdict" data-state="empty" role="status" aria-live="polite">
+            Заполните все поля блока.
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- ================= ИСТОЧНИКИ ================= -->
+    <article class="card full">
+      <div class="card-head">
+        <h2>Источники</h2>
+        <p>Научные публикации и клинические рекомендации</p>
+      </div>
+      <ol class="sources">
+        <li>Sterling R.K., Lissen E., Clumeck N. et al. Development of a simple noninvasive index to predict significant fibrosis in patients with HIV/HCV coinfection // <em>Hepatology</em>. 2006. Vol. 43, № 6. P. 1317–1325. <strong>(FIB-4)</strong></li>
+        <li>Bedogni G., Bellentani S., Miglioli L. et al. The Fatty Liver Index: a simple and accurate predictor of hepatic steatosis in the general population // <em>BMC Gastroenterology</em>. 2006. Vol. 6. P. 33. <strong>(FLI)</strong></li>
+        <li>Bonacini M., Hadi G., Govindarajan S., Lindsay K.L. Utility of a discriminant score for diagnosing advanced fibrosis or cirrhosis in patients with chronic hepatitis C virus infection // <em>American Journal of Gastroenterology</em>. 1997. Vol. 92, № 8. P. 1302–1304. <strong>(CDS)</strong></li>
+        <li>Lee J.H., Kim D., Kim H.J. et al. Hepatic steatosis index: a simple screening tool reflecting nonalcoholic fatty liver disease // <em>Digestive and Liver Disease</em>. 2010. Vol. 42, № 7. P. 503–508. <strong>(HSI)</strong></li>
+        <li>EASL–EASD–EASO Clinical Practice Guidelines for the management of non-alcoholic fatty liver disease // <em>Journal of Hepatology</em>. 2016. Vol. 64, № 6. P. 1388–1402.</li>
+        <li>Клинические рекомендации «Неалкогольная жировая болезнь печени у взрослых». Российское общество по изучению печени.</li>
+        <li>Исходная расчётная таблица «НАЖБП» (файл НАЖБП.xlsx) — формулы и пороговые значения воспроизведены без изменений.</li>
+      </ol>
+      <div class="note-small">
+        Калькулятор предназначен для информационной поддержки врача и не заменяет клиническое заключение.
+        Интерпретация результатов должна проводиться с учётом анамнеза, данных инструментальных исследований и действующих клинических рекомендаций.
+      </div>
+    </article>
+
+    <!-- ================= СОКРАЩЕНИЯ ================= -->
+    <article class="card full">
+      <div class="card-head">
+        <h2>Сокращения</h2>
+        <p>Условные обозначения и единицы измерения</p>
+      </div>
+      <div class="two-col">
+        <table class="ref-table">
+          <tbody>
+            <tr><td>НАЖБП</td><td>неалкогольная жировая болезнь печени</td></tr>
+            <tr><td>FIB-4</td><td>Fibrosis-4 — индекс фиброза печени</td></tr>
+            <tr><td>FLI</td><td>Fatty Liver Index — индекс стеатоза печени</td></tr>
+            <tr><td>CDS</td><td>Cirrhosis Discriminant Score — дискриминантная шкала цирроза</td></tr>
+            <tr><td>HSI</td><td>Hepatic Steatosis Index — индекс стеатоза печени</td></tr>
+            <tr><td>LP</td><td>линейный предиктор (linear predictor)</td></tr>
+            <tr><td>АЛТ</td><td>аланинаминотрансфераза</td></tr>
+            <tr><td>АСТ</td><td>аспартатаминотрансфераза</td></tr>
+          </tbody>
+        </table>
+        <table class="ref-table">
+          <tbody>
+            <tr><td>ГГТП</td><td>гамма-глутамилтранспептидаза</td></tr>
+            <tr><td>ИМТ</td><td>индекс массы тела, кг/м²</td></tr>
+            <tr><td>МНО</td><td>международное нормализованное отношение (INR)</td></tr>
+            <tr><td>ТГ</td><td>триглицериды</td></tr>
+            <tr><td>СД</td><td>сахарный диабет</td></tr>
+            <tr><td>ССЗ</td><td>сердечно-сосудистые заболевания</td></tr>
+            <tr><td>УЗИ</td><td>ультразвуковое исследование</td></tr>
+            <tr><td>×10⁹/л</td><td>клеток в литре (тромбоциты)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+
+  </main>
+
+ 
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  /* ---------- утилиты ---------- */
+  function readNum(id) {
+    var raw = $(id).value.trim().replace(/\s/g, '').replace(',', '.');
+    if (raw === '') return null;
+    var n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function fmt(n, digits) {
+    if (n === null || !Number.isFinite(n)) return '—';
+    return n.toLocaleString('ru-RU', {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits
+    });
+  }
+
+  function setText(id, text) { $(id).textContent = text; }
+
+  function setVerdict(id, text, state) {
+    var node = $(id);
+    node.textContent = text;
+    node.dataset.state = state;
+  }
+
+  /* ---------- основной пересчёт ---------- */
+  function update() {
+
+    /* ================= FIB-4 ================= */
+    var age = readNum('fib4-age'),
+        alt = readNum('fib4-alt'),
+        ast = readNum('fib4-ast'),
+        plt = readNum('fib4-plt'),
+        inr = readNum('fib4-inr');
+
+    var fib4 = null;
+    if (age !== null && alt !== null && ast !== null && plt !== null &&
+        age > 0 && alt > 0 && plt > 0) {
+      fib4 = (age * ast) / (plt * Math.sqrt(alt));
+    }
+
+    setText('fib4-value', fib4 === null ? '—' : fmt(fib4, 2));
+
+    if (fib4 === null) {
+      setVerdict('fib4-verdict', 'Заполните все поля блока для расчёта индекса.', 'empty');
+    } else if (fib4 <= 1.3) {
+      setVerdict('fib4-verdict', 'Отсутствие значимого фиброза (достоверность 90 %).', 'ok');
+    } else if (fib4 >= 2.67) {
+      setVerdict('fib4-verdict', 'Выраженный фиброз (достоверность 80 %).', 'bad');
+    } else {
+      setVerdict('fib4-verdict',
+        'Слепая зона. Рекомендовано проведение УЗИ печени и/или ультразвуковой эластографии ' +
+        'сдвиговой волной с эластометрией.', 'warn');
+    }
+
+    /* ================= CDS ================= */
+    var ratio = (alt !== null && ast !== null && ast > 0) ? alt / ast : null;
+
+    var ptsRatio = null;
+    if (ratio !== null) {
+      ptsRatio = ratio < 0.6 ? 3 : ratio < 1.12 ? 2 : ratio <= 1.7 ? 1 : 0;
+    }
+
+    var ptsPlt = null;
+    if (plt !== null) {
+      ptsPlt = plt < 40 ? 6 : plt < 110 ? 5 : plt < 160 ? 4 :
+               plt < 220 ? 3 : plt < 280 ? 2 : plt < 340 ? 1 : 0;
+    }
+
+    var ptsInr = null;
+    if (inr !== null) {
+      ptsInr = inr < 1.1 ? 0 : inr <= 1.4 ? 1 : 2;
+    }
+
+    var cds = null;
+    if (ptsRatio !== null && ptsPlt !== null && ptsInr !== null) {
+      cds = ptsRatio + ptsPlt + ptsInr;
+    }
+
+    setText('cds-value', cds === null ? '—' : String(cds));
+
+    if (cds === null) {
+      setVerdict('cds-verdict',
+        'Заполните АЛТ, АСТ, тромбоциты и МНО в блоке FIB-4.', 'empty');
+    } else if (cds >= 8) {
+      setVerdict('cds-verdict', 'Выраженный фиброз.', 'bad');
+    } else {
+      setVerdict('cds-verdict',
+        'Серая зона. Рекомендовано проведение УЗИ печени и/или ультразвуковой эластографии ' +
+        'сдвиговой волной с эластометрией.', 'warn');
+    }
+
+    /* ================= FLI ================= */
+    var h      = readNum('fli-height'),
+        w      = readNum('fli-weight'),
+        bmiIn  = readNum('fli-bmi'),
+        waist  = readNum('fli-waist'),
+        ggt    = readNum('fli-ggt'),
+        tg     = readNum('fli-tg');
+
+    var bmi = bmiIn !== null
+      ? bmiIn
+      : (h !== null && w !== null && h > 0 ? w / Math.pow(h / 100, 2) : null);
+
+    var tgMg = tg !== null ? tg * 38.66 : null;
+
+    var lp = null;
+    if (bmi !== null && tgMg !== null && tgMg > 0 &&
+        ggt !== null && ggt > 0 && waist !== null) {
+      lp = 0.953 * Math.log(tgMg)
+         + 0.139 * bmi
+         + 0.718 * Math.log(ggt)
+         + 0.053 * waist
+         - 15.745;
+    }
+
+    var fli = null;
+    if (lp !== null) {
+      var p = lp >= 0
+        ? 1 / (1 + Math.exp(-lp))
+        : Math.exp(lp) / (1 + Math.exp(lp));
+      fli = p * 100;
+    }
+
+    setText('fli-bmi-out',  bmi  === null ? '—' : fmt(bmi, 2));
+    setText('fli-tgmg-out', tgMg === null ? '—' : fmt(tgMg, 2));
+    setText('fli-lp-out',   lp   === null ? '—' : fmt(lp, 2));
+    setText('fli-value',    fli  === null ? '—' : fmt(fli, 1));
+
+    if (fli === null) {
+      setVerdict('fli-verdict', 'Заполните все поля блока для расчёта индекса.', 'empty');
+    } else if (fli < 30) {
+      setVerdict('fli-verdict', 'Отсутствует стеатоз печени.', 'ok');
+    } else if (fli >= 60) {
+      setVerdict('fli-verdict', 'Стеатоз печени (вероятность > 78 %).', 'bad');
+    } else {
+      setVerdict('fli-verdict', 'Неопределённый уровень стеатоза. Высокий риск ССЗ.', 'warn');
+    }
+
+    /* ================= HSI ================= */
+    var bmi2   = readNum('hsi-bmi'),
+        alt2   = readNum('hsi-alt'),
+        ast2   = readNum('hsi-ast'),
+        female = $('hsi-female').checked,
+        dm     = $('hsi-dm').checked;
+
+    var ratio2 = (alt2 !== null && ast2 !== null && ast2 > 0) ? alt2 / ast2 : null;
+
+    var hsi = null;
+    if (ratio2 !== null && bmi2 !== null) {
+      hsi = 8 * ratio2 + bmi2 + (female ? 2 : 0) + (dm ? 2 : 0);
+    }
+
+    setText('hsi-ratio', ratio2 === null ? '—' : fmt(ratio2, 2));
+    setText('hsi-value', hsi === null ? '—' : fmt(hsi, 1));
+
+    if (hsi === null) {
+      setVerdict('hsi-verdict', 'Заполните все поля блока для расчёта индекса.', 'empty');
+    } else if (hsi > 36) {
+      setVerdict('hsi-verdict', 'Стеатоз печени.', 'bad');
+    } else {
+      setVerdict('hsi-verdict', 'Стеатоз печени не выявлен (HSI ≤ 36).', 'ok');
+    }
+  }
+
+  /* ---------- копирование ---------- */
+  function getCopyText(type) {
+    var title, valueId, verdictId;
+    if (type === 'fib4') {
+      title = 'Индекс FIB-4'; valueId = 'fib4-value'; verdictId = 'fib4-verdict';
+    } else if (type === 'cds') {
+      title = 'Шкала CDS'; valueId = 'cds-value'; verdictId = 'cds-verdict';
+    } else if (type === 'fli') {
+      title = 'Индекс FLI'; valueId = 'fli-value'; verdictId = 'fli-verdict';
+    } else if (type === 'hsi') {
+      title = 'Индекс HSI'; valueId = 'hsi-value'; verdictId = 'hsi-verdict';
+    } else {
+      return '';
+    }
+    var val = $(valueId).textContent.trim();
+    var verd = $(verdictId).textContent.trim();
+    return title + ': ' + val + ' — ' + verd;
+  }
+
+  function copyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      return navigator.clipboard.writeText(text);
+    }
+    return new Promise(function (resolve, reject) {
+      var ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      try {
+        document.execCommand('copy');
+        resolve();
+      } catch (e) {
+        reject(e);
+      } finally {
+        document.body.removeChild(ta);
+      }
+    });
+  }
+
+  Array.prototype.forEach.call(document.querySelectorAll('.btn-copy'), function (btn) {
+    btn.addEventListener('click', function () {
+      var type = btn.dataset.copy;
+      var text = getCopyText(type);
+      copyText(text).then(function () {
+        var original = btn.textContent;
+        btn.textContent = 'Скопировано';
+        btn.classList.add('copied');
+        setTimeout(function () {
+          btn.textContent = original;
+          btn.classList.remove('copied');
+        }, 1500);
+      }).catch(function () {
+        /* при ошибке ничего не меняем */
+      });
+    });
+  });
+
+  /* ---------- события ввода ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('input'), function (inp) {
+    inp.addEventListener('input', update);
+    inp.addEventListener('change', update);
+  });
+
+  $('btn-clear').addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('input[type="text"]'), function (i) {
+      i.value = '';
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('input[type="checkbox"]'), function (i) {
+      i.checked = false;
+    });
+    update();
+  });
+
+  update();
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="статины.html" title="Коррекция липидов при НАЖБП">Статины</a>
+    <a href="SCORE2.html" title="Расчёт сердечно-сосудистого риска">SCORE2</a>
+    <a href="dlcn.html" title="Семейная гиперхолестеринемия">DLCN (геСГХС)</a>
+    
+  </div>
+</div>
+</body>
+</html>

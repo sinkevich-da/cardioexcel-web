@@ -1,0 +1,917 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Калькуляторы риска при ГКМП — HCM-AF и HCM Risk-SCD</title>
+<style>
+:root{
+  --ink:#0f172a;
+  --muted:#64748b;
+  --line:#e6ecf3;
+  --brand:#0e7490;
+  --green:#15803d;
+  --amber:#b45309;
+  --red:#b91c1c;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px;line-height:1.5;color:var(--ink);
+  background:
+    radial-gradient(1100px 520px at 8% -12%, #dff3fb 0%, rgba(223,243,251,0) 62%),
+    radial-gradient(900px 480px at 100% 0%, #e7f7f2 0%, rgba(231,247,242,0) 55%),
+    #eef2f7;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:1180px;margin:0 auto;padding:26px 18px 44px}
+
+/* ---------- HERO ---------- */
+.hero{
+  background:linear-gradient(135deg,#0b3b6f 0%,#0e7490 58%,#0f766e 100%);
+  color:#fff;border-radius:22px;padding:26px 28px;
+  box-shadow:0 22px 44px -24px rgba(11,59,111,.85);
+  display:flex;gap:18px;align-items:center;flex-wrap:wrap;
+}
+.logo{
+  width:58px;height:58px;border-radius:17px;flex:0 0 auto;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);
+  display:grid;place-items:center;font-weight:700;font-size:12px;letter-spacing:.08em;
+}
+.hero h1{font-size:clamp(19px,2.4vw,27px);margin:0 0 6px;font-weight:650;letter-spacing:-.01em}
+.hero p{margin:0;color:#c9e8ef;font-size:13.5px}
+
+/* ---------- TABS ---------- */
+.tabs{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}
+.tab{
+  border:1px solid #dbe3ec;background:#fff;color:#334155;
+  padding:11px 18px;border-radius:12px;font:inherit;font-weight:600;font-size:14px;
+  cursor:pointer;transition:.18s;box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.tab:hover{border-color:#a8b8c9}
+.tab.active{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 12px 22px -14px rgba(14,116,144,.95)}
+
+/* ---------- PANELS / GRID ---------- */
+.panel{display:none}
+.panel.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:16px;align-items:start}
+@media (max-width:920px){.grid{grid-template-columns:1fr}}
+
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;
+  box-shadow:0 1px 2px rgba(15,23,42,.05),0 16px 36px -28px rgba(15,23,42,.65);
+}
+.card h2{font-size:16px;margin:0 0 2px;letter-spacing:-.01em}
+.card-sub{color:var(--muted);font-size:13px;margin:0 0 16px}
+
+/* ---------- INPUT TABLE ---------- */
+.input-table{width:100%;border-collapse:collapse}
+.input-table th{
+  text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;
+  color:var(--muted);font-weight:650;padding:0 0 8px;border-bottom:1px solid #eef2f7;
+}
+.input-table th:nth-child(3){text-align:right}
+.input-table td{padding:13px 0;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+.input-table tr:last-child td{border-bottom:none}
+.input-table td:nth-child(2){width:134px}
+.input-table td:nth-child(3){width:66px;text-align:right}
+@media (max-width:520px){
+  .input-table td:nth-child(2){width:96px}
+  .input-table td:nth-child(3){width:48px}
+}
+.lbl{display:block;font-weight:600;font-size:14px}
+.hint{display:block;color:#7b8a9c;font-size:11.5px;margin-top:2px;line-height:1.35}
+.pts{font-variant-numeric:tabular-nums;font-weight:700;color:var(--brand);font-size:15px}
+.pts.zero{color:#a3b1c2;font-weight:600}
+.pts.neg{color:var(--amber)}
+
+input[type=number]{
+  width:100%;padding:9px 11px;border:1px solid #d7e0ea;border-radius:10px;
+  font:inherit;font-variant-numeric:tabular-nums;background:#f8fafc;color:var(--ink);
+  transition:.15s;-moz-appearance:textfield;
+}
+input[type=number]:focus{outline:none;border-color:var(--brand);background:#fff;box-shadow:0 0 0 3px rgba(14,116,144,.15)}
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+/* ---------- SWITCH ---------- */
+.switch{position:relative;display:inline-block;width:46px;height:26px;vertical-align:middle}
+.switch input{position:absolute;opacity:0;width:0;height:0}
+.slider{
+  position:absolute;inset:0;background:#cbd5e1;border-radius:999px;cursor:pointer;
+  transition:background .18s;
+}
+.slider::before{
+  content:"";position:absolute;width:20px;height:20px;left:3px;top:3px;background:#fff;
+  border-radius:50%;transition:transform .18s;box-shadow:0 1px 3px rgba(15,23,42,.35);
+}
+.switch input:checked + .slider{background:var(--brand)}
+.switch input:checked + .slider::before{transform:translateX(20px)}
+.switch input:focus-visible + .slider{box-shadow:0 0 0 3px rgba(14,116,144,.3)}
+
+/* ---------- ACTIONS ---------- */
+.actions{margin-top:16px;display:flex;gap:10px}
+.btn{
+  border:1px solid #d7e0ea;background:#fff;border-radius:10px;padding:9px 15px;
+  font:inherit;font-size:13.5px;font-weight:600;color:#334155;cursor:pointer;transition:.15s;
+}
+.btn:hover{background:#f8fafc;border-color:#b6c2d1}
+
+/* ---------- RESULTS ---------- */
+.score-box{
+  display:flex;align-items:center;gap:14px;
+  padding:16px 18px;border-radius:14px;
+  background:linear-gradient(135deg,#f0f9ff,#ecfeff);
+  border:1px solid #d7eef4;margin-bottom:14px;
+}
+.score-cap{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:650}
+.score-num{font-size:38px;font-weight:700;line-height:1.05;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.score-side{margin-left:auto;text-align:right}
+.score-index{font-size:19px;font-weight:700;color:#334155;font-variant-numeric:tabular-nums;line-height:1.2}
+
+.badge-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.badge{
+  display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;
+  font-weight:650;font-size:13.5px;white-space:nowrap;
+}
+.badge.low{background:#dcfce7;color:var(--green)}
+.badge.mid{background:#fef3c7;color:var(--amber)}
+.badge.high{background:#fee2e2;color:var(--red)}
+.badge.neutral{background:#eef2f7;color:var(--muted)}
+
+.risk-table{width:100%;border-collapse:collapse;margin:8px 0 4px}
+.risk-table td{padding:11px 0;border-bottom:1px dashed #e9eef5;font-size:14px}
+.risk-table tr:last-child td{border-bottom:none}
+.risk-table .val{
+  text-align:right;font-weight:700;font-variant-numeric:tabular-nums;font-size:17px;
+  color:#0b4f63;
+}
+
+/* ---------- SCALE ---------- */
+.scale{margin:16px 0 8px}
+.scale-track{position:relative;display:flex;height:12px;border-radius:999px}
+.zone{height:12px}
+.zone.low{background:#4ade80;border-radius:999px 0 0 999px}
+.zone.mid{background:#fbbf24}
+.zone.high{background:#f87171;border-radius:0 999px 999px 0}
+.marker{
+  position:absolute;top:-7px;width:4px;height:26px;background:#0f172a;border-radius:3px;
+  transform:translateX(-50%);box-shadow:0 0 0 3px #fff;transition:left .28s ease;
+}
+.scale-labels{position:relative;height:16px;margin-top:8px;font-size:11px;color:#94a3b8;font-variant-numeric:tabular-nums}
+.scale-labels span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.scale-labels span.first{transform:none}
+.scale-labels span.last{transform:translateX(-100%)}
+
+/* ---------- RECO ---------- */
+.reco{
+  margin-top:14px;padding:13px 15px;border-radius:12px;font-size:13.5px;line-height:1.45;
+  border:1px solid transparent;
+}
+.reco.info{background:#eff6ff;border-color:#dbeafe;color:#1e3a8a}
+.reco.ok{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+.reco.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+.reco.danger{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+
+/* ---------- DETAILS ---------- */
+details.details{margin-top:16px;border-top:1px solid #eef2f7;padding-top:12px}
+details.details summary{
+  cursor:pointer;font-size:13px;font-weight:650;color:var(--brand);list-style:none;
+  display:flex;align-items:center;gap:6px;
+}
+details.details summary::-webkit-details-marker{display:none}
+details.details summary::before{content:"▸";transition:transform .18s;display:inline-block}
+details.details[open] summary::before{transform:rotate(90deg)}
+.formula{
+  font-size:12.5px;color:#334155;background:#f8fafc;border:1px solid #eef2f7;
+  border-radius:10px;padding:11px 13px;margin:10px 0 0;line-height:1.55;
+  font-variant-numeric:tabular-nums;
+}
+.scroll{max-height:320px;overflow:auto;border:1px solid #eef2f7;border-radius:12px;margin-top:10px}
+.data-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.data-table th{
+  position:sticky;top:0;background:#f8fafc;text-align:left;
+  font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  padding:8px 10px;border-bottom:1px solid #e2e8f0;font-weight:650;
+}
+.data-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9}
+.data-table tr.current{background:#ecfeff;font-weight:700;color:#0b4f63}
+.data-table tr.current td{border-bottom-color:#cffafe}
+
+/* ---------- INFO ---------- */
+.info{margin-top:18px}
+.info h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:20px 0 8px}
+.info h3:first-of-type{margin-top:4px}
+.info ul{padding-left:18px;margin:0;color:#334155;font-size:13.5px}
+.info li{margin-bottom:7px}
+.info li::marker{color:#9fb3c8}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{
+  background:#f1f5f9;border:1px solid #e2e8f0;border-radius:999px;
+  padding:5px 11px;font-size:12.5px;color:#334155;
+}
+.chip b{color:#0b4f63;font-weight:700}
+
+/* ---------- FOOTER ---------- */
+footer{
+  margin-top:26px;padding-top:16px;border-top:1px solid #dde5ee;
+  color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;
+  gap:10px;flex-wrap:wrap;
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="logo">ГКМП</div>
+    <div>
+      <h1>Калькуляторы риска при гипертрофической кардиомиопатии</h1>
+      <p>HCM-AF — риск фибрилляции предсердий&nbsp;&nbsp;·&nbsp;&nbsp;HCM Risk-SCD — риск внезапной сердечной смерти</p>
+    </div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Выбор шкалы">
+    <button class="tab active" id="tab-af" role="tab" aria-selected="true" aria-controls="panel-af" type="button">
+      HCM-AF · фибрилляция предсердий
+    </button>
+    <button class="tab" id="tab-scd" role="tab" aria-selected="false" aria-controls="panel-scd" type="button">
+      HCM Risk-SCD · внезапная смерть
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ================= HCM-AF ================= -->
+    <section id="panel-af" class="panel active" role="tabpanel" aria-labelledby="tab-af">
+      <div class="grid">
+
+        <div class="card">
+          <h2>Шкала HCM-AF</h2>
+          <p class="card-sub">Риск фибрилляции предсердий при ГКМП</p>
+
+          <table class="input-table">
+            <thead>
+              <tr><th>Показатель</th><th>Значение</th><th>Баллы</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <label class="lbl" for="af-la">Диаметр ЛП, мм</label>
+                  <span class="hint">передне-задний размер левого предсердия</span>
+                </td>
+                <td><input type="number" id="af-la" value="48" min="10" max="90" step="1" inputmode="numeric"></td>
+                <td class="pts" id="af-la-pts">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="lbl" for="af-age">Возраст, годы</label>
+                  <span class="hint">на момент оценки</span>
+                </td>
+                <td><input type="number" id="af-age" value="60" min="0" max="110" step="1" inputmode="numeric"></td>
+                <td class="pts" id="af-age-pts">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="lbl" for="af-dx">Возраст диагностики ГКМП, годы</label>
+                  <span class="hint">возраст установления диагноза</span>
+                </td>
+                <td><input type="number" id="af-dx" value="45" min="0" max="110" step="1" inputmode="numeric"></td>
+                <td class="pts" id="af-dx-pts">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="lbl">NYHA III–IV</span>
+                  <span class="hint">выраженная сердечная недостаточность (III–IV ФК)</span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" id="af-nyha" aria-label="NYHA III–IV">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td class="pts zero" id="af-nyha-pts">0</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="actions">
+            <button class="btn" id="af-reset" type="button">Очистить</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Результат</h2>
+          <p class="card-sub">Оценка HCM-AF</p>
+
+          <div class="score-box">
+            <div>
+              <div class="score-cap">Сумма баллов</div>
+              <div class="score-num" id="af-score">—</div>
+            </div>
+          </div>
+
+          <div class="badge-row">
+            <span class="badge neutral" id="af-badge">Введите данные</span>
+            <span class="hint" id="af-badge-note">заполните все числовые поля</span>
+          </div>
+
+          <table class="risk-table">
+            <tbody>
+              <tr><td>Риск ФП через 2 года</td><td class="val" id="af-r2">—</td></tr>
+              <tr><td>Риск ФП через 5 лет</td><td class="val" id="af-r5">—</td></tr>
+            </tbody>
+          </table>
+
+          <div class="scale">
+            <div class="scale-track">
+              <div class="zone low" style="width:43.5%"></div>
+              <div class="zone mid" style="width:17.4%"></div>
+              <div class="zone high" style="width:39.1%"></div>
+              <div class="marker" id="af-marker" style="left:0;display:none"></div>
+            </div>
+            <div class="scale-labels">
+              <span class="first" style="left:0">8</span>
+              <span style="left:43.5%">17</span>
+              <span style="left:60.9%">22</span>
+              <span class="last" style="left:100%">31</span>
+            </div>
+          </div>
+
+          <div class="reco info" id="af-reco">Заполните диаметр ЛП, возраст и возраст диагностики ГКМП.</div>
+
+          <details class="details">
+            <summary>Таблица соответствия баллов и риска</summary>
+            <div class="scroll">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Баллы</th>
+                    <th>Риск ФП, 2 года</th>
+                    <th>Риск ФП, 5 лет</th>
+                    <th>Когорта, n (%)</th>
+                  </tr>
+                </thead>
+                <tbody id="af-table-body"></tbody>
+              </table>
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ================= HCM Risk-SCD ================= -->
+    <section id="panel-scd" class="panel" role="tabpanel" aria-labelledby="tab-scd">
+      <div class="grid">
+
+        <div class="card">
+          <h2>Шкала HCM Risk-SCD</h2>
+          <p class="card-sub">sudden cardiac death in hypertrophic cardiomyopathy</p>
+
+          <table class="input-table">
+            <thead>
+              <tr><th>Показатель</th><th>Значение</th><th>Балл</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <label class="lbl" for="scd-age">Возраст, годы</label>
+                  <span class="hint">на момент оценки</span>
+                </td>
+                <td><input type="number" id="scd-age" value="45" min="1" max="110" step="1" inputmode="numeric"></td>
+                <td class="pts zero">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="lbl" for="scd-la">Диаметр ЛП, мм</label>
+                  <span class="hint">М-режим или 2D ЭхоКГ, парастернальная позиция по длинной оси</span>
+                </td>
+                <td><input type="number" id="scd-la" value="30" min="10" max="90" step="1" inputmode="numeric"></td>
+                <td class="pts zero">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="lbl" for="scd-mwt">Максимальная толщина стенки ЛЖ, мм</label>
+                  <span class="hint">наибольшая толщина на уровне МК, папиллярных мышц и верхушки (2D, короткая ось)</span>
+                </td>
+                <td><input type="number" id="scd-mwt" value="16" min="5" max="60" step="1" inputmode="numeric"></td>
+                <td class="pts zero">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <label class="lbl" for="scd-grad">Максимальный градиент ВОЛЖ, мм рт. ст.</label>
+                  <span class="hint">в покое и при пробе Вальсальвы; ΔP = 4V²</span>
+                </td>
+                <td><input type="number" id="scd-grad" value="50" min="0" max="250" step="1" inputmode="numeric"></td>
+                <td class="pts zero">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="lbl">Семейный анамнез ВСС</span>
+                  <span class="hint">ВСС у родственника 1-й степени &lt; 40 лет или ВСС при подтверждённом ГКМП в любом возрасте</span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" id="scd-fh" aria-label="Семейный анамнез ВСС">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td class="pts zero" id="scd-fh-pts">0</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="lbl">Неустойчивая ЖТ</span>
+                  <span class="hint">≥ 3 последовательных желудочковых сокращений ≥ 120 уд/мин, &lt; 30 с (Холтер ≥ 24 ч)</span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" id="scd-nsvt" aria-label="Неустойчивая ЖТ">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td class="pts zero" id="scd-nsvt-pts">0</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="lbl">Необъяснимый обморок</span>
+                  <span class="hint">обморок в анамнезе без установленной причины</span>
+                </td>
+                <td>
+                  <label class="switch">
+                    <input type="checkbox" id="scd-sync" aria-label="Необъяснимый обморок">
+                    <span class="slider"></span>
+                  </label>
+                </td>
+                <td class="pts zero" id="scd-sync-pts">0</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="actions">
+            <button class="btn" id="scd-reset" type="button">Очистить</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Результат</h2>
+          <p class="card-sub">HCM Risk-SCD · 5-летний горизонт</p>
+
+          <div class="score-box">
+            <div>
+              <div class="score-cap">Риск ВСС за 5 лет</div>
+              <div class="score-num" id="scd-risk">—</div>
+            </div>
+            <div class="score-side">
+              <div class="score-cap">Прогностический индекс</div>
+              <div class="score-index" id="scd-index">—</div>
+            </div>
+          </div>
+
+          <div class="badge-row">
+            <span class="badge neutral" id="scd-badge">Введите данные</span>
+            <span class="hint" id="scd-note">заполните все числовые поля</span>
+          </div>
+
+          <div class="scale">
+            <div class="scale-track">
+              <div class="zone low" style="width:20%"></div>
+              <div class="zone mid" style="width:10%"></div>
+              <div class="zone high" style="width:70%"></div>
+              <div class="marker" id="scd-marker" style="left:0;display:none"></div>
+            </div>
+            <div class="scale-labels">
+              <span class="first" style="left:0">0%</span>
+              <span style="left:20%">4%</span>
+              <span style="left:30%">6%</span>
+              <span class="last" style="left:100%">20%</span>
+            </div>
+          </div>
+
+          <div class="reco info" id="scd-reco">Заполните возраст, диаметр ЛП, толщину стенки ЛЖ и градиент ВОЛЖ.</div>
+
+          <details class="details">
+            <summary>Формула прогностического индекса</summary>
+            <p class="formula">
+              Индекс = 0,15939858 × ТСЛЖ − 0,00294271 × ТСЛЖ² + 0,0259082 × ДЛП + 0,00446131 × Градиент
+              + 0,4583082 × Сем.&nbsp;анамнез + 0,82639195 × НЖТ + 0,71650361 × Обморок − 0,01799934 × Возраст
+            </p>
+            <p class="formula">
+              Риск ВСС за 5 лет = 1 − 0,998<sup>exp(Индекс)</sup>
+            </p>
+            <p class="formula" style="border-style:dashed">
+              ТСЛЖ — максимальная толщина стенки ЛЖ; ДЛП — диаметр левого предсердия;
+              НЖТ — неустойчивая желудочковая тахикардия. Бинарные факторы учитываются как 1 (есть) / 0 (нет).
+            </p>
+          </details>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= INFO ================= -->
+  <section class="card info">
+    <h2>Источники</h2>
+    <h3>HCM Risk-SCD</h3>
+    <ul>
+      <li>
+        O'Mahony C., Jichi F., Pavlou M., et al. A novel clinical risk prediction model for sudden cardiac death
+        in hypertrophic cardiomyopathy (HCM Risk-SCD). <i>Eur Heart J.</i> 2014;35(30):2010–2020.
+        doi:10.1093/eurheartj/eht439
+      </li>
+    </ul>
+    <h3>HCM-AF</h3>
+    <ul>
+      <li>
+        Шкала оценки риска фибрилляции предсердий при ГКМП (HCM-AF): градации баллов, значения риска
+        за 2 и 5 лет и распределение когорты приведены в соответствии с исходной таблицей «ГКМП.xlsx» (лист HCM-AF).
+      </li>
+    </ul>
+
+    <h3>Сокращения</h3>
+    <div class="chips">
+      <span class="chip"><b>ГКМП</b> — гипертрофическая кардиомиопатия</span>
+      <span class="chip"><b>ФП</b> — фибрилляция предсердий</span>
+      <span class="chip"><b>ВСС</b> — внезапная сердечная смерть</span>
+      <span class="chip"><b>ЛП</b> — левое предсердие</span>
+      <span class="chip"><b>ЛЖ</b> — левый желудочек</span>
+      <span class="chip"><b>ВОЛЖ</b> — выводной отдел левого желудочка</span>
+      <span class="chip"><b>ТСЛЖ</b> — толщина стенки левого желудочка</span>
+      <span class="chip"><b>ЖТ</b> — желудочковая тахикардия</span>
+      <span class="chip"><b>НЖТ</b> — неустойчивая желудочковая тахикардия</span>
+      <span class="chip"><b>ИКД</b> — имплантируемый кардиовертер-дефибриллятор</span>
+      <span class="chip"><b>NYHA</b> — Нью-Йоркская кардиологическая ассоциация</span>
+      <span class="chip"><b>ESC</b> — Европейское общество кардиологов</span>
+      <span class="chip"><b>ЭхоКГ</b> — эхокардиография</span>
+      <span class="chip"><b>МК</b> — митральный клапан</span>
+    </div>
+
+    <h3>Ограничения</h3>
+    <ul>
+      <li>Калькулятор носит информационный характер и не заменяет клиническое суждение врача.</li>
+      <li>HCM Risk-SCD валидирована у взрослых пациентов с ГКМП; не предназначена для детей и вторичных (фенокопийных) гипертрофий.</li>
+      <li>Значения риска HCM-AF определены для диапазона 8–31 балла; за пределами диапазона отображается ближайший порог.</li>
+      <li>Диаметр ЛП ≥ 66 мм оценивается максимальными 20 баллами, возраст ≥ 80 лет и возраст диагностики ≥ 80 лет — последней категорией таблицы (в исходных формулах эти диапазоны не заданы).</li>
+    </ul>
+  </section>
+
+
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- утилиты ---------------- */
+  const $ = (id) => document.getElementById(id);
+  const num = (id) => {
+    const raw = $(id).value.trim().replace(",", ".");
+    if (raw === "") return null;
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : null;
+  };
+  const fmtPct1 = (v) => (v * 100).toFixed(1).replace(".", ",") + "%";
+  const fmtPct2 = (v) => v.toFixed(2).replace(".", ",") + "%";
+
+  /* ================================================================
+     HCM-AF
+     ================================================================ */
+  const AF_RISK = {
+    8:  [0.004, 0.010],
+    9:  [0.005, 0.012],
+    10: [0.006, 0.014],
+    11: [0.007, 0.017],
+    12: [0.009, 0.021],
+    13: [0.010, 0.025],
+    14: [0.013, 0.030],
+    15: [0.015, 0.036],
+    16: [0.018, 0.043],
+    17: [0.022, 0.052],
+    18: [0.026, 0.062],
+    19: [0.031, 0.074],
+    20: [0.038, 0.089],
+    21: [0.045, 0.106],
+    22: [0.054, 0.126],
+    23: [0.065, 0.150],
+    24: [0.078, 0.178],
+    25: [0.093, 0.211],
+    26: [0.111, 0.248],
+    27: [0.133, 0.291],
+    28: [0.157, 0.339],
+    29: [0.187, 0.393],
+    30: [0.220, 0.452],
+    31: [0.259, 0.515]
+  };
+
+  const AF_COHORT = {
+    8: "1 (0,1%)",    9: "14 (0,7%)",   10: "12 (0,6%)",  11: "22 (1,2%)",
+    12: "26 (1,4%)",  13: "42 (2,2%)",  14: "43 (2,3%)",  15: "80 (4,2%)",
+    16: "94 (4,9%)",  17: "108 (5,7%)", 18: "181 (9,5%)", 19: "191 (10,1%)",
+    20: "186 (9,8%)", 21: "213 (11,2%)",22: "169 (8,9%)", 23: "169 (8,9%)",
+    24: "99 (5,2%)",  25: "81 (4,3%)",  26: "51 (2,7%)",  27: "51 (2,7%)",
+    28: "29 (1,5%)",  29: "15 (0,8%)",  30: "11 (0,6%)",  31: "5 (0,3%)"
+  };
+
+  /* Баллы за диаметр ЛП */
+  function afLaPoints(v) {
+    if (v < 30) return 8;
+    if (v < 36) return 10;
+    if (v < 42) return 12;
+    if (v < 48) return 14;
+    if (v < 54) return 16;
+    if (v < 60) return 18;
+    if (v < 66) return 20;
+    return 20; // ≥ 66 мм — максимум (в исходной формуле диапазон не задан)
+  }
+
+  /* Баллы за возраст */
+  function afAgePoints(v) {
+    if (v < 20) return 3;
+    if (v < 30) return 6;
+    if (v < 40) return 9;
+    if (v < 50) return 12;
+    if (v < 60) return 15;
+    if (v < 70) return 18;
+    if (v < 80) return 21;
+    return 21; // ≥ 80 лет — максимум
+  }
+
+  /* Баллы за возраст диагностики ГКМП (отрицательные) */
+  function afDxPoints(v) {
+    if (v < 10) return 0;
+    if (v < 20) return -2;
+    if (v < 30) return -4;
+    if (v < 40) return -6;
+    if (v < 50) return -8;
+    if (v < 60) return -10;
+    if (v < 70) return -12;
+    if (v < 80) return -14;
+    return -14; // ≥ 80 лет — последняя категория
+  }
+
+  function setPts(id, v) {
+    const el = $(id);
+    if (v === null) {
+      el.textContent = "—";
+      el.className = "pts";
+      return;
+    }
+    el.textContent = String(v);
+    el.className = "pts" + (v < 0 ? " neg" : v === 0 ? " zero" : "");
+  }
+
+  function buildAFTable() {
+    const tb = $("af-table-body");
+    const scores = Object.keys(AF_RISK).map(Number).sort((a, b) => a - b);
+    tb.innerHTML = scores.map((s) => {
+      const r2 = AF_RISK[s][0], r5 = AF_RISK[s][1];
+      return "<tr data-score=\"" + s + "\">" +
+        "<td>" + s + "</td>" +
+        "<td>" + fmtPct1(r2) + "</td>" +
+        "<td>" + fmtPct1(r5) + "</td>" +
+        "<td>" + AF_COHORT[s] + "</td>" +
+        "</tr>";
+    }).join("");
+  }
+
+  function highlightAFRow(score) {
+    document.querySelectorAll("#af-table-body tr").forEach((tr) => {
+      tr.classList.toggle("current", score !== null && Number(tr.dataset.score) === score);
+    });
+  }
+
+  function updateAF() {
+    const la = num("af-la");
+    const age = num("af-age");
+    const dx = num("af-dx");
+    const nyha = $("af-nyha").checked;
+
+    const pLA = la === null ? null : afLaPoints(la);
+    const pAge = age === null ? null : afAgePoints(age);
+    const pDx = dx === null ? null : afDxPoints(dx);
+    const pNyha = nyha ? 3 : 0;
+
+    setPts("af-la-pts", pLA);
+    setPts("af-age-pts", pAge);
+    setPts("af-dx-pts", pDx);
+    setPts("af-nyha-pts", pNyha);
+
+    const scoreEl = $("af-score");
+    const badgeEl = $("af-badge");
+    const noteEl = $("af-badge-note");
+    const r2El = $("af-r2");
+    const r5El = $("af-r5");
+    const marker = $("af-marker");
+    const reco = $("af-reco");
+
+    if (pLA === null || pAge === null || pDx === null) {
+      scoreEl.textContent = "—";
+      badgeEl.className = "badge neutral";
+      badgeEl.textContent = "Введите данные";
+      noteEl.textContent = "заполните все числовые поля";
+      r2El.textContent = "—";
+      r5El.textContent = "—";
+      marker.style.display = "none";
+      reco.className = "reco info";
+      reco.textContent = "Заполните диаметр ЛП, возраст и возраст диагностики ГКМП.";
+      highlightAFRow(null);
+      return;
+    }
+
+    const total = pLA + pAge + pDx + pNyha;
+    const key = Math.max(8, Math.min(31, total));
+    const r2 = AF_RISK[key][0];
+    const r5 = AF_RISK[key][1];
+
+    scoreEl.textContent = String(total);
+
+    let cat, cls, catNote;
+    if (total <= 17) {
+      cat = "Низкий риск"; cls = "low"; catNote = "частота ФП < 1% в год";
+    } else if (total <= 21) {
+      cat = "Промежуточный риск"; cls = "mid"; catNote = "частота ФП 1–2% в год";
+    } else {
+      cat = "Высокий риск"; cls = "high"; catNote = "частота ФП > 2% в год";
+    }
+
+    badgeEl.className = "badge " + cls;
+    badgeEl.textContent = cat;
+
+    const notes = [catNote];
+    if (dx > age) notes.push("возраст диагностики больше возраста — проверьте данные");
+    if (total < 8 || total > 31) notes.push("сумма вне таблицы (8–31) — показан ближайший порог");
+    noteEl.textContent = notes.join(" · ");
+
+    r2El.textContent = fmtPct1(r2);
+    r5El.textContent = fmtPct1(r5);
+
+    marker.style.display = "block";
+    marker.style.left = ((key - 8) / 23 * 100) + "%";
+
+    if (total >= 22) {
+      reco.className = "reco warn";
+      reco.innerHTML = "<b>Рекомендация:</b> усилить мониторинг бессимптомной ФП (петлевые регистраторы), консультирование пациента.";
+    } else {
+      reco.className = "reco ok";
+      reco.textContent = "Порог усиленного мониторинга ФП (≥ 22 баллов) не достигнут.";
+    }
+
+    highlightAFRow(key);
+  }
+
+  /* ================================================================
+     HCM Risk-SCD
+     ================================================================ */
+  function setFlag(id, on) {
+    const el = $(id);
+    el.textContent = on ? "1" : "0";
+    el.className = "pts" + (on ? "" : " zero");
+  }
+
+  function updateSCD() {
+    const age = num("scd-age");
+    const la = num("scd-la");
+    const mwt = num("scd-mwt");
+    const grad = num("scd-grad");
+    const fh = $("scd-fh").checked;
+    const nsvt = $("scd-nsvt").checked;
+    const sync = $("scd-sync").checked;
+
+    setFlag("scd-fh-pts", fh);
+    setFlag("scd-nsvt-pts", nsvt);
+    setFlag("scd-sync-pts", sync);
+
+    const riskEl = $("scd-risk");
+    const idxEl = $("scd-index");
+    const badgeEl = $("scd-badge");
+    const noteEl = $("scd-note");
+    const marker = $("scd-marker");
+    const reco = $("scd-reco");
+
+    if (age === null || la === null || mwt === null || grad === null) {
+      riskEl.textContent = "—";
+      idxEl.textContent = "—";
+      badgeEl.className = "badge neutral";
+      badgeEl.textContent = "Введите данные";
+      noteEl.textContent = "заполните все числовые поля";
+      marker.style.display = "none";
+      reco.className = "reco info";
+      reco.textContent = "Заполните возраст, диаметр ЛП, толщину стенки ЛЖ и градиент ВОЛЖ.";
+      return;
+    }
+
+    const index =
+      0.15939858 * mwt -
+      0.00294271 * mwt * mwt +
+      0.0259082 * la +
+      0.00446131 * grad +
+      0.4583082 * (fh ? 1 : 0) +
+      0.82639195 * (nsvt ? 1 : 0) +
+      0.71650361 * (sync ? 1 : 0) -
+      0.01799934 * age;
+
+    const risk = (1 - Math.pow(0.998, Math.exp(index))) * 100;
+
+    idxEl.textContent = index.toFixed(3).replace(".", ",");
+    riskEl.textContent = fmtPct2(risk);
+
+    let cat, cls, rec, recCls;
+    if (risk < 4) {
+      cat = "Низкий риск"; cls = "low";
+      rec = "<b>Рекомендации ESC:</b> ИКД не показан.";
+      recCls = "reco ok";
+    } else if (risk < 6) {
+      cat = "Средний риск"; cls = "mid";
+      rec = "<b>Рекомендации ESC:</b> ИКД возможен (может рассматриваться).";
+      recCls = "reco warn";
+    } else {
+      cat = "Высокий риск"; cls = "high";
+      rec = "<b>Рекомендации ESC:</b> ИКД показан (должен рассматриваться).";
+      recCls = "reco danger";
+    }
+
+    badgeEl.className = "badge " + cls;
+    badgeEl.textContent = cat;
+
+    const notes = [];
+    if (risk > 20) notes.push("риск превышает верхнюю границу шкалы (20%)");
+    if (mwt < 10) notes.push("толщина стенки < 10 мм — вне типичного диапазона ГКМП");
+    noteEl.textContent = notes.length ? notes.join(" · ") : "5-летний риск ВСС";
+
+    marker.style.display = "block";
+    marker.style.left = Math.min(risk / 20 * 100, 100) + "%";
+
+    reco.className = recCls;
+    reco.innerHTML = rec;
+  }
+
+  /* ================================================================
+     Табы и инициализация
+     ================================================================ */
+  function bindTabs() {
+    const tabs = [
+      { btn: $("tab-af"), panel: $("panel-af") },
+      { btn: $("tab-scd"), panel: $("panel-scd") }
+    ];
+    tabs.forEach((t) => {
+      t.btn.addEventListener("click", () => {
+        tabs.forEach((o) => {
+          const active = o === t;
+          o.btn.classList.toggle("active", active);
+          o.btn.setAttribute("aria-selected", active ? "true" : "false");
+          o.panel.classList.toggle("active", active);
+        });
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    buildAFTable();
+    bindTabs();
+
+    ["af-la", "af-age", "af-dx"].forEach((id) => $(id).addEventListener("input", updateAF));
+    $("af-nyha").addEventListener("change", updateAF);
+    $("af-reset").addEventListener("click", () => {
+      ["af-la", "af-age", "af-dx"].forEach((id) => { $(id).value = ""; });
+      $("af-nyha").checked = false;
+      updateAF();
+    });
+
+    ["scd-age", "scd-la", "scd-mwt", "scd-grad"].forEach((id) => $(id).addEventListener("input", updateSCD));
+    ["scd-fh", "scd-nsvt", "scd-sync"].forEach((id) => $(id).addEventListener("change", updateSCD));
+    $("scd-reset").addEventListener("click", () => {
+      ["scd-age", "scd-la", "scd-mwt", "scd-grad"].forEach((id) => { $(id).value = ""; });
+      ["scd-fh", "scd-nsvt", "scd-sync"].forEach((id) => { $(id).checked = false; });
+      updateSCD();
+    });
+
+    updateAF();
+    updateSCD();
+  });
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="qt.html" title="Оценка интервала QT">Интервал QT</a>
+    <a href="ЖА.html" title="Классификация ЖА (РКО 2023)">Желудочковые аритмии</a>
+    <a href="ААТ.html" title="Классы и дозы ААП">Антиаритмики (EHRA 2025)</a>
+    <a href="ХСН.html" title="Диагностика ХСН">СНсФВ</a>
+    
+  </div>
+</div>
+</body>
+</html>

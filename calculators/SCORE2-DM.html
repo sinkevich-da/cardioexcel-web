@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SCORE2-Diabetes · WATCH-DM · Калькулятор СС-риска при СД 2 типа</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+       background:#eef2f7;color:#0f172a;font-size:15px;line-height:1.45}
+  .hero{background:linear-gradient(120deg,#0b4f8a,#0e7490);color:#fff;padding:22px 28px;
+        position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(15,23,42,.12)}
+  .hero h1{margin:0;font-size:20px;font-weight:600}
+  .tabs{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .tab{padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.3);
+       background:rgba(255,255,255,.1);color:#fff;cursor:pointer;
+       font-size:13.5px;font-weight:600;transition:.15s;font-family:inherit;text-decoration:none}
+  .tab:hover{background:rgba(255,255,255,.2)}
+  .layout{display:grid;grid-template-columns:380px 1fr;gap:18px;padding:18px;max-width:1560px;margin:0 auto;align-items:start}
+  @media(max-width:1050px){.layout{grid-template-columns:1fr}}
+  .layout.single{grid-template-columns:1fr;max-width:1400px}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px;
+        box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:16px}
+  .card h2{margin:0 0 12px;font-size:15px;font-weight:600;color:#0b4f8a;
+           text-transform:uppercase;letter-spacing:.04em}
+  .sidebar{position:sticky;top:96px;align-self:start}
+  @media(max-width:1050px){.sidebar{position:static}}
+  label{display:block;font-size:12.5px;color:#475569;margin:10px 0 4px;font-weight:500}
+  input[type=number],input[type=text],select{
+    width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;
+    background:#fff;color:#0f172a;outline:none;transition:.15s;font-family:inherit}
+  input:focus,select:focus{border-color:#0ea5a4;box-shadow:0 0 0 3px rgba(14,165,164,.15)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chk{display:flex;gap:8px;align-items:center;margin-top:12px;font-size:13px;color:#334155}
+  .chk input{width:16px;height:16px;accent-color:#0e7490}
+  .hint{font-size:11.5px;color:#94a3b8;margin-top:4px}
+
+  /* Стильные переключатели пола */
+  .sex-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+  .sex-opt{position:relative;display:flex;align-items:center;gap:10px;margin:0;
+       padding:10px 12px;border:1.5px solid #cbd5e1;border-radius:12px;background:#fff;
+       cursor:pointer;user-select:none;transition:border-color .18s,background .18s,
+       box-shadow .18s,transform .12s}
+  .sex-opt input{position:absolute;opacity:0;width:0;height:0;pointer-events:none}
+  .sex-opt:hover{border-color:#0ea5a4;background:#f0fdfa}
+  .sex-opt:active{transform:scale(.985)}
+  .sex-ico{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;
+       justify-content:center;font-size:17px;font-weight:700;background:#f1f5f9;
+       color:#64748b;transition:.18s;flex:0 0 auto}
+  .sex-txt{font-size:13.5px;font-weight:600;color:#475569;transition:.18s}
+  .sex-check{margin-left:auto;width:20px;height:20px;border-radius:50%;display:flex;
+       align-items:center;justify-content:center;font-size:12px;font-weight:700;
+       background:#e2e8f0;color:transparent;transition:.18s;flex:0 0 auto}
+  .sex-opt:has(input:checked){transform:translateY(-1px)}
+  .sex-opt:has(input[value="1"]:checked){border-color:#0e7490;
+       background:linear-gradient(180deg,#ecfeff,#fff);
+       box-shadow:0 0 0 3px rgba(14,116,144,.12),0 4px 10px rgba(14,116,144,.08)}
+  .sex-opt:has(input[value="1"]:checked) .sex-ico{background:#0e7490;color:#fff}
+  .sex-opt:has(input[value="1"]:checked) .sex-txt{color:#0b4f8a}
+  .sex-opt:has(input[value="1"]:checked) .sex-check{background:#0e7490;color:#fff}
+  .sex-opt:has(input[value="2"]:checked){border-color:#be185d;
+       background:linear-gradient(180deg,#fdf2f8,#fff);
+       box-shadow:0 0 0 3px rgba(190,24,93,.10),0 4px 10px rgba(190,24,93,.08)}
+  .sex-opt:has(input[value="2"]:checked) .sex-ico{background:#be185d;color:#fff}
+  .sex-opt:has(input[value="2"]:checked) .sex-txt{color:#9d174d}
+  .sex-opt:has(input[value="2"]:checked) .sex-check{background:#be185d;color:#fff}
+
+  .grp-title{font-size:12px;color:#0b4f8a;text-transform:uppercase;letter-spacing:.04em;
+       font-weight:700;margin:16px 0 4px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}
+  .grp-title:first-of-type{margin-top:0}
+  .grp-title.aux{color:#64748b;border-bottom-color:#f1f5f9}
+
+  .gfr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .gfr{border:1px solid #e2e8f0;border-radius:12px;padding:14px 16px;
+       background:#fbfdff;transition:background .2s, border-color .2s}
+  .gfr .gfr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+  .gfr .name{font-size:12px;color:#64748b;font-weight:600;letter-spacing:.02em;flex:1 1 auto;min-width:0}
+  .gfr .val{font-size:30px;font-weight:700;line-height:1.15;margin:6px 0 2px}
+  .gfr .val small{font-size:13px;font-weight:500;opacity:.75;color:inherit}
+  .gfr .stage{display:inline-block;font-size:13px;padding:3px 10px;border-radius:20px;
+              font-weight:700;margin-top:4px}
+  .gfr .deidx{font-size:12px;margin-top:6px;opacity:.85}
+
+  .gfr.st-c1{background:linear-gradient(180deg,#f0fdf4,#fff);border-color:#86efac}
+  .gfr.st-c1 .val{color:#15803d}
+  .gfr.st-c1 .stage{background:#dcfce7;color:#15803d}
+  .gfr.st-c3a{background:linear-gradient(180deg,#fefce8,#fff);border-color:#fde047}
+  .gfr.st-c3a .val{color:#a16207}
+  .gfr.st-c3a .stage{background:#fef9c3;color:#854d0e}
+  .gfr.st-c3b{background:linear-gradient(180deg,#fff7ed,#fff);border-color:#fdba74}
+  .gfr.st-c3b .val{color:#c2410c}
+  .gfr.st-c3b .stage{background:#ffedd5;color:#9a3412}
+  .gfr.st-c5{background:linear-gradient(180deg,#fdf2f8,#fff);border-color:#9f1239}
+  .gfr.st-c5 .val{color:#7f1d1d}
+  .gfr.st-c5 .stage{background:#7f1d1d;color:#fff}
+
+  .alert{padding:10px 14px;border-radius:10px;font-size:13.5px;margin-top:12px;border:1px solid}
+  .alert.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+  .alert.info{background:#f0f9ff;border-color:#bae6fd;color:#075985}
+  .alert.ok{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+  .alert.danger{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+
+  .dx-copy-btn{padding:5px 12px;font-size:11.5px;font-weight:600;border-radius:20px;
+       border:1px solid #bae6fd;background:#fff;color:#0e7490;cursor:pointer;
+       transition:.15s;text-transform:none;letter-spacing:0;white-space:nowrap;font-family:inherit}
+  .dx-copy-btn:hover{background:#e0f2fe;border-color:#7dd3fc}
+  .dx-copy-btn.copied{background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+
+  .scale-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .scale-legend .lg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
+       padding:3px 9px;border-radius:20px;font-weight:600;border:1px solid}
+  .lg-green{background:#dcfce7;color:#15803d;border-color:#86efac}
+  .lg-yellow{background:#fef9c3;color:#854d0e;border-color:#fde047}
+  .lg-orange{background:#ffedd5;color:#9a3412;border-color:#fdba74}
+  .lg-red{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+  .section-divider{max-width:1560px;margin:8px auto 0;padding:0 18px}
+  .section-divider h2{margin:20px 0 12px;font-size:18px;color:#0b4f8a;font-weight:700;letter-spacing:.02em}
+  .meta-block{max-width:1560px;margin:0 auto 24px;padding:0 18px}
+  .meta-block .card{background:#fbfdff}
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:820px){.meta-grid{grid-template-columns:1fr}}
+  .meta-block h3{margin:0 0 8px;font-size:13px;color:#0b4f8a;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+  .meta-block ul{margin:0;padding-left:18px;font-size:13px;color:#334155}
+  .meta-block li{margin:3px 0;line-height:1.5}
+  .meta-block .abbr{font-size:13px;color:#334155}
+  .meta-block .abbr b{color:#0b4f8a}
+  .copyright{text-align:center;font-size:12.5px;color:#475569;padding:10px 20px 26px;
+       border-top:1px dashed #cbd5e1;margin-top:8px}
+  .copyright b{color:#0b4f8a}
+
+  .lipid-summary{font-size:13.5px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;
+       border-radius:12px;margin-bottom:14px}
+  .lipid-summary b{color:#0b4f8a}
+  .lipid-tables{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}
+  .lipid-block{border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;background:#fff}
+  .lipid-block .lb-head{padding:12px 16px;font-weight:700;font-size:14px;color:#fff;
+       letter-spacing:.02em;display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .lb-rosu .lb-head{background:linear-gradient(90deg,#0e7490,#0891b2)}
+  .lb-ator .lb-head{background:linear-gradient(90deg,#7c3aed,#8b5cf6)}
+  .lb-pita .lb-head{background:linear-gradient(90deg,#0284c7,#0ea5e9)}
+  .best-dose{padding:16px}
+  .best-dose .bd-name{font-size:17px;font-weight:700;color:#0f172a;margin-bottom:10px}
+  .best-dose .bd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .best-dose .bd-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px 12px}
+  .best-dose .bd-label{font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+  .best-dose .bd-value{font-size:20px;font-weight:700;margin-top:4px;color:#0b4f8a}
+  .best-dose .bd-value small{font-size:12px;font-weight:500;color:#64748b;margin-left:3px}
+  .best-dose .bd-hit{font-size:13px;font-weight:700;padding:8px 12px;border-radius:8px;text-align:center}
+  .bd-hit-yes{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+  .bd-hit-near{background:#fefce8;color:#854d0e;border:1px solid #fde047}
+  .bd-hit-no{background:#fef2f2;color:#991b1b;border:1px solid #fecaca}
+  .best-dose .bd-note{font-size:12px;color:#64748b;margin-top:8px;line-height:1.5}
+
+  .opt-risk{display:flex;gap:10px;align-items:baseline;margin-top:10px;flex-wrap:wrap;
+       padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px}
+  .opt-risk .or-label{font-size:12.5px;color:#166534;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+  .opt-risk .or-val{font-size:20px;font-weight:700;color:#15803d}
+  .opt-risk .or-note{font-size:12px;color:#64748b;margin-left:auto}
+
+  .watch-table{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:8px}
+  .watch-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9}
+  .watch-table tr:last-child td{border-bottom:none}
+  .watch-table .wt-label{color:#334155}
+  .watch-table .wt-val{text-align:right;color:#64748b;white-space:nowrap}
+  .watch-table .wt-pts{text-align:right;font-weight:700;color:#0b4f8a;white-space:nowrap}
+  .watch-total{margin-top:12px;padding:12px 16px;border-radius:10px;background:#f0f9ff;
+       border:1px solid #bae6fd;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .watch-total .wt-title{font-size:13px;color:#075985;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+  .watch-total .wt-value{font-size:22px;font-weight:700;color:#0b4f8a}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>SCORE2-Diabetes · WATCH-DM · Калькулятор СС-риска при СД 2 типа</h1>
+  <nav class="tabs">
+    <a class="tab" href="#section-calc">Расчёт риска</a>
+    <a class="tab" href="#section-ref">Справка</a>
+  </nav>
+</div>
+
+<div class="section-divider" id="section-calc"><h2>Расчёт риска и подбор терапии</h2></div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="card">
+      <h2>Данные пациента</h2>
+
+      <div class="grp-title">SCORE2-Diabetes · основные</div>
+
+      <label>Пол</label>
+      <div class="sex-toggle">
+        <label class="sex-opt">
+          <input type="radio" name="sex" value="1" checked>
+          <span class="sex-ico">♂</span>
+          <span class="sex-txt">Мужчина</span>
+          <span class="sex-check">✓</span>
+        </label>
+        <label class="sex-opt">
+          <input type="radio" name="sex" value="2">
+          <span class="sex-ico">♀</span>
+          <span class="sex-txt">Женщина</span>
+          <span class="sex-check">✓</span>
+        </label>
+      </div>
+
+      <label>Курение (текущее)</label>
+      <div class="chk" style="margin-top:4px"><input type="checkbox" id="smoke"><label for="smoke" style="margin:0">Да</label></div>
+
+      <label>Возраст, годы (40–69)</label>
+      <input type="number" id="age" min="40" max="69" step="1">
+
+      <label>Возраст диагностики СД 2 типа, годы</label>
+      <input type="number" id="age_dx" min="1" max="69" step="1">
+
+      <label>САД, мм рт.ст.</label>
+      <input type="number" id="sbp" min="60" max="260" step="1">
+
+      <div class="row2">
+        <div><label>ОХС, ммоль/л</label><input type="number" id="tc" min="1" max="20" step="0.01"></div>
+        <div><label>ХС-ЛВП, ммоль/л</label><input type="number" id="hdl" min="0.1" max="5" step="0.01"></div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label>ХС-ЛНП, ммоль/л</label>
+          <input type="number" id="ldl" min="0.1" max="15" step="0.01">
+          <div class="hint">без лечения</div>
+        </div>
+        <div><label>Креатинин, мкмоль/л</label><input type="number" id="cr" min="10" max="2000" step="0.1"></div>
+      </div>
+
+      <label>HbA1c, % (NGSP)</label>
+      <input type="number" id="hba1c" min="3" max="20" step="0.1">
+      <div class="hint" id="ifcc-hint">HbA1c (IFCC): — ммоль/моль</div>
+
+      <div class="grp-title aux">Дополнительно (для оценки риска СН)</div>
+
+      <div class="row2">
+        <div><label>Рост, см</label><input type="number" id="height" min="50" max="250" step="0.5"></div>
+        <div><label>Масса, кг</label><input type="number" id="weight" min="10" max="300" step="0.5"></div>
+      </div>
+      <div class="hint" id="bmi-hint">ИМТ: — кг/м²</div>
+
+      <div class="row2">
+        <div><label>ДАД, мм рт.ст.</label><input type="number" id="dbp" min="30" max="160" step="1"></div>
+        <div><label>Глюкоза плазмы, ммоль/л</label><input type="number" id="glucose" min="1" max="40" step="0.1"></div>
+      </div>
+
+      <div class="chk"><input type="checkbox" id="qrs_wide"><label for="qrs_wide" style="margin:0">QRS ≥ 120 мс</label></div>
+      <div class="chk"><input type="checkbox" id="prior_mi"><label for="prior_mi" style="margin:0">ПИКС (перенесённый ИМ)</label></div>
+      <div class="chk"><input type="checkbox" id="cabg"><label for="cabg" style="margin:0">АКШ в анамнезе</label></div>
+
+      <div class="hint" style="margin-top:14px">Расчёт обновляется автоматически.</div>
+
+      <div class="scale-legend">
+        <span class="lg lg-green">Низкий</span>
+        <span class="lg lg-yellow">Умеренный</span>
+        <span class="lg lg-orange">Высокий</span>
+        <span class="lg lg-red">Очень высокий</span>
+      </div>
+    </div>
+  </aside>
+
+  <main id="results"></main>
+</div>
+
+<div class="section-divider" id="section-ref"><h2>Справочная информация</h2></div>
+
+<div class="meta-block">
+  <div class="card">
+    <div class="meta-grid">
+      <div>
+        <h3>Источник</h3>
+        <ul>
+          <li>SCORE2-Diabetes Working Group and the ESC Cardiovascular Risk Collaboration, SCORE2-Diabetes: 10-year cardiovascular risk estimation in type 2 diabetes in Europe, <b>European Heart Journal</b>, 2023.</li>
+          <li>2023 ESC Guidelines for the management of cardiovascular disease in patients with diabetes. <b>European Heart Journal</b>, 2023.</li>
+          <li>Segar, MW et al. Machine Learning to Predict the Risk of Incident Heart Failure Hospitalization Among Patients With Diabetes: The WATCH-DM Risk Score. <b>Diabetes Care</b>. DOI: 10.2337/dc19-0587</li>
+          <li>Kershaw V. Patel et al. Optimal Screening for Predicting and Preventing the Risk of Heart Failure Among Adults With Diabetes Without Atherosclerotic Cardiovascular Disease: A Pooled Cohort Analysis. <b>Circulation</b>. https://www.ahajournals.org/doi/10.1161/CIRCULATIONAHA.123.067530</li>
+          <li>Диабетическая дисфункция миокарда: консенсус экспертов HFA и рабочей группы по заболеваниям миокарда и перикарда Европейского общества кардиологов. <b>Eur J Heart Fail</b>. 2024. https://onlinelibrary.wiley.com/doi/ftr/10.1002/ejhf.3347</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Сокращения</h3>
+        <p class="abbr">
+          <b>СД 2 типа</b> — сахарный диабет 2 типа · <b>ССЗ</b> — сердечно-сосудистые заболевания ·
+          <b>ОХС</b> — общий холестерин · <b>ХС-ЛВП</b> — холестерин ЛПВП ·
+          <b>ХС-ЛНП</b> — холестерин ЛПНП · <b>ТГ</b> — триглицериды ·
+          <b>САД</b> / <b>ДАД</b> — систолическое / диастолическое АД ·
+          <b>ИМТ</b> — индекс массы тела · <b>рСКФ</b> — расчётная СКФ ·
+          <b>HbA1c</b> — гликированный гемоглобин · <b>NGSP</b> / <b>IFCC</b> — стандарты измерения HbA1c ·
+          <b>ПИКС</b> — постинфарктный кардиосклероз · <b>АКШ</b> — аортокоронарное шунтирование ·
+          <b>СН</b> — сердечная недостаточность · <b>NT-proBNP</b> — N-терминальный промозговой натриуретический пептид.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   УТИЛИТЫ
+   ============================================================ */
+const NOW = new Date();
+const DATE_STR = NOW.toLocaleDateString('ru-RU');
+
+const $  = id => document.getElementById(id);
+const nf = (x,d=1) => (x==null||!isFinite(x)) ? '—'
+      : Number(x).toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+const num = id => {
+  const el=$(id); if(!el) return null;
+  const v=parseFloat(String(el.value).replace(',','.'));
+  return isNaN(v)?null:v;
+};
+const getSex = () => {
+  const el = document.querySelector('input[name="sex"]:checked');
+  return el ? parseInt(el.value,10) : 1;
+};
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ============================================================
+   eGFR CKD-EPI 2009 в модификации 2011 (используется внутри SCORE2-DM)
+   ============================================================ */
+function egfrCKDEPI2011(age, sex, cr_mgdl){
+  if(age==null||cr_mgdl==null||age<18) return null;
+  const s = cr_mgdl;
+  if(sex === 1){
+    const k = 0.9;
+    return s <= k
+      ? 141 * Math.pow(s/k, -0.411) * Math.pow(0.993, age)
+      : 141 * Math.pow(s/k, -1.209) * Math.pow(0.993, age);
+  }
+  const k = 0.7;
+  return s <= k
+    ? 144 * Math.pow(s/k, -0.329) * Math.pow(0.993, age)
+    : 144 * Math.pow(s/k, -1.209) * Math.pow(0.993, age);
+}
+
+/* ============================================================
+   SCORE2-Diabetes (Eur Heart J 2023)
+   ============================================================ */
+function score2Diabetes(age, sex, smoke, age_dx, sbp, tc, hdl, cr, hba1c_ngsp){
+  if(age==null||sbp==null||tc==null||hdl==null||cr==null||hba1c_ngsp==null) return null;
+  if(age<40 || age>69) return null;
+
+  const cr_mgdl = cr / 88.4;
+  const egfr = egfrCKDEPI2011(age, sex, cr_mgdl);
+  if(egfr==null || egfr<=0) return null;
+
+  const age_c    = (age - 60) / 5;
+  const sm       = smoke ? 1 : 0;
+  const sbp_c    = (sbp - 120) / 20;
+  const tc_c     = (tc - 6) / 1;
+  const hdl_c    = (hdl - 1.3) / 0.5;
+  const dm       = 1;
+  const age_dx_c = age_dx!=null ? (age_dx - 50) / 5 : 0;
+
+  const hba1c_ifcc = 10.93 * hba1c_ngsp - 23.5;
+  const hba1c_c    = (hba1c_ifcc - 31) / 9.34;
+
+  const lnegfr_c  = (Math.log(egfr) - 4.5) / 0.15;
+  const lnegfr_c2 = lnegfr_c * lnegfr_c;
+
+  const ix_age_smoke = age_c * sm;
+  const ix_age_sbp   = age_c * sbp_c;
+  const ix_age_dm    = age_c * dm;
+  const ix_age_tc    = age_c * tc_c;
+  const ix_age_hdl   = age_c * hdl_c;
+  const ix_gluc_age  = -hba1c_c * age_c;
+  const ix_egfr_age  = lnegfr_c * age_c;
+
+  let LP, baseSurv, scale1, scale2;
+
+  if(sex === 1){
+    LP = 0.5368*age_c + 0.4774*sm + 0.1322*sbp_c + 0.6457*dm
+       + 0.1102*tc_c + (-0.1087)*hdl_c
+       + (-0.0672)*ix_age_smoke + (-0.0268)*ix_age_sbp
+       + (-0.0983)*ix_age_dm + (-0.0181)*ix_age_tc
+       + 0.0095*ix_age_hdl + (-0.0998)*age_dx_c
+       + 0.0955*hba1c_c + (-0.0591)*lnegfr_c
+       + 0.0058*lnegfr_c2 + (-0.0134)*ix_gluc_age
+       + 0.0115*ix_egfr_age;
+    baseSurv = 0.9605;
+    scale1 = 0.5836; scale2 = 0.8294;
+  } else {
+    LP = 0.6624*age_c + 0.6139*sm + 0.1421*sbp_c + 0.8096*dm
+       + 0.1127*tc_c + (-0.1568)*hdl_c
+       + (-0.1122)*ix_age_smoke + (-0.0167)*ix_age_sbp
+       + (-0.1272)*ix_age_dm + (-0.02)*ix_age_tc
+       + 0.0186*ix_age_hdl + (-0.118)*age_dx_c
+       + 0.1173*hba1c_c + (-0.064)*lnegfr_c
+       + 0.0062*lnegfr_c2 + (-0.0196)*ix_gluc_age
+       + 0.0169*ix_egfr_age;
+    baseSurv = 0.9776;
+    scale1 = 0.9412; scale2 = 0.8329;
+  }
+
+  const u = 1 - Math.pow(baseSurv, Math.exp(LP));
+  if(!(u > 0 && u < 1)) return null;
+  const risk = 1 - Math.exp(-Math.exp(scale1 + scale2 * Math.log(-Math.log(1 - u))));
+  return risk * 100;
+}
+
+function score2DMCat(risk){
+  if(risk==null) return null;
+  if(risk < 5)  return {name:'Низкий',        cls:'st-c1',  ldl:'<3,0 ммоль/л', ldlVal:3.0};
+  if(risk < 10) return {name:'Умеренный',     cls:'st-c3a', ldl:'<2,6 ммоль/л', ldlVal:2.6};
+  if(risk < 20) return {name:'Высокий',       cls:'st-c3b', ldl:'<1,8 ммоль/л', ldlVal:1.8};
+  return                  {name:'Очень высокий', cls:'st-c5',  ldl:'<1,4 ммоль/л', ldlVal:1.4};
+}
+
+/* ============================================================
+   WATCH-DM (Diabetes Care 2019)
+   ============================================================ */
+function watchDM(age, bmi, sbp, dbp, cr_mgdl, hdl_mgdl, glucose_mgdl, qrs_wide, prior_mi, cabg){
+  if(age==null||bmi==null||sbp==null||dbp==null||cr_mgdl==null||hdl_mgdl==null||glucose_mgdl==null) return null;
+
+  const pts = [];
+
+  let p_age;
+  if(age<50) p_age=0;
+  else if(age<55) p_age=1;
+  else if(age<60) p_age=2;
+  else if(age<65) p_age=3;
+  else if(age<70) p_age=4;
+  else if(age<75) p_age=5;
+  else p_age=6;
+  pts.push({name:'Возраст', val:age+' лет', pts:p_age});
+
+  let p_bmi;
+  if(bmi<25) p_bmi=0;
+  else if(bmi<35) p_bmi=1;
+  else if(bmi<40) p_bmi=2;
+  else p_bmi=5;
+  pts.push({name:'ИМТ', val:nf(bmi,1)+' кг/м²', pts:p_bmi});
+
+  let p_sbp;
+  if(sbp<100) p_sbp=0;
+  else if(sbp<140) p_sbp=1;
+  else if(sbp<160) p_sbp=2;
+  else p_sbp=3;
+  pts.push({name:'САД', val:sbp+' мм рт.ст.', pts:p_sbp});
+
+  let p_dbp;
+  if(dbp<60) p_dbp=2;
+  else if(dbp<80) p_dbp=1;
+  else p_dbp=0;
+  pts.push({name:'ДАД', val:dbp+' мм рт.ст.', pts:p_dbp});
+
+  let p_cr;
+  if(cr_mgdl<1) p_cr=0;
+  else if(cr_mgdl<1.5) p_cr=2;
+  else p_cr=5;
+  pts.push({name:'Креатинин', val:nf(cr_mgdl,2)+' мг/дл', pts:p_cr});
+
+  let p_hdl;
+  if(hdl_mgdl<30) p_hdl=2;
+  else if(hdl_mgdl<60) p_hdl=1;
+  else p_hdl=0;
+  pts.push({name:'ХС-ЛВП', val:nf(hdl_mgdl,1)+' мг/дл', pts:p_hdl});
+
+  let p_glu;
+  if(glucose_mgdl<125) p_glu=0;
+  else if(glucose_mgdl<200) p_glu=1;
+  else if(glucose_mgdl<300) p_glu=2;
+  else p_glu=3;
+  pts.push({name:'Глюкоза плазмы', val:nf(glucose_mgdl,0)+' мг/дл', pts:p_glu});
+
+  const p_qrs = qrs_wide ? 3 : 0;
+  pts.push({name:'QRS ≥ 120 мс', val:qrs_wide?'да':'нет', pts:p_qrs});
+
+  const p_mi = prior_mi ? 3 : 0;
+  pts.push({name:'ПИКС (перенесённый ИМ)', val:prior_mi?'да':'нет', pts:p_mi});
+
+  const p_cabg = cabg ? 2 : 0;
+  pts.push({name:'АКШ', val:cabg?'да':'нет', pts:p_cabg});
+
+  const total = pts.reduce((s,x)=>s+x.pts, 0);
+  return {pts, total};
+}
+
+function watchDMCat(total){
+  if(total<8)  return {name:'Очень низкий', cls:'st-c1',  risk5:'1,1%'};
+  if(total<10) return {name:'Низкий',       cls:'st-c3a', risk5:'3,6%'};
+  if(total<11) return {name:'Средний',      cls:'st-c3a', risk5:'4,7%'};
+  if(total<14) return {name:'Высокий',      cls:'st-c3b', risk5:'9,2%'};
+  return               {name:'Очень высокий', cls:'st-c5',  risk5:'17,4%'};
+}
+
+/* ============================================================
+   Таблицы гиполипидемической терапии
+   (из розувастатина удалена только монотерапия 40 мг)
+   ============================================================ */
+const STATIN_TABLES = {
+  rosuvastatin: [
+    {name:'Розувастатин 5 мг',                          pct:38.8},
+    {name:'Розувастатин 10 мг',                         pct:44.1},
+    {name:'Розувастатин 20 мг',                         pct:49.5},
+    {name:'Розувастатин 5 мг + Эзетимиб 10 мг',         pct:59.8},
+    {name:'Розувастатин 10 мг + Эзетимиб 10 мг',        pct:65.1},
+    {name:'Розувастатин 20 мг + Эзетимиб 10 мг',        pct:70.5},
+    {name:'Розувастатин 40 мг + Эзетимиб 10 мг',        pct:75.7}
+  ],
+  atorvastatin: [
+    {name:'Аторвастатин 10 мг',                          pct:35.5},
+    {name:'Аторвастатин 20 мг',                          pct:41.4},
+    {name:'Аторвастатин 40 мг',                          pct:46.2},
+    {name:'Аторвастатин 40 мг × 2 таб.',                 pct:50.2},
+    {name:'Аторвастатин 10 мг + Эзетимиб 10 мг',         pct:56.5},
+    {name:'Аторвастатин 20 мг + Эзетимиб 10 мг',         pct:62.4},
+    {name:'Аторвастатин 40 мг + Эзетимиб 10 мг',         pct:67.2},
+    {name:'Аторвастатин 40 мг × 2 таб. + Эзетимиб 10 мг', pct:71.2}
+  ],
+  pitavastatin: [
+    {name:'Питавастатин 1 мг',                          pct:33.6},
+    {name:'Питавастатин 2 мг',                          pct:42.0},
+    {name:'Питавастатин 4 мг',                          pct:47.2},
+    {name:'Питавастатин 2 мг + Эзетимиб 10 мг',         pct:63.0},
+    {name:'Питавастатин 4 мг + Эзетимиб 10 мг',         pct:68.2}
+  ]
+};
+
+function pickOptimalDose(list, ldlBase, targetVal){
+  for(const item of list){
+    const achieved = ldlBase * (1 - item.pct/100);
+    if(achieved < targetVal){
+      return {item, achieved, hit:true};
+    }
+  }
+  let best = null, bestDiff = Infinity, bestAchieved = null;
+  list.forEach(item=>{
+    const achieved = ldlBase * (1 - item.pct/100);
+    const diff = Math.abs(achieved - targetVal);
+    if(diff < bestDiff){
+      bestDiff = diff; best = item; bestAchieved = achieved;
+    }
+  });
+  return {item: best, achieved: bestAchieved, hit: false};
+}
+
+/* ============================================================
+   Копирование
+   ============================================================ */
+function copyToClipboard(text, btn){
+  const done = () => {
+    const orig = btn.dataset.orig || btn.textContent;
+    btn.dataset.orig = orig;
+    btn.textContent = '✓ Скопировано';
+    btn.classList.add('copied');
+    clearTimeout(btn._t);
+    btn._t = setTimeout(()=>{
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, onSuccess){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly','');
+    ta.style.position = 'absolute'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(ok && onSuccess) onSuccess();
+  }catch(e){ console.warn('Copy failed:', e); }
+}
+
+/* ============================================================
+   Блок 1. SCORE2-Diabetes
+   (кнопка «Копировать» перенесена в карточку риска)
+   ============================================================ */
+function buildSCORE2DMBlock(age, sex, risk, cat){
+  let out = `<div class="card"><h2>SCORE2-Diabetes · 10-летний риск СС-осложнений</h2>`;
+
+  if(risk != null && cat){
+    const dxLine = `Шкала SCORE2-Diabetes от ${DATE_STR} — ${nf(risk,1)}% (10-летний риск СС-осложнений — ${cat.name}. Целевой уровень ХС-ЛНП ${cat.ldl}).`;
+
+    out += `<div class="gfr-grid" style="margin-bottom:12px">
+      <div class="gfr ${cat.cls}">
+        <div class="gfr-head">
+          <div class="name">SCORE2-Diabetes · 10-летний риск</div>
+          <button type="button" class="dx-copy-btn" data-dx="${esc(dxLine)}">Копировать</button>
+        </div>
+        <div class="val">${nf(risk,1)} <small>%</small></div>
+        <div class="stage">${cat.name}</div>
+        <div class="deidx">Фатальные и нефатальные СС-осложнения<br>(СС-смерть, ИМ, инсульт)</div>
+      </div>
+    </div>`;
+
+    out += `<div class="opt-risk">
+      <span class="or-label">Целевой ХС-ЛНП:</span>
+      <span class="or-val">${cat.ldl}</span>
+      <span class="or-note">${(cat.name==='Высокий'||cat.name==='Очень высокий')?'+ снижение ≥50% от исходного':''}</span>
+    </div>`;
+
+    let rec = '';
+    if(cat.name === 'Низкий') {
+      rec = '<b>Метформин (класс IIa).</b> Контроль ФР, ЗОЖ, регулярный контроль липидов.';
+    } else if(cat.name === 'Умеренный') {
+      rec = '<b>Метформин (класс IIa).</b> Контроль ФР, ЗОЖ, назначение липидснижающей терапии при недостижении целевого ХС-ЛНП.';
+    } else {
+      rec = '<b>Метформин и/или ингибитор SGLT2</b> [эмпаглифлозин, канаглифлозин, дапаглифлозин, сотаглифлозин]<br>' +
+            '<b>и/или агонисты рецептора GLP-1</b> [лираглутид, семаглутид s.c., дулаглутид, эфегленатид] (класс IIb).<br>' +
+            'Одновременное назначение липидснижающей терапии.';
+    }
+    const recCls = (cat.name==='Очень высокий') ? 'danger' : (cat.name==='Высокий') ? 'warn' : 'ok';
+    out += `<div class="alert ${recCls}" style="margin-top:12px">
+      <b>Тактика гипогликемической терапии (по уровню СС-риска):</b><br>${rec}
+    </div>`;
+  } else {
+    out += `<div class="alert warn">Введите все данные для расчёта SCORE2-Diabetes (возраст 40–69 лет, пол, курение, возраст диагностики СД, HbA1c, САД, ОХС, ХС-ЛВП, креатинин).</div>`;
+  }
+
+  out += `</div>`;
+  return out;
+}
+
+/* ============================================================
+   Блок 2. Оптимальная терапия
+   ============================================================ */
+function buildTherapyBlock(ldlBase, cat){
+  if(ldlBase == null){
+    return `<div class="card" id="section-therapy">
+      <div class="alert warn" style="margin-top:0">Введите ХС-ЛНП без лечения для подбора терапии.</div>
+    </div>`;
+  }
+  if(!cat){
+    return `<div class="card" id="section-therapy">
+      <div class="alert warn" style="margin-top:0">Сначала рассчитайте SCORE2-Diabetes.</div>
+    </div>`;
+  }
+
+  const tgt = {txt:cat.ldl, val:cat.ldlVal};
+
+  let out = `<div class="card" id="section-therapy">`;
+
+  out += `<div class="lipid-summary">
+    <div><b>Исходный ХС-ЛНП (без лечения):</b> ${nf(ldlBase,2)} ммоль/л &nbsp;·&nbsp;
+         <b>Целевой уровень:</b> ${tgt.txt}</div>
+    <div class="hint" style="margin-top:6px">
+      Показана минимально эффективная комбинация из каждой группы, позволяющая достичь целевого уровня.
+    </div>
+  </div>`;
+
+  out += `<h2>Оптимальная терапия для достижения целевого ХС-ЛНП</h2>`;
+
+  const families = [
+    {key:'rosuvastatin', title:'Розувастатин', cls:'lb-rosu'},
+    {key:'atorvastatin', title:'Аторвастатин', cls:'lb-ator'},
+    {key:'pitavastatin', title:'Питавастатин', cls:'lb-pita'}
+  ];
+
+  const results = families.map(fam=>{
+    const list = STATIN_TABLES[fam.key];
+    const pick = pickOptimalDose(list, ldlBase, tgt.val);
+    return {fam, pick};
+  });
+
+  const anyHit = results.some(r=>r.pick.hit);
+
+  out += `<div class="lipid-tables">`;
+
+  results.forEach(({fam, pick})=>{
+    const best = pick.item;
+    const achieved = pick.achieved;
+
+    let hitCls, hitTxt;
+    if(pick.hit){
+      hitCls = 'bd-hit-yes';
+      hitTxt = '✓ Целевой уровень достигнут';
+    } else if(achieved < tgt.val + 0.2){
+      hitCls = 'bd-hit-near';
+      hitTxt = '≈ Близко к цели (не достигнута)';
+    } else {
+      hitCls = 'bd-hit-no';
+      hitTxt = '✗ Целевой уровень не достигнут';
+    }
+
+    const note = pick.hit
+      ? `Минимально эффективная комбинация из группы, достигающая целевого уровня ${tgt.txt}.`
+      : `Ни одна комбинация из группы не достигает целевого уровня. Показана ближайшая.`;
+
+    out += `<div class="lipid-block ${fam.cls}">
+      <div class="lb-head">
+        <span>${fam.title}</span>
+      </div>
+      <div class="best-dose">
+        <div class="bd-name">${esc(best.name)}</div>
+        <div class="bd-grid">
+          <div class="bd-item">
+            <div class="bd-label">↓ ХС-ЛНП</div>
+            <div class="bd-value">−${nf(best.pct,1)}<small>%</small></div>
+          </div>
+          <div class="bd-item">
+            <div class="bd-label">Достигнутый ХС-ЛНП</div>
+            <div class="bd-value">${nf(achieved,2)}<small>ммоль/л</small></div>
+          </div>
+        </div>
+        <div class="bd-hit ${hitCls}">${hitTxt}</div>
+        <div class="bd-note">${note}</div>
+      </div>
+    </div>`;
+  });
+
+  out += `</div>`;
+
+  out += anyHit
+    ? `<div class="alert info" style="margin-top:14px">
+        <b>Общее правило:</b> при высоком и очень высоком риске — снижение ХС-ЛНП не менее чем на 50 % от исходного
+        и достижение целевого уровня. Если цель не достигается — комбинированная терапия (статин + эзетимиб),
+        при недостаточном эффекте — добавить ингибиторы PCSK9 или бемпедоэвую кислоту.
+      </div>`
+    : `<div class="alert warn" style="margin-top:14px">
+        <b>Ни один вариант монотерапии не достигает целевого ХС-ЛНП.</b>
+        Рекомендуется комбинированная терапия (статин + эзетимиб), при недостаточном эффекте —
+        добавить ингибиторы PCSK9 или бемпедоэвую кислоту.
+      </div>`;
+
+  out += `</div>`;
+  return out;
+}
+
+/* ============================================================
+   Блок 3. WATCH-DM
+   ============================================================ */
+function buildWatchDMBlock(wd, cat){
+  let out = `<div class="card"><h2>WATCH-DM · 5-летний риск сердечной недостаточности</h2>`;
+
+  if(wd && cat){
+    out += `<table class="watch-table"><tbody>`;
+    wd.pts.forEach(p=>{
+      const zero = p.pts === 0 ? 'style="color:#94a3b8"' : '';
+      out += `<tr>
+        <td class="wt-label">${esc(p.name)}</td>
+        <td class="wt-val">${esc(p.val)}</td>
+        <td class="wt-pts" ${zero}>${p.pts>0?'+'+p.pts:p.pts}</td>
+      </tr>`;
+    });
+    out += `</tbody></table>`;
+
+    out += `<div class="watch-total">
+      <span class="wt-title">Сумма баллов WATCH-DM</span>
+      <span class="wt-value">${wd.total}</span>
+    </div>`;
+
+    out += `<div class="gfr-grid" style="margin-top:12px">
+      <div class="gfr ${cat.cls}">
+        <div class="name">WATCH-DM · 5-летний риск СН</div>
+        <div class="val">${cat.risk5}</div>
+        <div class="stage">${cat.name}</div>
+        <div class="deidx">Риск развития сердечной недостаточности<br>при СД 2 типа в течение 5 лет</div>
+      </div>
+    </div>`;
+
+    if(wd.total >= 12){
+      out += `<div class="alert danger" style="margin-top:12px">
+        <b>Рекомендована оценка NT-proBNP.</b><br>
+        Рассмотреть назначение иНГЛТ-2 (эмпаглифлозин, дапаглифлозин) — доказанное снижение риска
+        госпитализаций по поводу СН.
+      </div>`;
+    } else if(cat.name === 'Средний'){
+      out += `<div class="alert warn" style="margin-top:12px">
+        <b>Средний риск СН.</b> Контроль АД, гликемии, липидов.
+      </div>`;
+    } else {
+      out += `<div class="alert ok" style="margin-top:12px">
+        <b>Низкий риск СН.</b> Продолжить стандартную профилактику.
+      </div>`;
+    }
+  } else {
+    out += `<div class="alert warn">Введите все данные для расчёта WATCH-DM: возраст, рост, масса, САД, ДАД, креатинин, ХС-ЛВП, глюкоза плазмы.</div>`;
+  }
+
+  out += `</div>`;
+  return out;
+}
+
+/* ============================================================
+   ГЛАВНЫЙ РАСЧЁТ
+   ============================================================ */
+function render(){
+  const sex     = getSex();
+  const smoke   = $('smoke').checked;
+  const age     = num('age');
+  const age_dx  = num('age_dx');
+  const sbp     = num('sbp');
+  const tc      = num('tc');
+  const hdl     = num('hdl');
+  const cr      = num('cr');
+  const ldl     = num('ldl');
+  const hba1c   = num('hba1c');
+  const h       = num('height');
+  const w       = num('weight');
+  const dbp     = num('dbp');
+  const glucose = num('glucose');
+  const qrs     = $('qrs_wide').checked;
+  const mi      = $('prior_mi').checked;
+  const cabg    = $('cabg').checked;
+
+  // Подсказки
+  if(hba1c != null){
+    const ifcc = 10.93 * hba1c - 23.5;
+    $('ifcc-hint').textContent = `HbA1c (IFCC): ${ifcc.toFixed(1)} ммоль/моль`;
+  } else {
+    $('ifcc-hint').textContent = 'HbA1c (IFCC): — ммоль/моль';
+  }
+  const bmi = (h!=null&&w!=null) ? w/Math.pow(h/100,2) : null;
+  if(bmi != null){
+    $('bmi-hint').textContent = `ИМТ: ${nf(bmi,1)} кг/м²`;
+  } else {
+    $('bmi-hint').textContent = 'ИМТ: — кг/м²';
+  }
+
+  const cr_mgdl = (cr!=null) ? cr/88.4 : null;
+
+  const risk = score2Diabetes(age, sex, smoke, age_dx, sbp, tc, hdl, cr, hba1c);
+  const cat  = score2DMCat(risk);
+
+  const wd = watchDM(age, bmi, sbp, dbp, cr_mgdl,
+                     hdl!=null ? hdl*38.6 : null,
+                     glucose!=null ? glucose*18.0182 : null,
+                     qrs, mi, cabg);
+  const wdCat = wd ? watchDMCat(wd.total) : null;
+
+  let out = '';
+  out += buildSCORE2DMBlock(age, sex, risk, cat);
+  out += buildTherapyBlock(ldl, cat);
+  out += buildWatchDMBlock(wd, wdCat);
+
+  $('results').innerHTML = out;
+
+  document.querySelectorAll('.dx-copy-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const text = btn.getAttribute('data-dx') || '';
+      copyToClipboard(text, btn);
+    });
+  });
+}
+
+/* ============================================================
+   СОБЫТИЯ
+   ============================================================ */
+['age','age_dx','sbp','tc','hdl','ldl','cr','hba1c','height','weight','dbp','glucose']
+  .forEach(id=>{
+    const el=$(id); if(!el) return;
+    el.addEventListener('input', render);
+    el.addEventListener('change', render);
+  });
+['smoke','qrs_wide','prior_mi','cabg'].forEach(id=>{
+  const el=$(id); if(!el) return;
+  el.addEventListener('change', render);
+});
+document.querySelectorAll('input[name="sex"]').forEach(el=>{
+  el.addEventListener('change', render);
+});
+
+render();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="SCORE2.html" title="10-летний риск ССЗ в общей популяции">SCORE2</a>
+    <a href="статины.html" title="Целевые уровни липидов">Подбор статинов</a>
+    <a href="af.html" title="CHA₂DS₂-VA при фибрилляции предсердий">ФП · ОАК</a>
+    <a href="ХСН.html" title="Диагностика сердечной недостаточности">СНсФВ</a>
+    
+  </div>
+</div>
+</body>
+</html>

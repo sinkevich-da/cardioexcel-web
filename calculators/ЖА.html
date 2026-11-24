@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Классификация желудочковых аритмий РКО 2023</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #dcdde1;
+            --hover-color: #e8f0fe;
+            --success-color: #27ae60;
+            --table-header-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        /* Стили таблицы */
+        .form-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .form-table th {
+            background-color: var(--table-header-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+            text-align: left;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            font-size: 15px;
+        }
+
+        .form-table td {
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .options-cell {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Вертикальное расположение для классификации Lown */
+        .options-column {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .options-column .radio-label {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .radio-label {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: 1px solid transparent;
+            background-color: #fff;
+            user-select: none;
+        }
+
+        .radio-label:hover {
+            background-color: var(--hover-color);
+        }
+
+        .radio-label input[type="radio"] {
+            margin-right: 8px;
+            accent-color: var(--accent-color);
+            transform: scale(1.1);
+        }
+
+        .radio-label.selected {
+            background-color: var(--hover-color);
+            border-color: var(--accent-color);
+        }
+
+        .select-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        select {
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: white;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent-color);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Блок вывода */
+        .output-container {
+            background-color: #eaf2f8;
+            border-left: 5px solid var(--accent-color);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            position: sticky;
+            bottom: 20px;
+            z-index: 100;
+        }
+
+        .output-text {
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            min-height: 50px;
+            word-wrap: break-word;
+        }
+
+        .copy-btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .copy-btn:active {
+            transform: scale(0.98);
+        }
+
+        .copy-btn.copied {
+            background-color: var(--success-color);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .abbreviations {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+        
+        .abbreviations strong {
+            color: var(--primary-color);
+        }
+
+        @media (max-width: 600px) {
+            .options-cell {
+                flex-direction: column;
+            }
+            .container {
+                padding: 15px;
+            }
+            .form-table th, .form-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Классификация желудочковых аритмий (РКО 2023 г.)</h1>
+
+    <table class="form-table">
+        <!-- Тип желудочковой аритмии -->
+        <tr>
+            <th colspan="2">Тип желудочковой аритмии</th>
+        </tr>
+        <tr>
+            <td colspan="2" class="options-cell" id="type-options">
+                <label class="radio-label"><input type="radio" name="type" value="1"> Одиночная ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="type" value="2"> Парная ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="type" value="3"> Желудочковая тахикардия (ЖТ)</label>
+                <label class="radio-label"><input type="radio" name="type" value="4"> Фибрилляция желудочков (ФЖ)</label>
+                <label class="radio-label"><input type="radio" name="type" value="5"> Трепетание желудочков</label>
+            </td>
+        </tr>
+
+        <!-- По длительности и повторяемости (Появляется для ЖТ и ФЖ) -->
+        <tr class="conditional-row hidden" id="row-duration">
+            <th colspan="2">По длительности и повторяемости (для ЖТ)</th>
+        </tr>
+        <tr class="conditional-row hidden" id="row-duration-options">
+            <td colspan="2" class="options-cell" id="duration-options">
+                <label class="radio-label"><input type="radio" name="duration" value="1"> Устойчивая (≥30 сек)</label>
+                <label class="radio-label"><input type="radio" name="duration" value="2"> Неустойчивая (<30 сек)</label>
+                <label class="radio-label"><input type="radio" name="duration" value="3"> Непрерывно-рецидивирующая</label>
+                <label class="radio-label"><input type="radio" name="duration" value="4"> Электрический шторм</label>
+            </td>
+        </tr>
+
+        <!-- По частоте (Появляется для ЖТ и ФЖ) -->
+        <tr class="conditional-row hidden" id="row-frequency">
+            <th colspan="2">По частоте (для ЖТ)</th>
+        </tr>
+        <tr class="conditional-row hidden" id="row-frequency-options">
+            <td colspan="2" class="options-cell" id="frequency-options">
+                <label class="radio-label"><input type="radio" name="frequency" value="1"> Ускоренный желудочковый ритм, частота <100 уд/мин (цикл >600 мс)</label>
+                <label class="radio-label"><input type="radio" name="frequency" value="2"> Медленная ЖТ, <150 уд/мин (цикл >400 мс)</label>
+                <label class="radio-label"><input type="radio" name="frequency" value="3"> Быстрая ЖТ, ≥150 уд/мин (цикл ≤400 мс)</label>
+            </td>
+        </tr>
+
+        <!-- Морфология QRS -->
+        <tr id="row-morphology">
+            <th colspan="2">Морфология QRS</th>
+        </tr>
+        <tr id="row-morphology-options">
+            <td colspan="2" class="options-cell" id="morphology-options">
+                <label class="radio-label"><input type="radio" name="morphology" value="1"> Мономорфная</label>
+                <label class="radio-label"><input type="radio" name="morphology" value="2"> Полиморфная</label>
+                <label class="radio-label" id="label-pleomorphic"><input type="radio" name="morphology" value="3"> Плеоморфная (для ЖТ)</label>
+            </td>
+        </tr>
+
+        <!-- Характер основного заболевания -->
+        <tr>
+            <th colspan="2">Характер основного заболевания</th>
+        </tr>
+        <tr>
+            <td colspan="2" class="options-cell" id="disease-options">
+                <label class="radio-label"><input type="radio" name="disease" value="1"> Без СЗС и каналопатий</label>
+                <label class="radio-label"><input type="radio" name="disease" value="2"> Без явного СЗС, с каналопатией</label>
+                <label class="radio-label"><input type="radio" name="disease" value="3"> Без явного СЗС, обратимые причины</label>
+                <label class="radio-label"><input type="radio" name="disease" value="4"> С наличием структурного заболевания сердца (СЗС)</label>
+                <label class="radio-label"><input type="radio" name="disease" value="5"> Идиопатические</label>
+                
+                <div class="select-container">
+                    <select id="channelopathy-select" class="hidden">
+                        <option value="">Выбрать каналопатию</option>
+                        <option value="синдром удлиненного интервала QT">синдром удлиненного интервала QT</option>
+                        <option value="синдром Бругада">синдром Бругада</option>
+                        <option value="катехоламинзависимая полиморфная ЖТ">катехоламинзависимая полиморфная ЖТ</option>
+                        <option value="синдром короткого интервала QT">синдром короткого интервала QT</option>
+                        <option value="синдром ранней реполяризации желудочков">синдром ранней реполяризации желудочков</option>
+                    </select>
+
+                    <select id="nosology-select" class="hidden">
+                        <option value="">Выбрать нозологию</option>
+                        <option value="ИБС">ИБС</option>
+                        <option value="постинфарктный кардиосклероз">постинфарктный кардиосклероз</option>
+                        <option value="ДКМП">ДКМП</option>
+                        <option value="ГКМП">ГКМП</option>
+                        <option value="миокардит">миокардит</option>
+                    </select>
+                </div>
+            </td>
+        </tr>
+
+        <!-- Классификация Lown (Появляется при постинфарктном кардиосклерозе) -->
+        <tr class="conditional-row hidden" id="row-lown">
+            <th colspan="2">Классификация B.Lown, M.Wolf, в модификации M.Ryan (1975)</th>
+        </tr>
+        <tr class="conditional-row hidden" id="row-lown-options">
+            <td colspan="2" class="options-cell options-column" id="lown-options">
+                <label class="radio-label"><input type="radio" name="lown" value="1"> 0 класс - Отсутствие ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="lown" value="2"> 1 класс - Редкая мономорфная (до 30 в час)</label>
+                <label class="radio-label"><input type="radio" name="lown" value="3"> 2 класс - Частая, мономорфная (более 30 в час)</label>
+                <label class="radio-label"><input type="radio" name="lown" value="4"> 3 класс - Полиморфные ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="lown" value="5"> 4А класс - Мономорфные парные ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="lown" value="6"> 4Б класс - Полиморфные парные ЖЭ</label>
+                <label class="radio-label"><input type="radio" name="lown" value="7"> 5 класс - Желудочковая тахикардия (≥3 подряд ЖЭ)</label>
+                <label class="radio-label"><input type="radio" name="lown" value="8"> Не указывать в диагнозе</label>
+            </td>
+        </tr>
+
+        <!-- Симптомность аритмии -->
+        <tr>
+            <th colspan="2">Симптомность аритмии</th>
+        </tr>
+        <tr>
+            <td colspan="2" class="options-cell" id="symptom-options">
+                <label class="radio-label"><input type="radio" name="symptom" value="1"> Симптомная</label>
+                <label class="radio-label"><input type="radio" name="symptom" value="2"> Бессимптомная</label>
+            </td>
+        </tr>
+
+        <!-- Нагрузка ЖА (Скрывается при ЖТ и ФЖ) -->
+        <tr id="row-burden">
+            <th colspan="2">Нагрузка ЖА (для ЖЭ и желудочковых ритмов)</th>
+        </tr>
+        <tr id="row-burden-options">
+            <td colspan="2" class="options-cell" id="burden-options">
+                <label class="radio-label"><input type="radio" name="burden" value="1"> <10% от всех желудочковых комплексов</label>
+                <label class="radio-label"><input type="radio" name="burden" value="2"> ≥10% от всех желудочковых комплексов</label>
+            </td>
+        </tr>
+    </table>
+</div>
+
+<!-- Блок вывода -->
+<div class="container output-container">
+    <div class="output-text" id="diagnosis-output">Выберите параметры для формирования диагноза...</div>
+    <button class="copy-btn" id="copy-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        Копировать
+    </button>
+</div>
+
+<div class="container">
+    <div class="abbreviations">
+        <strong>Сокращения:</strong> ЖА — желудочковая аритмия, ЖЭ — желудочковая экстрасистолия, ЖТ — желудочковая тахикардия, ФЖ — фибрилляция желудочков, СЗС — структурное заболевание сердца, ИБС — ишемическая болезнь сердца, ДКМП — дилатационная кардиомиопатия, ГКМП — гипертрофическая кардиомиопатия.
+    </div>
+    
+</div>
+
+<script>
+    // Состояние приложения
+    const state = {
+        type: null,
+        morphology: null,
+        duration: null,
+        frequency: null,
+        disease: null,
+        channelopathy: "",
+        nosology: "",
+        symptom: null,
+        burden: null,
+        lown: null
+    };
+
+    // DOM элементы для условного отображения
+    const conditionalRows = {
+        duration: [document.getElementById('row-duration'), document.getElementById('row-duration-options')],
+        frequency: [document.getElementById('row-frequency'), document.getElementById('row-frequency-options')],
+        lown: [document.getElementById('row-lown'), document.getElementById('row-lown-options')]
+    };
+
+    const selects = {
+        channelopathy: document.getElementById('channelopathy-select'),
+        nosology: document.getElementById('nosology-select')
+    };
+
+    const outputText = document.getElementById('diagnosis-output');
+    const copyBtn = document.getElementById('copy-btn');
+
+    // Инициализация: убрать все выделения по умолчанию
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.checked = false;
+    });
+
+    // Обработчики событий для радио-кнопок
+    document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            const name = e.target.name;
+            const value = parseInt(e.target.value);
+            
+            if (name === 'type') {
+                resetStateExcept(['type', 'disease', 'symptom']); 
+            }
+            
+            state[name] = value;
+            updateSelectedStyles(name);
+            updateVisibility();
+            render();
+        });
+    });
+
+    // Обработчики для выпадающих списков
+    selects.channelopathy.addEventListener('change', (e) => {
+        state.channelopathy = e.target.value;
+        render();
+    });
+
+    selects.nosology.addEventListener('change', (e) => {
+        state.nosology = e.target.value;
+        updateVisibility(); 
+        render();
+    });
+
+    function resetStateExcept(keysToKeep) {
+        for (let key in state) {
+            if (!keysToKeep.includes(key) && key !== 'disease' && key !== 'symptom' && key !== 'nosology' && key !== 'channelopathy') {
+                state[key] = null;
+                document.querySelectorAll(`input[name="${key}"]`).forEach(r => r.checked = false);
+                updateSelectedStyles(key);
+            }
+        }
+        if (!keysToKeep.includes('channelopathy') && state.disease !== 2) {
+            state.channelopathy = "";
+            selects.channelopathy.value = "";
+        }
+        if (!keysToKeep.includes('nosology') && state.disease !== 4) {
+            state.nosology = "";
+            selects.nosology.value = "";
+        }
+    }
+
+    function updateSelectedStyles(name) {
+        const radios = document.querySelectorAll(`input[name="${name}"]`);
+        radios.forEach(radio => {
+            const label = radio.closest('.radio-label');
+            if (radio.checked) {
+                label.classList.add('selected');
+            } else {
+                label.classList.remove('selected');
+            }
+        });
+    }
+
+    function updateVisibility() {
+        // 1. Блоки "По длительности" и "По частоте" 
+        // Показываются для ЖТ (3) и ФЖ (4)
+        if (state.type === 3 || state.type === 4) {
+            conditionalRows.duration.forEach(el => el.classList.remove('hidden'));
+            conditionalRows.frequency.forEach(el => el.classList.remove('hidden'));
+        } else {
+            conditionalRows.duration.forEach(el => el.classList.add('hidden'));
+            conditionalRows.frequency.forEach(el => el.classList.add('hidden'));
+            state.duration = null;
+            state.frequency = null;
+            document.querySelectorAll('input[name="duration"]').forEach(r => r.checked = false);
+            document.querySelectorAll('input[name="frequency"]').forEach(r => r.checked = false);
+            updateSelectedStyles('duration');
+            updateSelectedStyles('frequency');
+        }
+
+        // 2. Морфология QRS
+        const morphRow = document.getElementById('row-morphology');
+        const morphOptionsRow = document.getElementById('row-morphology-options');
+        const pleoLabel = document.getElementById('label-pleomorphic');
+        
+        if (state.type === 1 || state.type === 2 || state.type === 3) {
+            morphRow.classList.remove('hidden');
+            morphOptionsRow.classList.remove('hidden');
+            if (state.type === 3) {
+                pleoLabel.style.display = 'inline-flex';
+            } else {
+                pleoLabel.style.display = 'none';
+                if (state.morphology === 3) {
+                    state.morphology = null;
+                    document.querySelector('input[name="morphology"][value="3"]').checked = false;
+                    updateSelectedStyles('morphology');
+                }
+            }
+        } else {
+            morphRow.classList.add('hidden');
+            morphOptionsRow.classList.add('hidden');
+            state.morphology = null;
+            document.querySelectorAll('input[name="morphology"]').forEach(r => r.checked = false);
+            updateSelectedStyles('morphology');
+        }
+
+        // 3. Нагрузка ЖА (Скрывается для ЖТ и ФЖ, т.е. показывается только для 1 и 2)
+        const burdenRow = document.getElementById('row-burden');
+        const burdenOptionsRow = document.getElementById('row-burden-options');
+        if (state.type === 1 || state.type === 2) {
+            burdenRow.classList.remove('hidden');
+            burdenOptionsRow.classList.remove('hidden');
+        } else {
+            burdenRow.classList.add('hidden');
+            burdenOptionsRow.classList.add('hidden');
+            state.burden = null;
+            document.querySelectorAll('input[name="burden"]').forEach(r => r.checked = false);
+            updateSelectedStyles('burden');
+        }
+
+        // 4. Селекты при характере заболевания
+        if (state.disease === 2) {
+            selects.channelopathy.classList.remove('hidden');
+            selects.nosology.classList.add('hidden');
+            state.nosology = "";
+            selects.nosology.value = "";
+        } else if (state.disease === 4) {
+            selects.nosology.classList.remove('hidden');
+            selects.channelopathy.classList.add('hidden');
+            state.channelopathy = "";
+            selects.channelopathy.value = "";
+        } else {
+            selects.channelopathy.classList.add('hidden');
+            selects.nosology.classList.add('hidden');
+            state.channelopathy = "";
+            state.nosology = "";
+            selects.channelopathy.value = "";
+            selects.nosology.value = "";
+        }
+
+        // 5. Классификация Lown
+        // Появляется сразу, если выбран "постинфарктный кардиосклероз"
+        if (state.nosology === "постинфарктный кардиосклероз") {
+            conditionalRows.lown.forEach(el => el.classList.remove('hidden'));
+        } else {
+            conditionalRows.lown.forEach(el => el.classList.add('hidden'));
+            state.lown = null;
+            document.querySelectorAll('input[name="lown"]').forEach(r => r.checked = false);
+            updateSelectedStyles('lown');
+        }
+    }
+
+    // Логика формирования диагноза
+    function render() {
+        let result = "";
+
+        // 1. Базовое название
+        if (state.type === 1) result += "Одиночная желудочковая экстрасистолия";
+        else if (state.type === 2) result += "Парная желудочковая экстрасистолия";
+        else if (state.type === 3) result += "Желудочковая тахикардия";
+        else if (state.type === 4) result += "Фибрилляция желудочков";
+        else if (state.type === 5) result += "Трепетание желудочков";
+        else {
+            outputText.textContent = "Выберите параметры для формирования диагноза...";
+            return;
+        }
+
+        // 2. Морфология
+        if ((state.type === 1 || state.type === 2) && state.morphology) {
+            result += ", " + (state.morphology === 1 ? "мономорфная" : "полиморфная");
+        } else if (state.type === 3 && state.morphology) {
+            const morphMap = { 1: "мономорфная", 2: "полиморфная", 3: "плеоморфная" };
+            result += ", " + morphMap[state.morphology];
+        }
+
+        // 3. Длительность (только для ЖТ)
+        if (state.type === 3 && state.duration) {
+            const durMap = { 1: "устойчивая", 2: "неустойчивая", 3: "непрерывно-рецидивирующая", 4: "электрический шторм" };
+            result += ", " + durMap[state.duration];
+        }
+
+        // 4. Частота (только для ЖТ)
+        if (state.type === 3 && state.frequency) {
+            const freqMap = { 
+                1: "ускоренный желудочковый ритм: частота <100 уд/мин (цикл >600 мс)", 
+                2: "медленная: <150 уд/мин (цикл >400 мс)", 
+                3: "быстрая: ≥150 уд/мин (цикл ≤400 мс)" 
+            };
+            result += ", " + freqMap[state.frequency];
+        }
+
+        // 5. Характер основного заболевания
+        if (state.disease === 1) {
+            result += " при отсутствии структурного заболевания сердца и каналопатий";
+        } else if (state.disease === 2) {
+            result += " при отсутствии явного структурного заболевания сердца, на фоне каналопатии: " + (state.channelopathy || "выбрать каналопатию");
+        } else if (state.disease === 3) {
+            result += " при отсутствии явного структурного заболевания сердца, предположительно обусловленные обратимыми метаболическими/лекарственными причинами";
+        } else if (state.disease === 4) {
+            result += " на фоне структурного заболевания сердца: " + (state.nosology || "выбрать нозологию");
+        } else if (state.disease === 5) {
+            result += " идиопатические";
+        }
+
+        // 6. Симптомность
+        if (state.symptom === 1) result += ", симптомная";
+        else if (state.symptom === 2) result += ", бессимптомная";
+
+        // 7. Нагрузка (только для ЖЭ)
+        if ((state.type === 1 || state.type === 2) && state.burden) {
+            if (state.burden === 1) result += ", <10% от всех желудочковых комплексов";
+            else if (state.burden === 2) result += ", ≥10% от всех желудочковых комплексов";
+        }
+
+        // 8. Классификация Lown
+        // Выводится ТОЛЬКО если выбран постинфарктный кардиосклероз, активна одна из кнопок 1-7 (не 8 и не null)
+        if (state.nosology === "постинфарктный кардиосклероз" && state.lown && state.lown !== 8) {
+            const lownMap = {
+                1: "0 класс", 2: "1 класс", 3: "2 класс", 4: "3 класс",
+                5: "4А класс", 6: "4Б класс", 7: "5 класс"
+            };
+            result += ", " + lownMap[state.lown] + " по B.Lown, M.Wolf, в модификации M.Ryan (1975)";
+        }
+
+        // 9. Суффикс
+        result += " [Классификация желудочковых аритмий РКО 2023 г.]";
+
+        outputText.textContent = result;
+    }
+
+    // Копирование текста
+    copyBtn.addEventListener('click', () => {
+        const text = outputText.textContent;
+        if (text && text !== "Выберите параметры для формирования диагноза...") {
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Скопировано!`;
+                copyBtn.classList.add('copied');
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.classList.remove('copied');
+                }, 2000);
+            }).catch(err => {
+                console.error('Ошибка копирования: ', err);
+            });
+        }
+    });
+
+    // Первоначальный вызов для установки видимости
+    updateVisibility();
+</script>
+
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="ААТ.html" title="Классы и дозы ААП">Антиаритмики (EHRA 2025)</a>
+    <a href="qt.html" title="Коррекция интервала QT">Интервал QT</a>
+    <a href="гкмп.html" title="Риск внезапной смерти при ГКМП">ГКМП</a>
+    <a href="ie.html" title="Инфекционные причины ЖА">Инфекционный эндокардит</a>
+    
+  </div>
+</div>
+</body>
+</html>

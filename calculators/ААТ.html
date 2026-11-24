@@ -1,0 +1,1291 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Экспресс-навигатор по антиаритмической терапии (EHRA 2025)</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --ink:#16202c; --ink-2:#4a5a6d; --ink-3:#8494a6;
+    --line:#dde4ec; --line-2:#eef2f7; --accent:#1a6fb5; --accent-soft:#e8f2fb;
+    --l1:#1f7a4d; --l1-soft:#e7f5ee; --l2:#b06a10; --l2-soft:#fdf3e3;
+    --warn:#b3261e; --warn-soft:#fdeceb;
+    --shadow:0 1px 2px rgba(16,32,48,.06), 0 6px 18px rgba(16,32,48,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 18px 60px}
+
+  header.top{background:linear-gradient(135deg,#0f4c81 0%,#1a6fb5 55%,#2f8fd6 100%);
+    color:#fff;padding:22px 0 18px;box-shadow:0 2px 14px rgba(15,76,129,.25);}
+  header.top .wrap{padding-bottom:0}
+  .brand{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{width:42px;height:42px;border-radius:11px;background:rgba(255,255,255,.16);
+    display:flex;align-items:center;justify-content:center;flex:0 0 auto;
+    border:1px solid rgba(255,255,255,.28);}
+  .logo svg{width:25px;height:25px}
+  h1{font-size:19px;line-height:1.25;margin:0;font-weight:700;letter-spacing:.2px}
+  .sub{font-size:13px;opacity:.9;margin-top:3px}
+  .badges{margin-top:11px;display:flex;gap:8px;flex-wrap:wrap}
+  .badge{font-size:11.5px;letter-spacing:.4px;text-transform:uppercase;font-weight:600;
+    background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);
+    padding:4px 10px;border-radius:20px;}
+  .reset-btn{margin-left:auto;background:rgba(255,255,255,.16);
+    border:1px solid rgba(255,255,255,.3);color:#fff;padding:7px 16px;border-radius:8px;
+    font:inherit;font-size:13px;font-weight:600;cursor:pointer;transition:.15s;}
+  .reset-btn:hover{background:rgba(255,255,255,.28)}
+
+  nav.tabs{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;
+    z-index:40;box-shadow:0 1px 4px rgba(16,32,48,.05);}
+  nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto;padding-bottom:0}
+  nav.tabs button{appearance:none;background:none;border:0;border-bottom:3px solid transparent;
+    padding:13px 16px;font:inherit;font-size:14px;font-weight:600;color:var(--ink-2);
+    cursor:pointer;white-space:nowrap;transition:.15s;}
+  nav.tabs button:hover{color:var(--accent);background:#f7fafd}
+  nav.tabs button.active{color:var(--accent);border-bottom-color:var(--accent)}
+
+  .main-grid{display:grid;grid-template-columns:400px 1fr;gap:16px;margin-top:16px;align-items:start}
+  .col-left,.col-right{display:flex;flex-direction:column;gap:16px}
+  .row-5{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    box-shadow:var(--shadow);overflow:hidden;transition:opacity .2s;}
+  .card.disabled{opacity:.55}
+  .card-head{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line-2);}
+  .card-head h2{font-size:14px;margin:0;font-weight:700;letter-spacing:.2px}
+  .card-head .hint{font-size:11.5px;color:var(--ink-3);margin-left:auto;text-align:right}
+  .stepnum{flex:0 0 auto;min-width:24px;height:24px;padding:0 6px;border-radius:6px;
+    background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;}
+  .card-body{padding:6px 0}
+
+  .card-blue{border-color:#b8d4ec} .card-blue .card-head{background:#e8f2fb} .card-blue .stepnum{background:#d4e7f7;color:#0f4c81}
+  .card-green{border-color:#b8dcc8} .card-green .card-head{background:#e7f5ee} .card-green .stepnum{background:#d2ecdc;color:#1f6b3e}
+  .card-yellow{border-color:#ecdcae} .card-yellow .card-head{background:#fdf8e3} .card-yellow .stepnum{background:#f7edc4;color:#8a6d10}
+  .card-grey{border-color:#c8d4e0} .card-grey .card-head{background:#eef2f7} .card-grey .stepnum{background:#dde5ee;color:#4a5a6d}
+  .card-orange{border-color:#ecd0b0} .card-orange .card-head{background:#fdf0e3} .card-orange .stepnum{background:#f8e0c8;color:#a35c14}
+
+  .opt-list{padding:4px 0}
+  .opt-group-label{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--ink-3);padding:10px 15px 4px;}
+  .opt-radio,.opt-check{display:flex;align-items:flex-start;gap:10px;padding:7px 15px;
+    cursor:pointer;transition:background .12s;user-select:none;}
+  .opt-radio:hover,.opt-check:hover{background:rgba(0,0,0,.035)}
+  .opt-radio.selected{background:rgba(26,111,181,.08)}
+  .opt-check.checked{background:rgba(217,119,6,.08)}
+  .opt-radio.disabled,.opt-check.disabled{cursor:not-allowed;opacity:.55}
+  .opt-radio.disabled:hover,.opt-check.disabled:hover{background:none}
+  .radio-circle{width:15px;height:15px;border-radius:50%;border:2px solid #b0bcc8;
+    flex:0 0 auto;margin-top:2px;position:relative;transition:.15s;background:#fff;}
+  .opt-radio.selected .radio-circle{border-color:var(--accent)}
+  .opt-radio.selected .radio-circle::after{content:'';position:absolute;inset:2px;
+    border-radius:50%;background:var(--accent);}
+  .check-box{width:15px;height:15px;border-radius:3px;border:2px solid #b0bcc8;
+    flex:0 0 auto;margin-top:2px;position:relative;transition:.15s;background:#fff;}
+  .opt-check.checked .check-box{background:#d97706;border-color:#d97706}
+  .opt-check.checked .check-box::after{content:'';position:absolute;left:4px;top:1px;
+    width:4px;height:8px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg);}
+  .opt-text{flex:1;min-width:0}
+  .opt-name{font-size:13.5px;font-weight:600;line-height:1.35}
+  .opt-desc{font-size:11.5px;color:var(--ink-3);margin-top:1px;line-height:1.35}
+  .opt-radio.selected .opt-name{color:var(--accent)}
+  .opt-check.checked .opt-name{color:#8a4a06}
+
+  .result{border:1px solid var(--line);border-radius:12px;background:#fff;
+    box-shadow:var(--shadow);margin-top:16px;overflow:hidden;}
+  .result-head{background:linear-gradient(135deg,#0f4c81,#1a6fb5);color:#fff;
+    padding:14px 18px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+  .result-head .code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:13px;font-weight:700;background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.3);padding:4px 11px;border-radius:7px;letter-spacing:.5px;}
+  .result-head .title{font-size:15px;font-weight:600;flex:1;min-width:200px}
+  table.res{width:100%;border-collapse:collapse}
+  table.res th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.6px;
+    color:var(--ink-3);font-weight:700;padding:10px 18px 6px;background:#fbfcfe;
+    border-bottom:1px solid var(--line-2);}
+  table.res td{padding:12px 18px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  table.res tr:last-child td{border-bottom:0}
+  .line-badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.7px;
+    padding:3px 9px;border-radius:5px;text-transform:uppercase;}
+  .l1-badge{background:var(--l1-soft);color:var(--l1)}
+  .l2-badge{background:var(--l2-soft);color:var(--l2)}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{display:inline-flex;align-items:center;gap:6px;background:#f3f7fb;
+    border:1px solid #dbe7f2;color:var(--ink);padding:5px 11px;border-radius:20px;
+    font-size:13px;font-weight:600;transition:.12s;}
+  .chip.drug{cursor:pointer;background:#eef7f1;border-color:#cfe8da;color:#14563a}
+  .chip.drug:hover{background:#e0f1e8;border-color:#a9d5be}
+  .chip.drug.l2{background:#fdf5e9;border-color:#f0dcb8;color:#7d4c07}
+  .chip.drug.l2:hover{background:#fbeacd}
+  .chip.nondrug{background:#f5f7fa;border-color:#e2e8f0;color:var(--ink-2);font-weight:500}
+  .chip .info{font-size:11px;opacity:.65;font-style:italic}
+  .chip .warn-mark{font-size:12px;color:#d97706;font-weight:800;margin-left:2px}
+  .chip.drug.conflict{background:#fdeceb;border-color:#f3c9c5;color:#8c1d18}
+  .comment{font-size:13.5px;color:var(--ink-2);background:#fbfcfe;
+    border-left:3px solid var(--accent);padding:10px 14px;border-radius:0 8px 8px 0;margin:0;}
+  .warn-box{background:var(--warn-soft);border:1px solid #f3c9c5;color:#8c1d18;
+    padding:14px 18px;font-size:14px;font-weight:600;display:flex;gap:11px;align-items:flex-start;}
+  .warn-box svg{flex:0 0 auto;margin-top:1px}
+
+  .risk-panel{margin-top:16px;border:1px solid #ecd0b0;border-radius:12px;background:#fff;
+    box-shadow:var(--shadow);overflow:hidden;}
+  .risk-panel .rp-head{background:#fdf0e3;padding:11px 16px;border-bottom:1px solid #f0dcc4;
+    display:flex;align-items:center;gap:9px;font-size:13.5px;font-weight:700;color:#8a4a06;}
+  .risk-panel .rp-head svg{flex:0 0 auto}
+  .risk-item{display:flex;gap:12px;padding:11px 16px;border-bottom:1px solid #f8efe4;
+    font-size:13px;color:var(--ink-2);line-height:1.5;}
+  .risk-item:last-child{border-bottom:0}
+  .risk-item .ri-icon{flex:0 0 auto;width:22px;height:22px;border-radius:6px;
+    background:#fdeceb;color:#b3261e;font-size:12px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;margin-top:1px;}
+  .risk-item .ri-body strong{color:#8a4a06;font-weight:700}
+  .risk-item .ri-body{flex:1}
+
+  .empty{text-align:center;padding:52px 20px;color:var(--ink-3)}
+  .empty svg{opacity:.35;margin-bottom:14px}
+  .empty h3{margin:0 0 6px;font-size:16px;color:var(--ink-2);font-weight:700}
+  .empty p{margin:0;font-size:13.5px}
+
+  .s7-wrap{overflow-x:auto}
+  table.s7{width:100%;border-collapse:collapse;font-size:13px;min-width:1060px}
+  table.s7 th{position:sticky;top:0;background:#fbfcfe;text-align:left;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.5px;color:var(--ink-3);font-weight:700;
+    padding:11px 12px;border-bottom:2px solid var(--line);z-index:2;}
+  table.s7 td{padding:11px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  table.s7 tr:hover td{background:#f9fbfd}
+  table.s7 td.drugname{font-weight:700;white-space:nowrap;color:var(--ink)}
+  .cls{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.4px;
+    padding:2px 7px;border-radius:5px;background:#eef2f7;color:#4a5a6d;}
+  .cls.Ia{background:#fde8e8;color:#a32a2a} .cls.Ib{background:#fdeddd;color:#a35c14}
+  .cls.Ic{background:#fdf6d8;color:#8a7208} .cls.IIa{background:#e3f3e9;color:#1f7a4d}
+  .cls.IIb{background:#e6f2f7;color:#20708c} .cls.IIc{background:#e8ecfa;color:#3b4a9c}
+  .cls.IId{background:#efe9fa;color:#5b3ba3} .cls.III{background:#fae4f0;color:#a12a6e}
+  .cls.IV{background:#e4f0fb;color:#1a6fb5}
+  .note-ruf{display:inline-block;font-size:10px;background:#fdeceb;color:#b3261e;
+    border-radius:4px;padding:1px 6px;margin-left:6px;font-weight:700;letter-spacing:.2px;}
+  .filterbar{display:flex;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line-2);
+    flex-wrap:wrap;background:#fbfcfe;}
+  .filterbar input{flex:1;min-width:200px;padding:9px 13px;border:1px solid var(--line);
+    border-radius:8px;font:inherit;font-size:13.5px;outline:none;background:#fff;}
+  .filterbar input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+  .info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+    gap:12px;padding:16px;}
+  .info-item{background:#fbfcfe;border:1px solid var(--line-2);border-radius:9px;padding:12px 14px}
+  .info-item dt{font-weight:800;font-size:13px;color:var(--accent);margin:0 0 3px}
+  .info-item dd{margin:0;font-size:13px;color:var(--ink-2)}
+  .src-list{padding:8px 16px 20px;margin:0;list-style:none}
+  .src-list li{padding:12px 0;border-bottom:1px solid var(--line-2);font-size:13.5px;
+    color:var(--ink-2);display:flex;gap:12px;}
+  .src-list li:last-child{border-bottom:0}
+  .src-num{flex:0 0 auto;width:24px;height:24px;border-radius:6px;background:var(--accent-soft);
+    color:var(--accent);font-size:12px;font-weight:800;display:flex;
+    align-items:center;justify-content:center;}
+
+  .matrix-wrap{overflow-x:auto}
+  table.matrix{width:100%;border-collapse:collapse;font-size:12.5px;min-width:1100px}
+  table.matrix th{position:sticky;top:0;background:#fbfcfe;text-align:left;
+    font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--ink-3);
+    font-weight:700;padding:10px 10px;border-bottom:2px solid var(--line);z-index:2;}
+  table.matrix td{padding:9px 10px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  table.matrix tr:hover td{background:#f9fbfd}
+  table.matrix td.code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-weight:700;color:var(--accent);white-space:nowrap;font-size:12px}
+  table.matrix tr.error-row td{background:#fdeceb}
+  table.matrix tr.error-row td.code{color:#b3261e}
+  table.matrix tr.strategy-sep td{background:#e8f2fb;font-weight:800;color:#0f4c81;
+    font-size:12px;text-transform:uppercase;letter-spacing:.5px;padding:8px 10px}
+
+  .modal-bg{position:fixed;inset:0;background:rgba(14,26,38,.5);backdrop-filter:blur(2px);
+    display:none;align-items:center;justify-content:center;padding:18px;z-index:100;}
+  .modal-bg.on{display:flex}
+  .modal{background:#fff;border-radius:14px;max-width:680px;width:100%;max-height:88vh;
+    overflow:auto;box-shadow:0 24px 60px rgba(10,25,40,.32);}
+  .modal-head{display:flex;align-items:center;gap:12px;padding:16px 20px;
+    border-bottom:1px solid var(--line-2);position:sticky;top:0;background:#fff;z-index:2;}
+  .modal-head h3{margin:0;font-size:17px;flex:1}
+  .modal-close{appearance:none;border:1px solid var(--line);background:#fff;border-radius:8px;
+    width:32px;height:32px;font-size:18px;line-height:1;color:var(--ink-2);cursor:pointer;}
+  .modal-close:hover{background:#f3f6fa}
+  table.modal-tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+  table.modal-tbl th{text-align:left;width:190px;padding:11px 20px;vertical-align:top;
+    color:var(--ink-3);font-size:11px;text-transform:uppercase;letter-spacing:.5px;
+    font-weight:700;border-bottom:1px solid var(--line-2);background:#fbfcfe;}
+  table.modal-tbl td{padding:11px 20px;border-bottom:1px solid var(--line-2);vertical-align:top}
+  table.modal-tbl tr:last-child th,table.modal-tbl tr:last-child td{border-bottom:0}
+
+  footer.bottom{margin-top:34px;padding:20px 0;border-top:1px solid var(--line);
+    text-align:center;font-size:12.5px;color:var(--ink-3);line-height:1.7;}
+  footer.bottom strong{color:var(--ink-2)}
+  .disclaimer{max-width:820px;margin:12px auto 0;font-size:11.5px;color:#9aa8b8;line-height:1.6}
+
+  .view{display:none} .view.on{display:block}
+
+  @media (max-width:960px){ .main-grid{grid-template-columns:1fr} .row-5{grid-template-columns:1fr} }
+  @media (max-width:640px){
+    h1{font-size:16px} .card-head .hint{display:none}
+    table.res th, table.res td{padding-left:12px;padding-right:12px}
+    .info-grid{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Экспресс-навигатор по антиаритмической терапии</h1>
+        <div class="sub">Клинический алгоритм выбора ААП · для взрослых пациентов</div>
+      </div>
+      <button class="reset-btn" onclick="resetAll()">Сбросить</button>
+    </div>
+    <div class="badges">
+      <span class="badge">EHRA 2025</span>
+      <span class="badge">Матрица тактики · 89 кодов</span>
+      <span class="badge">Стратегии · Аритмии · ФР</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button data-view="navigator" class="active">Навигатор</button>
+    <button data-view="matrix">Матрица решений</button>
+    <button data-view="doses">Препараты</button>
+    <button data-view="abbr">Сокращения</button>
+    <button data-view="sources">Источники</button>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section id="view-navigator" class="view on">
+    <div class="main-grid">
+      <div class="col-left" id="colLeft"></div>
+      <div class="col-right" id="colRight"></div>
+    </div>
+    <div id="resultHost"></div>
+  </section>
+
+  <section id="view-matrix" class="view">
+    <div class="card">
+      <div class="card-head"><h2>Полная матрица тактики · все коды (ID)</h2></div>
+      <div class="filterbar">
+        <input id="matrixFilter" type="text" placeholder="Поиск по коду, описанию, препарату, комментарию…">
+      </div>
+      <div class="matrix-wrap">
+        <table class="matrix">
+          <thead>
+            <tr>
+              <th style="width:80px">Код (ID)</th>
+              <th style="width:260px">Описание ситуации</th>
+              <th style="width:220px">Линия 1</th>
+              <th style="width:200px">Линия 2</th>
+              <th>Комментарий</th>
+            </tr>
+          </thead>
+          <tbody id="matrixBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-doses" class="view">
+    <div class="card">
+      <div class="card-head"><h2>Справочник препаратов · Рекомендуемые дозы у взрослых</h2></div>
+      <div class="filterbar">
+        <input id="drugFilter" type="text" placeholder="Поиск по препарату, классу, форме выпуска…">
+      </div>
+      <div class="s7-wrap">
+        <table class="s7">
+          <thead>
+            <tr>
+              <th style="width:60px">Класс</th>
+              <th style="width:170px">Препарат</th>
+              <th style="width:210px">Формы выпуска</th>
+              <th style="width:220px">Внутривенно болюс</th>
+              <th style="width:200px">Внутривенная инфузия</th>
+              <th style="width:190px">Нагрузочная пероральная доза</th>
+              <th style="width:220px">Поддерживающая пероральная доза</th>
+            </tr>
+          </thead>
+          <tbody id="s7body"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-abbr" class="view">
+    <div class="card">
+      <div class="card-head"><h2>Сокращения и условные обозначения</h2></div>
+      <dl class="info-grid" id="abbrGrid"></dl>
+    </div>
+  </section>
+
+  <section id="view-sources" class="view">
+    <div class="card">
+      <div class="card-head"><h2>Источники</h2></div>
+      <ul class="src-list">
+        <li><span class="src-num">1</span><span>European Heart Rhythm Association (EHRA). <em>Practical guide on antiarrhythmic drug therapy</em>. 2025. — Основной документ, на основании которого построена логика навигатора.</span></li>
+        <li><span class="src-num">2</span><span>Таблица S7. <em>Рекомендуемые дозы антиаритмических препаратов у взрослых</em> (дополнительные материалы к практическому руководству EHRA 2025). — Источник доз, форм выпуска и путей введения.</span></li>
+        <li><span class="src-num">3</span><span>Внутренняя матрица решений: код ситуации = <code>(Стратегия × 10000) + (Аритмия × 100) + (Специфика × 10) + Подкатегория</code>.</span></li>
+        <li><span class="src-num">4</span><span>Отметки «нет в РФ» приведены по состоянию регистрации лекарственных средств на территории Российской Федерации и носят справочный характер.</span></li>
+      </ul>
+      <div class="info-grid" style="padding-top:0">
+        <div class="info-item">
+          <dt>Область применения</dt>
+          <dd>Взрослые пациенты. Алгоритм не заменяет клиническое мышление и индивидуальную оценку пациента.</dd>
+        </div>
+        <div class="info-item">
+          <dt>Порядок применения</dt>
+          <dd>Выберите стратегию → аритмию → структурный профиль. Для ФП укажите длительность и класс NYHA. Отметьте факторы риска.</dd>
+        </div>
+        <div class="info-item">
+          <dt>Линии терапии</dt>
+          <dd><b>Линия 1</b> — препараты первого выбора. <b>Линия 2</b> — альтернатива / при неэффективности или непереносимости первой линии.</dd>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <h3 id="modalTitle">—</h3>
+      <button class="modal-close" id="modalClose" aria-label="Закрыть">×</button>
+    </div>
+    <table class="modal-tbl"><tbody id="modalBody"></tbody></table>
+  </div>
+</div>
+
+<script>
+/* ==========================================================================
+   ЭКСПРЕСС-НАВИГАТОР ПО АНТИАРИТМИЧЕСКОЙ ТЕРАПИИ (EHRA 2025)
+   © Врач-кардиолог, к.м.н. Синкевич Д.А., Иркутск, 2026
+   ========================================================================== */
+
+/* =========================================================
+   1. ПОЛНАЯ МАТРИЦА ТАКТИКИ (все коды из файла аат1.xlsx)
+   ========================================================= */
+const MATRIX_DATA = [
+  /* --- СТРАТЕГИЯ 1: КУПИРОВАНИЕ --- */
+  {c:'10110', d:'Купирование: Син.Тах, Нет ССЗ', l1:['Исключить тиреотоксикоз / Анемию','Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'Исключить вторичные причины'},
+  {c:'10120', d:'Купирование: Син.Тах, ФВ >50', l1:['Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'Исключить вторичные причины'},
+  {c:'10130', d:'Купирование: Син.Тах, ФВ 40-49', l1:['Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'Исключить вторичные причины'},
+  {c:'10140', d:'Купирование: Син.Тах, ФВ Б40', l1:['Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'Исключить вторичные причины'},
+
+  {c:'10210', d:'Купирование: Очаг. ПТ, Нет ССЗ', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Верапамил','Дилтиазем'], k:'Вагусные пробы вначале. Аденозин для диагностики и купирования.'},
+  {c:'10220', d:'Купирование: Очаг. ПТ, ХСН (ФВ 50)', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Верапамил','Дилтиазем'], k:'Вагусные пробы вначале. Избегать БКК и IC класса при ХСН'},
+  {c:'10230', d:'Купирование: Очаг. ПТ, ХСН (ФВ 40-49)', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Амиодарон'], k:'Вагусные пробы вначале.'},
+  {c:'10240', d:'Купирование: Очаг. ПТ, ХСН (ФВ<40)', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Амиодарон'], k:'Вагусные пробы вначале.'},
+
+  {c:'10310', d:'Купирование: Трепетание, Нет ССЗ', l1:['ЭИТ (Кардиоверсия)','Ибутилид (нет в РФ)','Дофетилид (нет в РФ)'], l2:['Амиодарон'], k:'IC не рекомендуются'},
+  {c:'10320', d:'Купирование: Трепетание, ФВ 50', l1:['ЭИТ (Кардиоверсия)','Ибутилид (нет в РФ)','Дофетилид (нет в РФ)'], l2:['Амиодарон'], k:'Вернакалант быстрее амиодарона'},
+  {c:'10330', d:'Купирование: Трепетание, ФВ50-49', l1:['ЭИТ (Кардиоверсия)','Ибутилид (нет в РФ)','Дофетилид (нет в РФ)'], l2:['Амиодарон'], k:'Вернакалант и IC противопоказаны'},
+  {c:'10340', d:'Купирование: Трепетание, ФВ<40', l1:['ЭИТ (Кардиоверсия)','Ибутилид (нет в РФ)','Дофетилид (нет в РФ)'], l2:['Амиодарон'], k:'Фармакологическая конверсия редко успешна'},
+
+  {c:'10410', d:'Купирование: НЖТ, Нет ССЗ', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Верапамил','Дилтиазем'], k:''},
+  {c:'10420', d:'Купирование: НЖТ, 50', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Верапамил','Дилтиазем'], k:''},
+  {c:'10430', d:'Купирование: НЖТ, 40-49', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Прокаинамид','Амиодарон'], k:'прокаинамид в/в у стационарных больных, особенно при НЖТ с широкими QRS.'},
+  {c:'10440', d:'Купирование: НЖТ, 40', l1:['Аденозин','Метопролол','Бисопролол'], l2:['Прокаинамид','Амиодарон'], k:'прокаинамид в/в у стационарных больных, особенно при НЖТ с широкими QRS.'},
+
+  {c:'10511', d:'Купирование: нет ФП, Нет ССЗ, NYHA I-II', l1:['ОШИБКА! Проверьте блок 5а.'], l2:[], k:'', err:true},
+  {c:'10521', d:'Купирование: нет ФП, 50, NYHA I-II', l1:['ОШИБКА! Проверьте блок 5а.'], l2:[], k:'', err:true},
+  {c:'10531', d:'Купирование: нет ФП, 40-49, NYHA I-II', l1:['ОШИБКА! Проверьте блок 5а.'], l2:[], k:'', err:true},
+  {c:'10541', d:'Купирование: нет ФП, 40, NYHA I-II', l1:['ОШИБКА! Проверьте блок 5а.'], l2:[], k:'', err:true},
+
+  {c:'10512', d:'Купирование: ФП <7д, Нет ССЗ, NYHA I-II', l1:['Вернакалант (нет в РФ)','Флекаинид','Пропафенон'], l2:['Антазолин (нет в РФ)','Пилсикаинид (нет в РФ)','Цибензолин (нет в РФ)'], k:'Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'10522', d:'Купирование: ФП <7д, ФВ>50%, NYHA I-II', l1:['Вернакалант (нет в РФ)','Амиодарон'], l2:[], k:'В РФ доступен Ниферидил (Рефралон), III класс.'},
+  {c:'10532', d:'Купирование: ФП <7д, ФВ>40-49%, NYHA I-II', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10542', d:'Купирование: ФП <7д, ФВ>40%, NYHA I-II', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+
+  {c:'10513', d:'Купирование: ФП <7д, нет ссз, NYHA III-IV', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10523', d:'Купирование: ФП <7д, ФВ 50%, NYHA III-IV', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10533', d:'Купирование: ФП <7д, ФВ 40-49%, NYHA III-IV', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10543', d:'Купирование: ФП <7д, ФВ<40%, NYHA III-IV', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+
+  {c:'10514', d:'Купирование постоянной ФП', l1:['ОШИБКА! Оптимально не купировать, а по контроль ЧСС!'], l2:[], k:'', err:true},
+  {c:'10524', d:'Купирование постоянной ФП', l1:['ОШИБКА! Оптимально не купировать, а по контроль ЧСС!'], l2:[], k:'', err:true},
+  {c:'10534', d:'Купирование постоянной ФП', l1:['ОШИБКА! Оптимально не купировать, а по контроль ЧСС!'], l2:[], k:'', err:true},
+  {c:'10544', d:'Купирование постоянной ФП', l1:['ОШИБКА! Оптимально не купировать, а по контроль ЧСС!'], l2:[], k:'', err:true},
+
+  {c:'10518', d:'Купирование: ФП > 7 дней (нет ССЗ)', l1:['Флекаинид','Пропафенон'], l2:[], k:'Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'10528', d:'Купирование: ФП > 7 дней (50)', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10538', d:'Купирование: ФП > 7 дней (40-49)', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:''},
+  {c:'10548', d:'Купирование: ФП > 7 дней (40)', l1:['Амиодарон'], l2:['ЭИТ (Кардиоверсия)'], k:'Аблация предпочтительна'},
+
+  {c:'10610', d:'Купирование: ЖЭС/ЖТ (Идиопат), Нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон'], k:'Верапамил при фасцикулярной ЖТ. Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'10620', d:'Купирование: ЖЭС/ЖТ (Идиопат), 50', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон'], k:'Верапамил при фасцикулярной ЖТ. Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'10630', d:'Купирование: ЖЭС/ЖТ (Идиопат), 40-49', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Лидокаин'], k:'Аблация - "Золотой стандарт"'},
+  {c:'10640', d:'Купирование: ЖЭС/ЖТ (Идиопат), 40-50', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Лидокаин'], k:'Аблация - "Золотой стандарт"'},
+
+  {c:'10710', d:'Купирование: ЖТ при ССЗ (Без ССЗ)', l1:['Ошибка! Выберите ССЗ.'], l2:[], k:'', err:true},
+  {c:'10720', d:'Купирование: ЖТ при ССЗ (ФВ 50)', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Лидокаин'], k:''},
+  {c:'10730', d:'Купирование: ЖТ при ССЗ (ФВ 40-49)', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Лидокаин'], k:''},
+  {c:'10740', d:'Купирование: ЖТ при ССЗ (ФВ < 40)', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Лидокаин'], k:'Аблация - "Золотой стандарт"'},
+
+  {c:'10810', d:'Купирование: Полиморфная ЖТ/ФЖ без ССЗ', l1:['Магния сульфат'], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+  {c:'10820', d:'Купирование: Полиморфная ЖТ/ФЖ 50', l1:['Магния сульфат'], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+  {c:'10830', d:'Купирование: Полиморфная ЖТ/ФЖ 40-49', l1:['Магния сульфат'], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+  {c:'10840', d:'Купирование: Полиморфная ЖТ/ФЖ 40', l1:['Магния сульфат'], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+
+  /* --- СТРАТЕГИЯ 2: ПРОФИЛАКТИКА --- */
+  {c:'20110', d:'Профилактика: Син.Тах, Нет ССЗ', l1:['Метопролол','Бисопролол','Ивабрадин'], l2:['Комбо: БКК+ББ'], k:''},
+  {c:'20120', d:'Профилактика: Син.Тах, 50', l1:['Метопролол','Бисопролол','Ивабрадин'], l2:['Комбо: БКК+ББ'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+  {c:'20130', d:'Профилактика: Син.Тах, 40-49', l1:['Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+  {c:'20140', d:'Профилактика: Син.Тах, ХСН (ФВ < 40)', l1:['Метопролол','Бисопролол'], l2:['Ивабрадин'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+
+  {c:'20210', d:'Профилактика: Очаг. ПТ, Нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон','Аблация'], k:'Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'20220', d:'Профилактика: Очаг. ПТ, 50', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон','Аблация'], k:'Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'20230', d:'Профилактика: Очаг. ПТ, 40-49', l1:['Метопролол','Бисопролол'], l2:['Аблация'], k:'БКК и IC не рекомендованы'},
+  {c:'20240', d:'Профилактика: Очаг. ПТ, 40', l1:['Метопролол','Бисопролол'], l2:['Аблация'], k:'БКК и IC не рекомендованы'},
+
+  {c:'20310', d:'Профилактика: Трепетание (без ССЗ)', l1:['Метопролол','Бисопролол','Аблация'], l2:['Верапамил','Дилтиазем'], k:'Другие ААП (IC, Дронадорон, Соталол) опасны'},
+  {c:'20320', d:'Профилактика: Трепетание (ФВ 50)', l1:['Метопролол','Бисопролол','Аблация'], l2:['Верапамил','Дилтиазем'], k:'Абляция при симптомах или снижении ФВ'},
+  {c:'20330', d:'Профилактика: Трепетание (ФВ 40-49)', l1:['Метопролол','Бисопролол','Аблация'], l2:[], k:'Абляция при симптомах или снижении ФВ'},
+  {c:'20340', d:'Профилактика: Трепетание (ФВ< 40)', l1:['Метопролол','Бисопролол','Аблация'], l2:[], k:'Абляция при симптомах или снижении ФВ'},
+
+  {c:'20410', d:'Профилактика: НЖТ, Нет ССЗ', l1:['Метопролол','Бисопролол','Аблация'], l2:['Верапамил','Дилтиазем'], k:'Абляция при симптомах или снижении ФВ; Можно комбинировать БКК+ББ'},
+
+  {c:'20511', d:'Профилактика: ФП, Нет ССЗ', l1:['Флекаинид','Пропафенон','Дронедарон'], l2:['Соталол'], k:'Комбинация ББ+IC при рецидивах; Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.'},
+  {c:'20521', d:'Профилактика: ФП, ФВ >= 50%', l1:['Дронедарон'], l2:['Соталол','Амиодарон'], k:'Избегать блокаторов Na каналов!'},
+  {c:'20531', d:'Профилактика: ФП, ФВ 40-49%', l1:['Дронедарон'], l2:['Амиодарон'], k:'Дронедарон снижает риск госпитализаций'},
+  {c:'20541', d:'Профилактика: ФП, ФВ < 40% (ХСН)', l1:['Амиодарон'], l2:[], k:''},
+
+  {c:'20610', d:'Профилактика: ЖЭС (Идиопат), Нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон','Аблация'], k:'БКК с осторожностью; Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'20620', d:'Профилактика: ЖЭС (Идиопат), 50', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон','Аблация'], k:'БКК с осторожностью; Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'20630', d:'Профилактика: ЖЭС (Идиопат), 40-49', l1:['Метопролол','Бисопролол'], l2:['Аблация'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+  {c:'20640', d:'Профилактика: ЖЭС (Идиопат), 40', l1:['Метопролол','Бисопролол'], l2:['Аблация'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+
+  {c:'20710', d:'Профилактика: ЖТ,нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Флекаинид','Пропафенон','Аблация'], k:'БКК с осторожностью; Контроль QRS при приеме IC класса. (Этацунорм (этацизин)/Аллапинин также могут быть рассмотрены. Однако, не имеют сильной доказательной базы.)'},
+  {c:'20720', d:'Профилактика: ЖТ при ССЗ 50', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Амиодарон','Аблация'], k:'БКК с осторожностью'},
+  {c:'20730', d:'Профилактика: ЖТ при ССЗ 40-49', l1:['Метопролол','Бисопролол'], l2:['Амиодарон','Соталол'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ. Можно комбинировать'},
+  {c:'20740', d:'Профилактика: ЖТ при ССЗ (ФВ < 40)', l1:['Метопролол','Бисопролол'], l2:['Амиодарон'], k:'БКК (Верапамил) ЗАПРЕЩЕНЫ'},
+
+  {c:'20810', d:'Профилактика полиморфная ЖТ/ФЖ', l1:[], l2:[], k:'Отмена лек.препартов, которые могли индуцировать ЖТ. Устранение гипомагниемии и/или гипокалиемии.'},
+  {c:'20820', d:'Профилактика полиморфная ЖТ/ФЖ 50', l1:[], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+  {c:'20830', d:'Профилактика полиморфная ЖТ/ФЖ 40-49', l1:[], l2:[], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ.'},
+  {c:'20840', d:'Профилактика полиморфная ЖТ/ФЖ 40', l1:[], l2:['ИКД'], k:'Лечение ХСН. Устранение гипомагниемии и/или гипокалиемии. Отмена лек.препартов, которые могли индуцировать ЖТ. Имплантация ИКД рекомендуется пациентам с ИБС, симптомами хронической сердечной недостаточности (ХСН) (II–III класс по NYHA) и ФВ ЛЖ ≤35% на фоне оптимальной медикаментозной терапии (ОМТ), продолжающейся более 3 месяцев.'},
+
+  {c:'20910', d:'Профилактика: LQT 1-2 (Каналопатия)', l1:['Пропранолол','Надолол'], l2:[], k:'Неселективные бета-блокаторы'},
+  {c:'21010', d:'Профилактика: LQT 3 (Каналопатия)', l1:['Мексилетин'], l2:['Пропранолол'], k:'Мексилетин укорачивает QT'},
+  {c:'21110', d:'Профилактика: КПЖТ (Каналопатия)', l1:['Пропранолол','Надолол'], l2:['Флекаинид','ИКД'], k:'Избегать соревновательных видов спорта, силовых тренировок и стрессовых ситуаций. ИКД - пережившим остановку сердца, поторные синкопы или пароксизмы ЖТ "пируэт".'},
+  {c:'21210', d:'Профилактика: Бругада / Ран.Репол.', l1:['Хинидин'], l2:[], k:''},
+
+  /* --- СТРАТЕГИЯ 3: КОНТРОЛЬ ЧСС --- */
+  {c:'30514', d:'Контроль ЧСС: ФП Постоянная, Нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Дигоксин'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30524', d:'Контроль ЧСС: ФП Постоянная, ФВ > 50%', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Дигоксин'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30534', d:'Контроль ЧСС: ФП Постоянная, ФВ 40-49%', l1:['Метопролол','Бисопролол'], l2:['Дигоксин','Верапамил','Дилтиазем'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30544', d:'Контроль ЧСС: ФП Постоянная, ФВ < 40%', l1:['Метопролол','Бисопролол'], l2:['Дигоксин'], k:'Можно комбинировать ББ+Дигоксин'},
+
+  {c:'30310', d:'Контроль ЧСС: ТП Постоянная, Нет ССЗ', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Дигоксин'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30320', d:'Контроль ЧСС: ТП Постоянная, ФВ > 50%', l1:['Метопролол','Бисопролол','Верапамил'], l2:['Дигоксин'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30330', d:'Контроль ЧСС: ТП Постоянная, ФВ 40-49%', l1:['Метопролол','Бисопролол'], l2:['Дигоксин','Верапамил','Дилтиазем'], k:'Можно комбинировать ББ+Дигоксин; БКК+ББ'},
+  {c:'30340', d:'Контроль ЧСС: ТП Постоянная, ФВ < 40%', l1:['Метопролол','Бисопролол'], l2:['Дигоксин'], k:''}
+];
+
+/* индексация матрицы */
+const MATRIX_INDEX = {};
+MATRIX_DATA.forEach(m => { MATRIX_INDEX[m.c] = m; });
+
+/* =========================================================
+   2. СПРАВОЧНИК ПРЕПАРАТОВ (S7)
+   ========================================================= */
+const S7 = [
+ {cls:'0',    name:'Ивабрадин', forms:'Таблетки 5 и 7,5 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'Не указана', maint:'5–7,5 мг каждые 12 ч'},
+ {cls:'Ia',   name:'Аймалин', forms:'Флаконы 50 мг', bolus:'1 мг/кг за 10 мин (макс. 100 мг)', inf:'–', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'Ia',   name:'Хинидин', forms:'Сульфат: табл. 200 и 300 мг; глюконат: фл. 800 мг, табл. 324 мг', bolus:'Глюконат: <5 мг/кг со скоростью 0,25 мг/кг/мин (макс. 10 мг/кг)', inf:'–', load:'200 мг каждые 3 ч (макс. 3 г/сут)', maint:'Сульфат: 200–400 мг/6–8 ч или 600 мг пролонг./8–12 ч (макс. 3–4 г/сут); глюконат: 648 мг/12 ч или 324–660 мг/8 ч'},
+ {cls:'Ia',   name:'Прокаинамид', forms:'Флаконы 1 г; капсулы 250 мг', bolus:'100 мг; повторить каждые 5 мин (макс. 500–750 мг, 50 мг/мин)', inf:'2–6 мг/мин (макс. 1 г/сут)', load:'500–1000 мг', maint:'250 мг/6 ч'},
+ {cls:'Ia',   name:'Дизопирамид', forms:'Флаконы 50 мг; капсулы 100 и 150 мг пролонг.', bolus:'2 мг/кг за 10 мин', inf:'400 мкг/кг/ч', load:'Не указана', maint:'100–150 мг/6 ч или 200–300 мг пролонг./12 ч (макс. 750 мг/сут)'},
+ {cls:'Ib',   name:'Лидокаин', forms:'Флаконы 50 и 100 мг', bolus:'100 мг (1–1,5 мг/кг); повторить 50 мг (0,5–0,75 мг/кг) через 5–10 мин (макс. 3 мг/кг)', inf:'1–4 мг/мин (макс. 3 мг/кг)', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'Ib',   name:'Мексилетин', forms:'Капсулы 50, 100, 150, 167, 200, 250 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'400 мг, затем 300 мг 2–3 раза (макс. 1,2 г/сут)', maint:'167 мг/сут (макс. 500 мг)'},
+ {cls:'Ib',   name:'Фенитоин', forms:'Флаконы 100 мг; капсулы 30, 100, 200, 300 мг пролонг.', bolus:'50–100 мг каждые 10–15 мин (макс. 1 г)', inf:'–', load:'–', maint:'300–400 мг/сут внутрь разделёнными дозами 1–4 раза/сут (макс. 600 мг/сут)'},
+ {cls:'Ic',   name:'Флекаинид', forms:'Флакон 150 мг; табл. 50, 100, 150 мг; капс. 100, 150, 200 мг пролонг.', bolus:'2 мг/кг за 10 мин', inf:'50 мг/ч (макс. 1 г/сут)', load:'300 мг', maint:'100 мг/12 ч или 200 мг пролонг./сут (макс. 300 мг/сут)'},
+ {cls:'Ic',   name:'Пропафенон', forms:'Флакон 70 мг; табл. 150, 225, 300 мг; табл. 225, 325, 425 мг пролонг.', bolus:'2 мг/кг за 10 мин', inf:'7 мг/кг за 1 сут', load:'600 мг', maint:'150–300 мг/8 ч или 225–425 мг пролонг./12 ч (макс. 900 мг/сут)'},
+ {cls:'Ic',   name:'Антазолин', forms:'Флакон 100 мг', bolus:'100 мг за 1 мин; 50 мг повторить каждые 5 мин (макс. 300 мг)', inf:'100 мг за 60 мин (30–50 мг/мин)', load:'–', maint:'–', note:'нет в РФ'},
+ {cls:'Ic',   name:'Пилсикаинид', forms:'Флакон 50 мг; капсулы 25 и 50 мг', bolus:'0,75 мг/кг', inf:'–', load:'150 мг', maint:'50 мг/8 ч (макс. 225 мг/сут)', note:'нет в РФ'},
+ {cls:'Ic',   name:'Ранолазин', forms:'Табл. пролонг. 375, 500, 750, 1000 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'2000 мг', maint:'500–750 мг каждые 12 ч (во время еды), макс. 1 г каждые 12 ч'},
+ {cls:'IIa',  name:'Бисопролол', forms:'Табл. 1,25; 2,5; 5; 10 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'Не указана', maint:'1,25–5 мг/сут (макс. 20 мг/сут)'},
+ {cls:'IIa',  name:'Карведилол', forms:'Табл. 3,125; 6,25; 12,5; 25 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'Начально 3,125 мг/12 ч', maint:'25 мг/12 ч (макс. 100 мг/сут)'},
+ {cls:'IIa',  name:'Метопролол', forms:'Флакон 5 мг; табл. 25, 37,5, 50, 75, 100 мг', bolus:'5 мг за 2 мин (макс. 15 мг)', inf:'Не указана для пролонгированной инфузии', load:'Не указана', maint:'25–100 мг каждые 12 ч (тартрат) или 50–200 мг/сут (сукцинат XL)'},
+ {cls:'IIa',  name:'Небиволол', forms:'Табл. 2,5; 5; 10; 20 мг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'Не указана', maint:'2,5–10 мг/сут (макс. 20 мг/сут)'},
+ {cls:'IIa',  name:'Пропранолол', forms:'Флаконы 1, 5, 10 мг; табл. 10, 20, 40, 60, 80 мг; табл. 60, 80, 120, 160 мг пролонг.', bolus:'1–3 мг за 1 мин; повторять каждые 2–5 мин до 5 мг (макс. 0,2 мг/кг)', inf:'–', load:'Не указана', maint:'20–40 мг/6 ч; 80–160 мг пролонг./сут (макс. 240 мг/сут), с едой'},
+ {cls:'IIa',  name:'Надолол', forms:'Табл. 20, 40, 80 мг', bolus:'–', inf:'–', load:'Не указана', maint:'40–80 мг/сут (макс. 320 мг/сут)'},
+ {cls:'IIa',  name:'Эсмолол', forms:'Флакон 100 мг', bolus:'0,5 мг/кг за 1 мин', inf:'0,05–0,2 мг/кг/мин (макс. 0,3 мг/кг/мин)', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'IIa',  name:'Ландиолол', forms:'Флакон 288 мг', bolus:'0,1 мг/кг за 1 мин (только при гемодинамической стабильности)', inf:'10–40 мкг/кг/мин (макс. 57,6 мг/кг/сут); при дисфункции ЛЖ — 1–10 мкг/кг/мин', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'IIa',  name:'Этрипамил', forms:'Назальный спрей', bolus:'ПСВТ: 70–140 мг', inf:'—', load:'—', maint:'—'},
+ {cls:'IIb',  name:'Изопреналин', forms:'Ампулы 0,2 мг', bolus:'10 мкг', inf:'2–20 мкг/мин', load:'–', maint:'–'},
+ {cls:'IIc',  name:'Атропин', forms:'Ампулы 0,4; 0,8; 1 мг', bolus:'1 мг с дополнительными дозами до 3 мг (0,04 мг/кг)', inf:'Пролонгированная инфузия не рекомендуется', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'IId',  name:'Дигоксин', forms:'Ампулы 0,25 мг; табл. 0,125 и 0,25 мг; раствор 0,1–0,25 мг/мл', bolus:'0,25–0,5 мг с дополнительными дозами (макс. 1,5 мг/сут)', inf:'0,25 мг/сут; пролонгированная инфузия не рекомендуется', load:'0,5–0,75 мг в 2 приёма с интервалом 6 ч (макс. 1,5 мг/сут)', maint:'0,25 мг/сут (корректировать по концентрации в крови и CrCl)'},
+ {cls:'IId',  name:'Дигитоксин', forms:'Ампулы 0,07 мг; табл. 0,0625; 0,125; 0,25 мг', bolus:'0,5 мг с дополнительными дозами (макс. 1,5 мг/сут)', inf:'0,1 мг/сут; пролонгированная инфузия не рекомендуется', load:'0,6–1,2 мг, разделённые на несколько приёмов в течение 1 сут', maint:'0,05–0,1 мг/сут (корректировать по концентрации в крови и CrCl)'},
+ {cls:'IId',  name:'Аденозин', forms:'Флаконы 6, 12, 30, 60, 90, 100 мг', bolus:'Болюсы 6, 12 и 18 мг', inf:'Пролонгированная инфузия не рекомендуется', load:'Нет пероральной формы', maint:'Нет пероральной формы'},
+ {cls:'III',  name:'Амиодарон', forms:'Флаконы 150 и 300 мг; табл. 100, 200, 400 мг', bolus:'150 мг за 10 мин или 300 мг за 30 мин, затем 900–1200 мг в/в за 24 ч (макс. 2200 мг/сут)', inf:'600–1200 мг в/в/сут в течение 8–10 сут', load:'Ускоренная: 1200 мг/сут внутрь в 3 приёма в течение 2 нед (≈10 г)', maint:'400 мг/12 ч (с едой)'},
+ {cls:'III',  name:'Дронедарон', forms:'Табл. 400 мг', bolus:'–', inf:'–', load:'–', maint:'400 мг/12 ч (во время еды)'},
+ {cls:'III',  name:'Соталол', forms:'Флаконы 150 мг; табл. и капс. 80, 120, 160, 240 мг', bolus:'1 мг/кг за 10 мин; повторить через 6 ч (корректировать по CrCl), макс. 450 мг/сут', inf:'75 мг/12 ч', load:'Не указана', maint:'80–160 мг/12 ч (макс. 480 мг/сут)'},
+ {cls:'III',  name:'Дофетилид', forms:'Капсулы 125, 250, 500 мкг', bolus:'Нет в/в формы', inf:'Нет в/в формы', load:'Не указана', maint:'125–500 мкг/12 ч (алгоритм на основе QT и CrCl)', note:'нет в РФ'},
+ {cls:'III',  name:'Ибутилид', forms:'Флакон 1 мг', bolus:'1 мг за 10 мин при массе ≥60 кг (0,01 мг/кг при массе <60 кг); повторить 1 мг однократно', inf:'–', load:'Нет пероральной формы', maint:'Нет пероральной формы', note:'нет в РФ'},
+ {cls:'III',  name:'Вернакалант', forms:'Флаконы 500 мг', bolus:'3 мг/кг за 10 мин, затем через 15 мин 2 мг/кг за 10 мин при необходимости', inf:'Пролонгированная инфузия не рекомендуется', load:'Нет пероральной формы', maint:'Нет пероральной формы', note:'нет в РФ'},
+ {cls:'IV',   name:'Верапамил', forms:'Ампулы 5 мг; табл. 40, 80, 120 мг; табл. 100, 120, 180, 240, 300, 360 мг пролонг.', bolus:'2,5–5 мг за 2 мин, затем через 15 мин 5–10 мг при необходимости', inf:'2–4 мг/ч (макс. 100 мг/сут)', load:'Не указана', maint:'80–120 мг/8 ч или 180–240 мг пролонг./сут (макс. 480 мг/сут)'},
+ {cls:'IV',   name:'Дилтиазем', forms:'Флаконы 25, 50, 75, 100, 125 мг; табл. и капс. 30, 60, 90, 120 мг; табл. и капс. 120, 180, 200, 240, 300 мг пролонг.', bolus:'0,25 мг/кг за 2 мин, затем 0,35 мг/кг при необходимости', inf:'5–15 мг/ч', load:'Не указана', maint:'60 мг/8 ч или 120–360 мг пролонг./24 ч (макс. 480 мг/сут)'},
+ {cls:'IV',   name:'Бепридил', forms:'Табл. 100 и 200 мг', bolus:'–', inf:'–', load:'Не указана', maint:'200 мг/сут (макс. 400 мг/сут)'},
+ {cls:'—',    name:'Магния сульфат', forms:'Ампулы 1,5 г', bolus:'1–2 г за 5 мин', inf:'0,5–1 г/ч', load:'Не указана', maint:'–'},
+ {cls:'—',    name:'Атенолол', forms:'Флаконы 5 мг; табл. 25, 50, 100 мг', bolus:'2,5 мг за 2,5 мин (1 мг/мин), повторять с интервалом 5 мин (макс. 10 мг)', inf:'0,15 мг/кг за 20 мин, повторять каждые 12 ч', load:'Не указана', maint:'25–50 мг/сут (макс. 100 мг/сут)'},
+ {cls:'—',    name:'Лабеталол', forms:'Ампулы', bolus:'Контроль ЧСС при ФП: 1–2 мг/мин', inf:'—', load:'—', maint:'—'},
+ {cls:'—',    name:'Ацебутолол', forms:'Таблетки', bolus:'—', inf:'—', load:'—', maint:'Внутрь 200–1200 мг/сут или до 600 мг 2 раза в день'},
+ {cls:'—',    name:'Цибензолин', forms:'Таблетки, флаконы', bolus:'Кардиоверсия ФП: в/в 1–2,6 мг/кг', inf:'—', load:'100 мг 3 раза в день', maint:'—', note:'нет в РФ'}
+];
+
+const DRUG_INDEX = {};
+S7.forEach(d => { DRUG_INDEX[d.name.toLowerCase()] = d; });
+function lookupDrug(rawName){
+  const base = String(rawName).replace(/\s*\(.*?\)\s*/g,'').replace(/[«»"]/g,'').trim();
+  return DRUG_INDEX[base.toLowerCase()] || null;
+}
+
+/* =========================================================
+   3. СТРАТЕГИИ, АРИТМИИ, СПЕЦИФИКА, ДЕТАЛИ
+   ========================================================= */
+const STRATEGIES = [
+  {id:1, name:'Купирование тахикардии', desc:'Острая терапия · восстановление ритма'},
+  {id:2, name:'Профилактика (контроль ритма)', desc:'Долгосрочное удержание синусового ритма'},
+  {id:3, name:'Контроль ЧСС (для ФП/ТП)', desc:'Контроль частоты желудочковых сокращений'}
+];
+
+const ARRHYTHMIA_GROUPS = [
+  {label:'Наджелудочковые', items:[
+    {id:1,  name:'Синусовая тахикардия', desc:'Син.: Син.Тах'},
+    {id:2,  name:'Очаговая (фокусная) предсердная тахикардия', desc:'Син.: Очаг. ПТ'},
+    {id:3,  name:'Трепетание предсердий', desc:'Син.: Трепетание'},
+    {id:4,  name:'Пароксизмальная НЖТ (АВУРТ/АВРТ)', desc:'Син.: НЖТ'},
+    {id:5,  name:'Фибрилляция предсердий', desc:'Син.: ФП'}
+  ]},
+  {label:'Желудочковые', items:[
+    {id:6,  name:'ЖЭС / Идиопатическая ЖТ', desc:'Син.: ЖЭС/ЖТ'},
+    {id:7,  name:'ЖТ при структурных ССЗ', desc:'Син.: ЖТ при ССЗ'},
+    {id:8,  name:'Полиморфная ЖТ («пируэт»)', desc:'Син.: Полиморф. ЖТ/ФЖ'}
+  ]},
+  {label:'Каналопатии', items:[
+    {id:9,  name:'Синдром удлинённого QT (LQT 1-2)', desc:'Каналопатия · LQT 1-2'},
+    {id:10, name:'Синдром удлинённого QT (LQT 3)', desc:'Каналопатия · LQT 3'},
+    {id:11, name:'Катехоламинергическая полиморфная ЖТ', desc:'Каналопатия · КПЖТ'},
+    {id:12, name:'Синдром Бругада / Ранняя реполяризация / Идиопатическая ФЖ', desc:'Каналопатия'}
+  ]}
+];
+
+const SPECS = [
+  {id:1, name:'Нет структурных ССЗ', desc:'Структурно нормальное сердце'},
+  {id:2, name:'Структурные ССЗ + ФВ ≥ 50% (СНсФВ)', desc:'Сохранённая ФВ ЛЖ'},
+  {id:3, name:'Структурные ССЗ + ФВ 40–49% (СНунФВ)', desc:'Умеренно сниженная ФВ ЛЖ'},
+  {id:4, name:'Структурные ССЗ + ФВ < 40% (СНнФВ)', desc:'Сниженная ФВ ЛЖ / ХСН'}
+];
+
+const AF_DURATIONS = [
+  {id:'na',  name:'Не применимо / Нет ФП', desc:'Для не-ФП аритмий'},
+  {id:'lt7', name:'ФП < 7 дней', desc:'Пароксизмальная / недавно возникшая'},
+  {id:'gt7', name:'ФП > 7 дней', desc:'Персистирующая'},
+  {id:'perm',name:'Постоянная форма', desc:'Купирование не показано'}
+];
+
+const NYHA_LEVELS = [
+  {id:'I-II',  name:'Стабилен / NYHA I–II', desc:'Без значимой симптоматики'},
+  {id:'III-IV',name:'Тяжёлая СН / NYHA III–IV', desc:'Выраженная симптоматика'}
+];
+
+const RISK_FACTORS = [
+  {id:'brady',   name:'Брадикардия / ДСУ', desc:'Дисфункция синусового узла'},
+  {id:'ckd',     name:'ХБП (СКФ ≤60 мл/мин/1,73 м²)', desc:'Хроническая болезнь почек'},
+  {id:'hypoK',   name:'Гипокалиемия / Гипомагниемия', desc:'Электролитные нарушения'},
+  {id:'asthma',  name:'Бронхиальная астма / ХОБЛ', desc:'Бронхообструктивный синдром'},
+  {id:'amyloid', name:'Амилоидоз', desc:'Инфильтративная кардиомиопатия'},
+  {id:'aortSten',name:'Критический аортальный стеноз', desc:'Тяжёлый АС'}
+];
+
+const RISK_INFO = {
+  brady:    {label:'Брадикардия / ДСУ', warn:'β-блокаторы, БКК (верапамил, дилтиазем), дигоксин, ивабрадин могут усугубить брадикардию. Рассмотрите установку ЭКС.'},
+  ckd:      {label:'ХБП (СКФ ≤60 мл/мин/1,73 м²)', warn:'Требуется коррекция доз. Соталол, дофетилид, дигоксин — с осторожностью. Контролируйте СКФ и электролиты.'},
+  hypoK:    {label:'Гипокалиемия / Гипомагниемия', warn:'Устраните электролитные нарушения до начала терапии. Повышен риск ЖТ типа «пируэт» при приёме препаратов III класса.'},
+  asthma:   {label:'Бронхиальная астма / ХОБЛ', warn:'Избегайте неселективных β-блокаторов (пропранолол, надолол, лабеталол, карведилол). β1-селективные — с осторожностью.'},
+  amyloid:  {label:'Амилоидоз', warn:'Повышен риск брадикардии и АВ-блокады. Дигоксин и БКК — с особой осторожностью.'},
+  aortSten: {label:'Критический аортальный стеноз', warn:'Избегайте препаратов, снижающих ОПСС. β-блокаторы и БКК — с осторожностью. Рассмотрите хирургическую коррекцию.'}
+};
+
+const RISK_DRUG_CONFLICT = {
+  brady:    ['Метопролол','Бисопролол','Верапамил','Дилтиазем','Дигоксин','Дигитоксин','Ивабрадин','Атенолол','Пропранолол','Надолол','Эсмолол','Лабеталол','Карведилол','Небиволол','Соталол'],
+  ckd:      ['Соталол','Дофетилид','Дигоксин','Дигитоксин','Атенолол','Прокаинамид','Флекаинид'],
+  hypoK:    ['Амиодарон','Соталол','Дофетилид','Ибутилид','Вернакалант','Дигоксин','Дигитоксин'],
+  asthma:   ['Пропранолол','Надолол','Лабеталол','Карведилол'],
+  amyloid:  ['Дигоксин','Дигитоксин','Верапамил','Дилтиазем'],
+  aortSten: ['Дигоксин','Дигитоксин','Верапамил','Дилтиазем','Метопролол','Бисопролол','Атенолол','Пропранолол','Надолол','Эсмолол','Лабеталол','Карведилол','Небиволол']
+};
+
+/* =========================================================
+   4. СОСТОЯНИЕ
+   ========================================================= */
+const STATE = {
+  strategy:null,
+  arrhythmia:null,
+  spec:null,
+  afDuration:null,
+  nyha:null,
+  risks: new Set()
+};
+
+/* =========================================================
+   5. ФОРМИРОВАНИЕ КОДА (ID)
+   =========================================================
+   Формула из файла:
+   =AF5*10000 + AF6*100 + AF9*10 + IF(AF6=5,
+       IF(AND(AF7=2,AF8=1),2, IF(AND(AF7=2,AF8=2),3,
+       IF(AND(AF7=3,AF8=1),8, IF(AND(AF7=3,AF8=2),8,AF7)))), 0)
+   Где:
+   AF5 = Стратегия (1, 2, 3)
+   AF6 = Аритмия (код: 1=Син.Тах, 2=Очаг.ПТ, 3=Трепетание, 4=НЖТ, 5=ФП,
+                   6=ЖЭС/ЖТ, 7=ЖТ при ССЗ, 8=Полиморф.ЖТ/ФЖ,
+                   9=LQT 1-2, 10=LQT 3, 11=КПЖТ, 12=Бругада)
+   AF7 = Длительность ФП (1=не применимо, 2=<7д, 3=>7д, 4=постоянная)
+   AF8 = Тяжесть NYHA (1=I-II, 2=III-IV)
+   AF9 = Специфика / структурный профиль (1, 2, 3, 4)
+   ========================================================= */
+function computeCode(){
+  const s = STATE.strategy, a = STATE.arrhythmia;
+  if (!s || a === null) return null;
+
+  let spec, sub = 0;
+
+  /* Каналопатии: фиксирован spec=1 */
+  if (s === 2 && a >= 9 && a <= 12){
+    spec = 1;
+  } else {
+    if (!STATE.spec) return null;
+    spec = STATE.spec;
+  }
+
+  /* ФП при купировании (s=1, a=5) */
+  if (s === 1 && a === 5){
+    if (STATE.afDuration === 'lt7'){
+      if (!STATE.nyha) return null;
+      sub = (STATE.nyha === 'III-IV') ? 3 : 2;
+    } else if (STATE.afDuration === 'gt7'){
+      sub = 8;
+    } else if (STATE.afDuration === 'perm'){
+      sub = 4;
+    } else {
+      return null; /* na → ошибка, но код всё равно строится: sub=1 */
+    }
+  }
+
+  /* ФП при контроле ЧСС (s=3, a=5): sub=4 */
+  if (s === 3 && a === 5){
+    sub = 4;
+  }
+
+  /* ФП при профилактике (s=2, a=5): sub=1 (по умолчанию как в файле) */
+  if (s === 2 && a === 5){
+    sub = 1;
+  }
+
+  /* Для ФП с afDuration='na' при купировании → sub=1 (ошибка) */
+  if (s === 1 && a === 5 && STATE.afDuration === 'na'){
+    sub = 1;
+  }
+
+  return s * 10000 + a * 100 + spec * 10 + sub;
+}
+
+function codeStr(n){ return String(n).padStart(5,'0'); }
+
+/* =========================================================
+   6. ВАЛИДАЦИЯ
+   ========================================================= */
+function strategyWarnings(){
+  const w = [];
+  const s = STATE.strategy, a = STATE.arrhythmia;
+  if (s === null || a === null) return w;
+
+  if (s === 3 && a !== 3 && a !== 5){
+    w.push('Стратегия «Контроль ЧСС» применима только для ФП/ТП. Для других аритмий выберите «Купирование» или «Профилактика».');
+  }
+  if ((s === 1 || s === 3) && a >= 9 && a <= 12){
+    w.push('Каналопатии рассматриваются в стратегии профилактики. Переключите стратегию на «Профилактика».');
+  }
+  return w;
+}
+
+/* =========================================================
+   7. ХЕЛПЕРЫ DOM
+   ========================================================= */
+function el(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  if (attrs) for (const k in attrs){
+    const v = attrs[k];
+    if (v === null || v === undefined || v === false) continue;
+    if (k === 'class') e.className = v;
+    else if (k === 'html') e.innerHTML = v;
+    else if (k.startsWith('on') && typeof v === 'function') e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v);
+  }
+  kids.flat().forEach(c => {
+    if (c === null || c === undefined || c === false) return;
+    e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c);
+  });
+  return e;
+}
+
+function card(num, title, hint, bodyNode, disabled, colorClass){
+  return el('div', {class:'card ' + (colorClass || '') + (disabled ? ' disabled' : '')},
+    el('div', {class:'card-head'},
+      num ? el('div', {class:'stepnum'}, num) : null,
+      el('h2', {}, title),
+      hint ? el('div', {class:'hint'}, hint) : null
+    ),
+    el('div', {class:'card-body'}, bodyNode)
+  );
+}
+
+function radioGroup(items, selectedId, onPick, disabled){
+  const box = el('div', {class:'opt-list'});
+  items.forEach(it => {
+    const sel = selectedId === it.id;
+    box.appendChild(el('div', {
+      class:'opt-radio' + (sel ? ' selected' : '') + (disabled ? ' disabled' : ''),
+      onclick: disabled ? null : () => onPick(it.id)
+    },
+      el('div', {class:'radio-circle'}),
+      el('div', {class:'opt-text'},
+        el('div', {class:'opt-name'}, it.name),
+        it.desc ? el('div', {class:'opt-desc'}, it.desc) : null
+      )
+    ));
+  });
+  return box;
+}
+
+function checkGroup(items, selectedSet, onToggle, disabled){
+  const box = el('div', {class:'opt-list'});
+  items.forEach(it => {
+    const checked = selectedSet.has(it.id);
+    box.appendChild(el('div', {
+      class:'opt-check' + (checked ? ' checked' : '') + (disabled ? ' disabled' : ''),
+      onclick: disabled ? null : () => onToggle(it.id)
+    },
+      el('div', {class:'check-box'}),
+      el('div', {class:'opt-text'},
+        el('div', {class:'opt-name'}, it.name),
+        it.desc ? el('div', {class:'opt-desc'}, it.desc) : null
+      )
+    ));
+  });
+  return box;
+}
+
+/* =========================================================
+   8. РЕНДЕР НАВИГАТОРА
+   ========================================================= */
+function renderNavigator(){
+  const left = document.getElementById('colLeft');
+  const right = document.getElementById('colRight');
+  left.innerHTML = '';
+  right.innerHTML = '';
+
+  /* ===== Шаг 1. Стратегия лечения (blue) ===== */
+  left.appendChild(card('1', 'Стратегия лечения', 'Выберите цель вмешательства',
+    radioGroup(STRATEGIES, STATE.strategy, id => {
+      STATE.strategy = id;
+      STATE.arrhythmia = null;
+      STATE.spec = null;
+      STATE.afDuration = null;
+      STATE.nyha = null;
+      renderNavigator();
+    }, false),
+    false, 'card-blue'
+  ));
+
+  /* ===== Шаг 2. Тип аритмии (green) ===== */
+  const arrDisabled = STATE.strategy === null;
+  const arrBody = el('div', {class:'opt-list'});
+  if (arrDisabled){
+    arrBody.appendChild(el('div', {class:'empty', style:'padding:24px'},
+      el('p', {}, 'Выберите стратегию на шаге 1, чтобы увидеть доступные аритмии.')));
+  } else {
+    ARRHYTHMIA_GROUPS.forEach(group => {
+      arrBody.appendChild(el('div', {class:'opt-group-label'}, group.label));
+      group.items.forEach(it => {
+        const sel = STATE.arrhythmia === it.id;
+        arrBody.appendChild(el('div', {
+          class:'opt-radio' + (sel ? ' selected' : ''),
+          onclick: () => {
+            STATE.arrhythmia = it.id;
+            STATE.spec = null;
+            STATE.afDuration = (it.id === 5) ? null : 'na';
+            STATE.nyha = null;
+            if (STATE.strategy === 2 && it.id >= 9 && it.id <= 12) STATE.spec = 1;
+            renderNavigator();
+          }
+        },
+          el('div', {class:'radio-circle'}),
+          el('div', {class:'opt-text'},
+            el('div', {class:'opt-name'}, it.name),
+            it.desc ? el('div', {class:'opt-desc'}, it.desc) : null
+          )
+        ));
+      });
+    });
+  }
+  left.appendChild(card('2', 'Тип аритмии',
+    arrDisabled ? 'Сначала выберите стратегию' : 'Наджелудочковые / Желудочковые / Каналопатии',
+    arrBody, arrDisabled, 'card-green'
+  ));
+
+  /* ===== Шаг 4. Структурные ССЗ и ФВ ЛЖ (yellow) ===== */
+  const noSpecNeeded = (STATE.strategy === 2 && STATE.arrhythmia !== null && STATE.arrhythmia >= 9 && STATE.arrhythmia <= 12);
+  const specDisabled = STATE.arrhythmia === null || noSpecNeeded;
+
+  const specBody = el('div', {class:'opt-list'});
+  if (specDisabled){
+    specBody.appendChild(el('div', {class:'empty', style:'padding:24px'},
+      el('p', {}, noSpecNeeded
+        ? 'Для каналопатий структурный профиль фиксирован: нет структурных ССЗ.'
+        : 'Выберите тип аритмии на шаге 2.')));
+  } else {
+    SPECS.forEach(it => {
+      const sel = STATE.spec === it.id;
+      specBody.appendChild(el('div', {
+        class:'opt-radio' + (sel ? ' selected' : ''),
+        onclick: () => {
+          STATE.spec = it.id;
+          STATE.afDuration = (STATE.arrhythmia === 5) ? null : 'na';
+          STATE.nyha = null;
+          renderNavigator();
+        }
+      },
+        el('div', {class:'radio-circle'}),
+        el('div', {class:'opt-text'},
+          el('div', {class:'opt-name'}, it.name),
+          it.desc ? el('div', {class:'opt-desc'}, it.desc) : null
+        )
+      ));
+    });
+  }
+  right.appendChild(card('4', 'Структурные ССЗ и ФВ ЛЖ',
+    specDisabled ? 'Сначала выберите аритмию' : 'Структурное состояние сердца / ФВ ЛЖ',
+    specBody, specDisabled, 'card-yellow'
+  ));
+
+  /* ===== Шаг 5a и 5b (grey) ===== */
+  const afRelevant = STATE.arrhythmia === 5;
+  const afDisabled = !afRelevant;
+
+  const afBody = radioGroup(AF_DURATIONS, STATE.afDuration, id => {
+    STATE.afDuration = id;
+    STATE.nyha = null;
+    renderNavigator();
+  }, afDisabled);
+
+  const nyhaRelevant = STATE.strategy === 1 && STATE.arrhythmia === 5 && STATE.afDuration === 'lt7';
+  const nyhaDisabled = !nyhaRelevant;
+
+  const nyhaBody = radioGroup(NYHA_LEVELS, STATE.nyha, id => {
+    STATE.nyha = id;
+    renderNavigator();
+  }, nyhaDisabled);
+
+  const row5 = el('div', {class:'row-5'},
+    card('5a', 'Детализация ФП', afDisabled ? 'Не применимо' : 'Длительность',
+      afBody, afDisabled, 'card-grey'),
+    card('5b', 'Тяжесть симптомов (для купирования ФП)',
+      nyhaDisabled ? 'Не применимо' : 'Класс NYHA',
+      nyhaBody, nyhaDisabled, 'card-grey')
+  );
+  right.appendChild(row5);
+
+  /* ===== Шаг 6. Факторы риска и противопоказания (orange) ===== */
+  const riskBody = checkGroup(RISK_FACTORS, STATE.risks, id => {
+    if (STATE.risks.has(id)) STATE.risks.delete(id);
+    else STATE.risks.add(id);
+    renderNavigator();
+  }, false);
+
+  right.appendChild(card('6', 'Факторы риска и противопоказания',
+    'Отметьте все, что применимо',
+    riskBody, false, 'card-orange'
+  ));
+
+  /* ===== РЕЗУЛЬТАТ ===== */
+  renderResult();
+}
+
+/* =========================================================
+   9. РЕНДЕР РЕЗУЛЬТАТА
+   ========================================================= */
+function chipFor(name, line){
+  const d = lookupDrug(name);
+  const isConflict = d && Array.from(STATE.risks).some(r =>
+    (RISK_DRUG_CONFLICT[r] || []).includes(d.name));
+  const cls = 'chip ' + (d ? 'drug' + (line === 2 ? ' l2' : '') : 'nondrug') + (isConflict ? ' conflict' : '');
+  const node = el('span', {class:cls}, name);
+  if (d){
+    node.appendChild(el('span', {class:'info'}, 'i'));
+    if (isConflict) node.appendChild(el('span', {class:'warn-mark'}, '⚠'));
+    node.title = isConflict
+      ? 'Внимание: конфликт с выбранным фактором риска. Нажмите для деталей.'
+      : 'Показать дозу и формы выпуска';
+    node.addEventListener('click', () => showDrugModal(d));
+  }
+  return node;
+}
+
+function renderResult(){
+  const host = document.getElementById('resultHost');
+  host.innerHTML = '';
+
+  const code = computeCode();
+  const stratWarn = strategyWarnings();
+
+  if (code === null){
+    const empty = el('div', {class:'result'},
+      el('div', {class:'empty'},
+        el('svg', {width:'44', height:'44', viewBox:'0 0 24 24', fill:'none', stroke:'#8494a6', 'stroke-width':'1.5', 'stroke-linecap':'round', 'stroke-linejoin':'round'},
+          el('path', {d:'M9 11l3 3L22 4'}),
+          el('path', {d:'M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11'})),
+        el('h3', {}, 'Заполните все шаги'),
+        el('p', {}, 'Результат появится автоматически после выбора стратегии, аритмии и клинического профиля.')
+      )
+    );
+    host.appendChild(empty);
+    if (stratWarn.length){
+      host.appendChild(renderRiskPanel(stratWarn.map(w => ({label:'Предупреждение', warn:w}))));
+    }
+    return;
+  }
+
+  const rec = MATRIX_INDEX[codeStr(code)];
+
+  if (!rec){
+    host.appendChild(el('div', {class:'result'},
+      el('div', {class:'warn-box'},
+        el('svg', {width:'20', height:'20', viewBox:'0 0 24 24', fill:'none', stroke:'currentColor', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round'},
+          el('path', {d:'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'}),
+          el('line', {x1:'12', y1:'9', x2:'12', y2:'13'}),
+          el('line', {x1:'12', y1:'17', x2:'12.01', y2:'17'})),
+        el('div', {}, 'Комбинация не найдена в матрице решений (код ' + codeStr(code) + '). Проконсультируйтесь с аритмологом.')
+      )
+    ));
+    return;
+  }
+
+  /* Случай с ошибкой в матрице */
+  if (rec.err){
+    host.appendChild(el('div', {class:'result'},
+      el('div', {class:'result-head'},
+        el('span', {class:'code'}, codeStr(code)),
+        el('span', {class:'title'}, rec.d)
+      ),
+      el('div', {class:'warn-box'},
+        el('svg', {width:'20', height:'20', viewBox:'0 0 24 24', fill:'none', stroke:'currentColor', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round'},
+          el('path', {d:'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'}),
+          el('line', {x1:'12', y1:'9', x2:'12', y2:'13'}),
+          el('line', {x1:'12', y1:'17', x2:'12.01', y2:'17'})),
+        el('div', {}, rec.l1[0])
+      )
+    ));
+    return;
+  }
+
+  const l1 = (rec.l1 || []).filter(x => x && x !== '-' && x !== '–');
+  const l2 = (rec.l2 || []).filter(x => x && x !== '-' && x !== '–');
+
+  const rows = [];
+  rows.push(el('tr', {},
+    el('th', {style:'width:130px'}, 'Линия терапии'),
+    el('th', {}, 'Рекомендуемые препараты / вмешательства')
+  ));
+  rows.push(el('tr', {},
+    el('td', {}, el('span', {class:'line-badge l1-badge'}, 'Линия 1')),
+    el('td', {}, l1.length
+      ? el('div', {class:'chips'}, l1.map(n => chipFor(n, 1)))
+      : el('span', {style:'color:#8494a6;font-size:13.5px'}, '—'))
+  ));
+  rows.push(el('tr', {},
+    el('td', {}, el('span', {class:'line-badge l2-badge'}, 'Линия 2')),
+    el('td', {}, l2.length
+      ? el('div', {class:'chips'}, l2.map(n => chipFor(n, 2)))
+      : el('span', {style:'color:#8494a6;font-size:13.5px'}, '—'))
+  ));
+  if (rec.k){
+    rows.push(el('tr', {},
+      el('td', {}, el('span', {style:'font-size:11.5px;font-weight:800;color:#8494a6;text-transform:uppercase;letter-spacing:.5px'}, 'Комментарий')),
+      el('td', {}, el('p', {class:'comment'}, rec.k))
+    ));
+  }
+
+  host.appendChild(el('div', {class:'result'},
+    el('div', {class:'result-head'},
+      el('span', {class:'code'}, codeStr(code)),
+      el('span', {class:'title'}, rec.d)
+    ),
+    el('table', {class:'res'}, el('tbody', {}, rows))
+  ));
+
+  /* Панель предупреждений */
+  const warnItems = [];
+  stratWarn.forEach(w => warnItems.push({label:'Предупреждение', warn:w}));
+  STATE.risks.forEach(r => {
+    if (RISK_INFO[r]) warnItems.push({label:RISK_INFO[r].label, warn:RISK_INFO[r].warn});
+  });
+  if (warnItems.length) host.appendChild(renderRiskPanel(warnItems));
+}
+
+function renderRiskPanel(items){
+  const panel = el('div', {class:'risk-panel'},
+    el('div', {class:'rp-head'},
+      el('svg', {width:'18', height:'18', viewBox:'0 0 24 24', fill:'none', stroke:'#d97706', 'stroke-width':'2', 'stroke-linecap':'round', 'stroke-linejoin':'round'},
+        el('path', {d:'M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z'}),
+        el('line', {x1:'12', y1:'9', x2:'12', y2:'13'}),
+        el('line', {x1:'12', y1:'17', x2:'12.01', y2:'17'})),
+      'Предупреждения и ограничения'
+    )
+  );
+  items.forEach(it => {
+    panel.appendChild(el('div', {class:'risk-item'},
+      el('div', {class:'ri-icon'}, '!'),
+      el('div', {class:'ri-body'},
+        el('strong', {}, it.label + '. '),
+        it.warn
+      )
+    ));
+  });
+  return panel;
+}
+
+/* =========================================================
+   10. СБРОС
+   ========================================================= */
+function resetAll(){
+  STATE.strategy = null;
+  STATE.arrhythmia = null;
+  STATE.spec = null;
+  STATE.afDuration = null;
+  STATE.nyha = null;
+  STATE.risks.clear();
+  renderNavigator();
+}
+window.resetAll = resetAll;
+
+/* =========================================================
+   11. МОДАЛЬНОЕ ОКНО
+   ========================================================= */
+function showDrugModal(d){
+  document.getElementById('modalTitle').textContent = d.name;
+  const body = document.getElementById('modalBody');
+  body.innerHTML = '';
+  const rows = [
+    ['Класс (VW)', '<span class="cls ' + d.cls + '">' + d.cls + '</span>' + (d.note ? ' <span class="note-ruf">' + d.note + '</span>' : '')],
+    ['Формы выпуска', d.forms],
+    ['Внутривенно болюс', d.bolus],
+    ['Внутривенная инфузия', d.inf],
+    ['Нагрузочная пероральная доза', d.load],
+    ['Поддерживающая пероральная доза', d.maint]
+  ];
+  rows.forEach(([k, v]) => {
+    body.appendChild(el('tr', {},
+      el('th', {}, k),
+      el('td', {html: String(v)})
+    ));
+  });
+  document.getElementById('modalBg').classList.add('on');
+}
+document.getElementById('modalClose').addEventListener('click', () =>
+  document.getElementById('modalBg').classList.remove('on'));
+document.getElementById('modalBg').addEventListener('click', e => {
+  if (e.target.id === 'modalBg') document.getElementById('modalBg').classList.remove('on');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('modalBg').classList.remove('on');
+});
+
+/* =========================================================
+   12. МАТРИЦА РЕШЕНИЙ (ТАБЛИЦА)
+   ========================================================= */
+function renderMatrix(filter){
+  const q = (filter || '').trim().toLowerCase();
+  const body = document.getElementById('matrixBody');
+  body.innerHTML = '';
+
+  let currentStrategy = null;
+  const strategyNames = {1:'Стратегия 1 · Купирование тахикардии', 2:'Стратегия 2 · Профилактика (контроль ритма)', 3:'Стратегия 3 · Контроль ЧСС (ФП/ТП)'};
+
+  MATRIX_DATA.filter(m => {
+    if (!q) return true;
+    const hay = (m.c + ' ' + m.d + ' ' + (m.l1||[]).join(' ') + ' ' + (m.l2||[]).join(' ') + ' ' + (m.k||'')).toLowerCase();
+    return hay.includes(q);
+  }).forEach(m => {
+    const strat = parseInt(m.c[0], 10);
+    if (strat !== currentStrategy){
+      currentStrategy = strat;
+      body.appendChild(el('tr', {class:'strategy-sep'},
+        el('td', {colspan:'5'}, strategyNames[strat] || ('Стратегия ' + strat))
+      ));
+    }
+    const row = el('tr', {class: m.err ? 'error-row' : ''},
+      el('td', {class:'code'}, m.c),
+      el('td', {}, m.d),
+      el('td', {}, (m.l1 || []).filter(x=>x&&x!=='-'&&x!=='–').join(', ') || '—'),
+      el('td', {}, (m.l2 || []).filter(x=>x&&x!=='-'&&x!=='–').join(', ') || '—'),
+      el('td', {}, m.k || '')
+    );
+    body.appendChild(row);
+  });
+
+  if (!body.children.length){
+    body.appendChild(el('tr', {},
+      el('td', {colspan:'5', style:'text-align:center;padding:30px;color:#8494a6'},
+        'Ничего не найдено')));
+  }
+}
+document.getElementById('matrixFilter').addEventListener('input', e => renderMatrix(e.target.value));
+
+/* =========================================================
+   13. СПРАВОЧНИК ПРЕПАРАТОВ (S7)
+   ========================================================= */
+function renderS7(filter){
+  const q = (filter || '').trim().toLowerCase();
+  const body = document.getElementById('s7body');
+  body.innerHTML = '';
+  S7.filter(d => {
+    if (!q) return true;
+    return (d.name + ' ' + d.cls + ' ' + d.forms + ' ' + d.bolus + ' ' + d.inf + ' ' + d.load + ' ' + d.maint)
+      .toLowerCase().includes(q);
+  }).forEach(d => {
+    body.appendChild(el('tr', {},
+      el('td', {}, el('span', {class:'cls ' + d.cls}, d.cls)),
+      el('td', {class:'drugname'},
+        d.name,
+        d.note ? el('span', {class:'note-ruf'}, d.note) : null
+      ),
+      el('td', {}, d.forms),
+      el('td', {}, d.bolus),
+      el('td', {}, d.inf),
+      el('td', {}, d.load),
+      el('td', {}, d.maint)
+    ));
+  });
+  if (!body.children.length){
+    body.appendChild(el('tr', {},
+      el('td', {colspan:'7', style:'text-align:center;padding:30px;color:#8494a6'},
+        'Ничего не найдено')));
+  }
+}
+document.getElementById('drugFilter').addEventListener('input', e => renderS7(e.target.value));
+
+/* =========================================================
+   14. СОКРАЩЕНИЯ
+   ========================================================= */
+const ABBR = [
+  ['ААП', 'Антиаритмический препарат'],
+  ['АВБ', 'Атриовентрикулярная блокада'],
+  ['АВРТ', 'Атриовентрикулярная реципрокная тахикардия'],
+  ['АВУРТ', 'Атриовентрикулярная узловая реципрокная тахикардия'],
+  ['ББ', 'Бета-адреноблокатор'],
+  ['БКК', 'Блокатор кальциевых каналов'],
+  ['в/в', 'Внутривенно'],
+  ['ДСУ', 'Дисфункция синусового узла'],
+  ['ЖТ', 'Желудочковая тахикардия'],
+  ['ЖФ', 'Желудочковая фибрилляция'],
+  ['ЖЭС', 'Желудочковая экстрасистолия'],
+  ['ИБС', 'Ишемическая болезнь сердца'],
+  ['ИКД', 'Имплантируемый кардиовертер-дефибриллятор'],
+  ['КК', 'Клиренс креатинина'],
+  ['КПЖТ', 'Катехоламинергическая полиморфная желудочковая тахикардия'],
+  ['ЛЖ', 'Левый желудочек'],
+  ['НЖТ', 'Наджелудочковая тахикардия'],
+  ['ОМТ', 'Оптимальная медикаментозная терапия'],
+  ['ОПСС', 'Общее периферическое сосудистое сопротивление'],
+  ['Очаг. ПТ', 'Очаговая предсердная тахикардия'],
+  ['ПСВТ', 'Пароксизмальная суправентрикулярная тахикардия'],
+  ['СВТ', 'Суправентрикулярная тахикардия'],
+  ['Син. Тах', 'Синусовая тахикардия'],
+  ['СНсФВ', 'Сердечная недостаточность с сохранённой ФВ'],
+  ['СНунФВ', 'Сердечная недостаточность с умеренно сниженной ФВ'],
+  ['СНнФВ', 'Сердечная недостаточность со сниженной ФВ'],
+  ['СР', 'Синусовый ритм'],
+  ['ССЗ', 'Структурное заболевание сердца'],
+  ['ТП', 'Трепетание предсердий'],
+  ['ФВ', 'Фракция выброса'],
+  ['ФЖ', 'Фибрилляция желудочков'],
+  ['ФП', 'Фибрилляция предсердий'],
+  ['ФР', 'Факторы риска'],
+  ['ХБП', 'Хроническая болезнь почек'],
+  ['ХОБЛ', 'Хроническая обструктивная болезнь лёгких'],
+  ['ХСН', 'Хроническая сердечная недостаточность'],
+  ['ЧСС', 'Частота сердечных сокращений'],
+  ['ЭИТ', 'Электрическая импульсная терапия (кардиоверсия)'],
+  ['ЭКС', 'Электрокардиостимулятор'],
+  ['EHRA', 'European Heart Rhythm Association'],
+  ['LQT', 'Синдром удлинённого интервала QT'],
+  ['NYHA', 'Функциональный класс сердечной недостаточности (NYHA)'],
+  ['QTc', 'Корригированный интервал QT'],
+  ['CrCl', 'Клиренс креатинина'],
+  ['ER / пролонг.', 'Пролонгированная (замедленная) форма высвобождения']
+];
+function renderAbbr(){
+  const g = document.getElementById('abbrGrid');
+  g.innerHTML = '';
+  ABBR.forEach(([k, v]) => {
+    g.appendChild(el('div', {class:'info-item'},
+      el('dt', {}, k),
+      el('dd', {}, v)
+    ));
+  });
+}
+
+/* =========================================================
+   15. ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+   ========================================================= */
+document.querySelectorAll('nav.tabs button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('nav.tabs button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('on'));
+    document.getElementById('view-' + btn.dataset.view).classList.add('on');
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+});
+
+/* =========================================================
+   16. ИНИЦИАЛИЗАЦИЯ
+   ========================================================= */
+renderNavigator();
+renderMatrix('');
+renderS7('');
+renderAbbr();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="af.html" title="Антиаритмическая терапия и ОАК при ФП">ФП · ОАК</a>
+    <a href="qt.html" title="Коррекция интервала QT">Интервал QT</a>
+    <a href="ЖА.html" title="Классификация ЖА (РКО 2023)">Желудочковые аритмии</a>
+    <a href="гкмп.html" title="ААП при гипертрофической кардиомиопатии">ГКМП</a>
+    
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QTc — калькулятор корригированного интервала QT</title>
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  --bg:#eef2f8; --card:#fff; --ink:#0e1c2b; --muted:#67788c; --line:#e3e9f1;
+  --accent:#2563eb; --ok:#15803d; --warn:#a16207; --bad:#b91c1c;
+  --ok-bg:#e7f7ee; --warn-bg:#fdf4e0; --bad-bg:#fdeaea;
+  --shadow:0 1px 2px rgba(16,32,56,.05),0 10px 28px -14px rgba(16,32,56,.25);
+}
+html,body{margin:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  background:radial-gradient(1100px 500px at 50% -12%,#ffffff 0%,var(--bg) 62%) no-repeat,var(--bg);
+  color:var(--ink); line-height:1.45; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1160px;margin:0 auto;padding:26px 16px 72px}
+header.top{margin-bottom:20px}
+header.top h1{font-size:clamp(21px,3.2vw,33px);margin:0 0 6px;letter-spacing:-.02em}
+header.top p{margin:0;color:var(--muted);font-size:14.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:20px;margin-bottom:18px}
+
+/* ---------- ввод ---------- */
+.inputs{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:14px 16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label{font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.field input,.field select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:11px;font-size:16px;
+  font-variant-numeric:tabular-nums;background:#fbfcfe;color:var(--ink);outline:none;transition:.15s;font-family:inherit;
+}
+.field input:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.13);background:#fff}
+.igroup{display:flex;gap:7px}
+.igroup input{flex:1 1 auto;min-width:0}
+.igroup select{flex:0 0 auto;width:auto;padding:10px 6px;font-size:14px}
+.seg{display:flex;background:#eef2f8;border-radius:11px;padding:3px;gap:3px}
+.seg button{flex:1;border:0;background:transparent;padding:9px 4px;border-radius:9px;font:inherit;font-size:13.5px;
+  font-weight:600;color:var(--muted);cursor:pointer;transition:.15s}
+.seg button.active{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(16,32,56,.16)}
+
+/* ---------- заголовки секций ---------- */
+.sec-title{display:flex;align-items:center;gap:10px;margin:22px 0 8px;
+  font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.sec-title:first-child{margin-top:0}
+.sec-title::after{content:'';flex:1;height:1px;background:var(--line)}
+.sec-title .badge{text-transform:none;letter-spacing:0;font-weight:700;font-size:11px;padding:2px 8px;border-radius:999px;
+  background:#eef2f8;color:var(--muted)}
+.sec-title .badge.on{background:#fee2e2;color:#b91c1c}
+
+/* ---------- шапка ЭКГ + переключатель ---------- */
+.ecg-head{display:flex;align-items:center;gap:12px;margin:0 0 12px;
+  font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.ecg-head>span{white-space:nowrap}
+.ecg-head::after{content:'';flex:1;height:1px;background:var(--line)}
+.tg{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;text-transform:none;letter-spacing:0;
+  color:var(--ink);cursor:pointer;background:#f7f9fc;border:1px solid var(--line);padding:5px 11px;border-radius:9px;
+  user-select:none;white-space:nowrap}
+.tg input{accent-color:#dc2626;margin:0;cursor:pointer}
+
+/* ---------- вердикт ---------- */
+.verdict{margin:0 0 6px;font-size:13.5px;font-weight:600;padding:9px 13px;border-radius:11px;display:inline-block}
+.verdict.ok{background:var(--ok-bg);color:var(--ok)}
+.verdict.warn{background:var(--warn-bg);color:var(--warn)}
+.verdict.bad{background:var(--bad-bg);color:var(--bad)}
+
+/* ---------- таблица результатов ---------- */
+.ftable-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:12px}
+.ftable{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}
+.ftable thead th{
+  background:#f7f9fc;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em;
+  color:var(--muted);padding:7px 10px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.ftable thead th.num{text-align:right}
+.ftable tbody td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+.ftable tbody tr:last-child td{border-bottom:0}
+.ftable tbody tr:hover{background:#fafcff}
+.t-name{font-weight:700;white-space:nowrap}
+.t-formula{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.t-val{text-align:right;font-size:17px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-.02em;white-space:nowrap}
+.t-val small{font-size:10.5px;font-weight:600;color:var(--muted);margin-left:3px}
+.t-status{text-align:right;white-space:nowrap;width:1%}
+.t-note{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px;white-space:normal;max-width:200px;line-height:1.25}
+.ftable tr.dim td{opacity:.45}
+
+/* ---------- чипы ---------- */
+.chip{font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;white-space:nowrap;letter-spacing:.02em;display:inline-block}
+.chip.ok{background:var(--ok-bg);color:var(--ok)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.neutral{background:#eef2f8;color:var(--muted)}
+
+/* ---------- ЭКГ ---------- */
+.ecg-svg{width:100%;height:auto;display:block;border-radius:12px;border:1px solid #f1dede}
+.ecg-bars{position:relative;height:56px;margin-top:12px}
+.ebar{position:absolute;height:23px;border-radius:7px;font-size:12px;font-weight:700;display:flex;align-items:center;
+  padding:0 9px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ebar.qt{top:0;background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.ebar.rr{top:28px;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+.ecg-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:14px;font-size:12.5px;color:var(--muted)}
+.lg{display:flex;align-items:center;gap:7px}
+.lg i{display:inline-block;font-style:normal;width:22px;height:12px;border-radius:4px}
+.sw-qt{background:#fef3c7;border:1px solid #fcd34d}
+.sw-rr{background:#dbeafe;border:1px solid #93c5fd}
+.sw-tan{background:repeating-linear-gradient(90deg,#dc2626 0 5px,transparent 5px 9px);height:3px!important;border-radius:0}
+
+/* ---------- ссылки ---------- */
+.links-list{display:flex;flex-direction:column;gap:10px;margin-top:12px}
+.link-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;background:#f8fafc;border:1px solid var(--line);
+  border-radius:12px;text-decoration:none;color:var(--ink);transition:.15s;font-size:14px}
+.link-item:hover{background:#f1f5f9;border-color:#cbd5e1;transform:translateY(-1px);box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.link-item .dot{flex:0 0 auto;color:var(--accent);font-weight:800;font-size:16px;line-height:1.2;margin-top:1px}
+.link-item .txt{flex:1}
+.link-item .txt b{display:block;font-weight:700;font-size:14px}
+.link-item .txt small{display:block;font-size:12px;color:var(--muted);margin-top:2px}
+.link-item .ext{flex:0 0 auto;color:var(--muted);font-size:12px;font-weight:700;margin-top:2px}
+
+/* ---------- прочее ---------- */
+.notes{font-size:13px;color:var(--muted);line-height:1.6}
+.notes b{color:var(--ink)}
+.notes ul{margin:8px 0 0;padding-left:18px}
+.notes li{margin-bottom:5px}
+.kbd{font-family:ui-monospace,Menlo,monospace;background:#f1f5f9;padding:1px 6px;border-radius:5px;font-size:12px;color:var(--ink)}
+.warnbox{background:var(--warn-bg);color:var(--warn);font-size:13px;font-weight:600;padding:9px 13px;border-radius:11px;margin:8px 0 4px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <h1>Калькулятор корригированного интервала QT</h1>
+    <p>6 базовых формул коррекции · пороги для мужчин и женщин · коррекция при широком QRS (блокада ЛНПГ / ПНПГ) · метод касательной</p>
+  </header>
+
+  <!-- ================= ВВОД ================= -->
+  <section class="card inputs">
+    <div class="field">
+      <label>Пол</label>
+      <div class="seg" id="segSex">
+        <button data-sex="m" class="active">Мужской</button>
+        <button data-sex="f">Женский</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>ЧСС, уд/мин</label>
+      <input type="number" id="inHR" min="20" max="250" step="1" value="85">
+    </div>
+    <div class="field">
+      <label>RR, мс</label>
+      <input type="number" id="inRR" min="200" max="4000" step="1" value="706">
+    </div>
+    <div class="field">
+      <label>QT</label>
+      <div class="igroup">
+        <input type="number" id="inQT" min="1" step="0.1" value="400">
+        <select id="selQTUnit">
+          <option value="ms">мс</option>
+          <option value="mm">мм</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>QRS</label>
+      <div class="igroup">
+        <input type="number" id="inQRS" min="1" step="0.1" value="90">
+        <select id="selQRSUnit">
+          <option value="ms">мс</option>
+          <option value="mm">мм</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>Скорость ЭКГ</label>
+      <select id="selSpeed">
+        <option value="25">25 мм/с</option>
+        <option value="50">50 мм/с</option>
+      </select>
+    </div>
+  </section>
+
+  <!-- ================= ЭКГ-СХЕМА ================= -->
+  <section class="card">
+    <div class="ecg-head">
+      <span>ЭКГ-схема</span>
+      <label class="tg"><input type="checkbox" id="tgTangent" checked> Метод касательной</label>
+    </div>
+    <svg id="ecgSvg" viewBox="0 0 1000 440" preserveAspectRatio="xMidYMid meet" class="ecg-svg"></svg>
+    <div class="ecg-bars" id="ecgBars"></div>
+    <div class="ecg-legend">
+      <span class="lg"><i class="sw-qt"></i>Интервал QT</span>
+      <span class="lg"><i class="sw-rr"></i>Интервал RR (R→R)</span>
+      <span class="lg"><i class="sw-tan"></i>Метод касательной (конец T)</span>
+    </div>
+  </section>
+
+  <!-- ================= РЕЗУЛЬТАТЫ ================= -->
+  <section class="card">
+    <div id="verdict"></div>
+
+    <div class="sec-title">Основные формулы коррекции QT</div>
+    <div id="mainRows"></div>
+
+    <div class="sec-title" id="wideTitle">При широком QRS (ЛНПГ / внутрижелудочковые нарушения)</div>
+    <div id="wideRows"></div>
+
+    <div class="sec-title">При блокаде правой ножки пучка Гиса</div>
+    <div id="rbbbRows"></div>
+  </section>
+
+  <!-- ================= ПОЛЕЗНЫЕ ССЫЛКИ ================= -->
+  <section class="card">
+    <div class="sec-title">Полезные ссылки</div>
+    <div class="links-list">
+      <a class="link-item" href="https://mediqlab.com/check-interactions" target="_blank" rel="noopener noreferrer">
+        <span class="dot">●</span>
+        <span class="txt">
+          <b>Проверка лекарственного взаимодействия</b>
+          <small>mediqlab.com — интерактивная база лекарственных взаимодействий</small>
+        </span>
+        <span class="ext">↗</span>
+      </a>
+      <a class="link-item" href="https://reference.medscape.com/drug-interactionchecker" target="_blank" rel="noopener noreferrer">
+        <span class="dot">●</span>
+        <span class="txt">
+          <b>Проверка лекарственного взаимодействия</b>
+          <small>medscape.com — drug interaction checker</small>
+        </span>
+        <span class="ext">↗</span>
+      </a>
+      <a class="link-item" href="https://www.crediblemeds.org/" target="_blank" rel="noopener noreferrer">
+        <span class="dot">●</span>
+        <span class="txt">
+          <b>Перечень препаратов, удлиняющих интервал QT и вызывающих желудочковую тахикардию</b>
+          <small>CredibleMeds.org — официальный реестр (требуется регистрация)</small>
+        </span>
+        <span class="ext">↗</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= ПРИМЕЧАНИЯ ================= -->
+  <section class="card notes">
+
+<b>Источник:</b> 
+ <ul>
+<li>Комолятова В.Н., Шаблинова Т.С., Дроздов Д.В., Карпова И.Е., Козловская И.Л., Макаров Л.М. Интервал QT на электрокардиограмме покоя: значение и методы измерения. Вестник аритмологии. 2024;31(2):e15-e23. https://doi.org/10.35336/VA-1301.</li>
+
+<li>Терегулов ЮЭ, Ацель ЕА, Салямова ЛФ, и др. Разработка методов оценки интервала QT при блокаде левой ножки пучка Гиса. Медицинский алфавит. 2022;(11): 13-18. https://doi.org/10.33667/2078-5631-2022-11-13-18.</li>
+
+<li>2022 ESC Guidelines on cardio-oncology developed in collaboration with the European Hematology Association (EHA), the European Society for Therapeutic Radiology and Oncology (ESTRO) and the International Cardio-Oncology Society (IC-OS): Developed by the task force on cardio-oncology of the European Society of Cardiology (ESC).European Heart Journal, Volume 43, Issue 41, 1 November 2022, Pages 4229–4361, https://doi.org/10.1093/eurheartj/ehac244</li>
+</ul>
+    <b>Как пользоваться</b>
+    <ul>
+      <li>Введите <b>ЧСС</b> или <b>RR</b> — они связаны автоматически (RR = 60 000 / ЧСС).</li>
+      <li>QT и QRS можно вводить в <b>миллисекундах</b> или в <b>миллиметрах</b> (количество маленьких клеток на ЭКГ-плёнке).</li>
+      <li>Пересчёт клеток: <span class="kbd">25 мм/с → 1 мм = 40 мс</span>, <span class="kbd">50 мм/с → 1 мм = 20 мс</span>.</li>
+      <li>Формулы для широкого QRS активируются при <b>QRS ≥ 120 мс</b> (блокада ножки пучка Гиса, внутрижелудочковые нарушения проводимости).</li>
+    </ul>
+    <b style="display:block;margin-top:12px">Метод касательной (tangent method)</b>
+    <ul>
+      <li>Конец зубца T определяется как точка пересечения <b>касательной</b>, проведённой к наиболее крутому участку нисходящего колена зубца T, с <b>изоэлектрической линией</b> (горизонтальный пунктир).</li>
+      <li>На схеме: красный пунктир — касательная, красный кружок — точка перегиба, вертикальная линия — проекция конца T на изолинию, стрелка <span class="kbd">&lt;-- QT --&gt;</span> внизу — интервал QT с треугольниками, направленными наружу.</li>
+      <li>Метод касательной — стандарт клинического измерения QT; именно это значение затем подставляется в формулы коррекции.</li>
+    </ul>
+    <b style="display:block;margin-top:12px">Важные ограничения</b>
+    <ul>
+      <li>Формула <b>Bazett</b> при ЧСС &lt; 60 уд/мин <b>недооценивает</b> QT, при ЧСС &gt; 100 уд/мин — <b>переоценивает</b> QT.</li>
+      <li>Пороговые значения (норма / пограничное / удлинённое) взяты из исходного калькулятора и различаются для мужчин и женщин.</li>
+      <li>Калькулятор предназначен для поддержки клинического решения и не заменяет оценку врача.</li>
+    </ul>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+const $ = s => document.querySelector(s);
+
+/* ================= СОСТОЯНИЕ ================= */
+const state = {
+  sex:'m', hr:85, rr:60000/85,
+  qtRaw:400, qrsRaw:90,
+  qtUnit:'ms', qrsUnit:'ms', speed:25
+};
+let showTangent = true;
+
+const el = {
+  hr:$('#inHR'), rr:$('#inRR'), qt:$('#inQT'), qrs:$('#inQRS'),
+  qtUnit:$('#selQTUnit'), qrsUnit:$('#selQRSUnit'), speed:$('#selSpeed'),
+  segSex:$('#segSex'), svg:$('#ecgSvg'), bars:$('#ecgBars'),
+  verdict:$('#verdict'),
+  mainRows:$('#mainRows'), wideRows:$('#wideRows'), rbbbRows:$('#rbbbRows'),
+  wideTitle:$('#wideTitle'), tgTangent:$('#tgTangent')
+};
+
+/* ================= УТИЛИТЫ ================= */
+const fmt = (v,d=0) => (isFinite(v) ? v.toFixed(d) : '—');
+const clamp = (v,a,b) => Math.min(b, Math.max(a,v));
+const perMM = () => state.speed === 25 ? 40 : 20;
+const qtMs  = () => state.qtUnit  === 'ms' ? state.qtRaw  : state.qtRaw  * perMM();
+const qrsMs = () => state.qrsUnit === 'ms' ? state.qrsRaw : state.qrsRaw * perMM();
+
+function statusOf(v, lo, hi){
+  if (v < lo) return {cls:'ok',   text:'Нормальный'};
+  if (v > hi) return {cls:'bad',  text:'Удлинённый'};
+  return {cls:'warn', text:'Пограничный'};
+}
+
+/* ================= ТАБЛИЦА РЕЗУЛЬТАТОВ ================= */
+function renderTable(container, rows, dim){
+  const body = rows.map(r => {
+    const st = (r.lo == null) ? null : statusOf(r.v, r.lo, r.hi);
+    return `
+      <tr class="${dim?'dim':''}">
+        <td class="t-name">${r.name}${r.note ? `<div class="t-note">${r.note}</div>` : ''}</td>
+        <td class="t-formula">${r.f}</td>
+        <td class="t-val">${fmt(r.v,0)}<small>мс</small></td>
+        <td class="t-status">${st ? `<span class="chip ${st.cls}">${st.text}</span>`
+                                  : `<span class="chip neutral">не корр.</span>`}</td>
+      </tr>`;
+  }).join('');
+  container.innerHTML = `
+    <div class="ftable-wrap">
+      <table class="ftable">
+        <thead>
+          <tr>
+            <th>Формула</th>
+            <th>Расчёт</th>
+            <th class="num">QTc</th>
+            <th class="num">Оценка</th>
+          </tr>
+        </thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>`;
+}
+
+/* ================= ЭКГ-СХЕМА С МЕТОДОМ КАСАТЕЛЬНОЙ ================= */
+function drawECG(){
+  const rr  = state.rr;
+  const qt  = qtMs();
+  const qrs = qrsMs();
+
+  const A_T = 1.8;
+  const dQT = Math.max(qt - qrs, 30);
+  const tPeakRel = qrs + 0.65 * dQT;
+  const sT = Math.max(0.35 * dQT / Math.SQRT2, 8);
+
+  const tInfl = tPeakRel + sT / Math.SQRT2;
+  const aInfl = A_T * Math.exp(-0.5);
+  const slopeTan = -A_T * Math.SQRT2 / sT * Math.exp(-0.5);
+  const tEndTan = tInfl - aInfl / slopeTan;
+
+  const tR = qrs * 0.30;
+  const tRR0 = tR;
+  const tRR1 = tR + rr;
+
+  const tStart = -120;
+  const tEnd   = Math.max(rr + 80, tRR1 + 80, qt + 140, 600);
+  const span   = tEnd - tStart;
+
+  const mmPerMs = 1/20;
+  const K = 40;
+  const W = Math.round(span * mmPerMs * K);
+  const H = 11 * K;
+  const base = 7.0 * K;
+  const X = t => (t - tStart) * mmPerMs * K;
+
+  const P_OFFSET = 75;
+  const P_SIGMA  = 15;
+
+  const beats = [];
+  for (let k = -2; k <= Math.ceil(tEnd / rr) + 2; k++){
+    const t0 = k * rr;
+    if (t0 > tStart - 500 && t0 < tEnd + 500) beats.push(t0);
+  }
+  const rw = Math.max(qrs * 0.15, 9);
+
+  function amp(t){
+    let a = 0;
+    for (const t0 of beats){
+      const pC = t0 - P_OFFSET;
+      const pIntrudes = (pC > qrs - 60) && (pC < tEndTan + 60);
+      if (!pIntrudes) a += 1.05 * Math.exp(-Math.pow((t - pC) / P_SIGMA, 2));
+      a += 4.60 * Math.exp(-Math.pow((t - (t0 + qrs*0.30)) / rw, 2));
+      a -= 1.70 * Math.exp(-Math.pow((t - (t0 + qrs*0.78)) / (rw*0.85), 2));
+      a += A_T  * Math.exp(-Math.pow((t - (t0 + tPeakRel)) / sT, 2));
+    }
+    return a;
+  }
+
+  let grid = '';
+  for (let x = 0; x <= W; x += K){
+    const bold = Math.round(x / K) % 5 === 0;
+    grid += `<line x1="${x}" y1="0" x2="${x}" y2="${H}" stroke="${bold?'#e9b4b4':'#f6dcdc'}" stroke-width="${bold?1.2:0.7}"/>`;
+  }
+  for (let y = 0; y <= H; y += K){
+    const bold = Math.round(y / K) % 5 === 0;
+    grid += `<line x1="0" y1="${y}" x2="${W}" y2="${y}" stroke="${bold?'#e9b4b4':'#f6dcdc'}" stroke-width="${bold?1.2:0.7}"/>`;
+  }
+
+  let d = '';
+  for (let t = tStart; t <= tEnd; t += 1){
+    const y = base - amp(t) * K;
+    d += (d ? 'L' : 'M') + X(t).toFixed(1) + ',' + y.toFixed(1);
+  }
+
+  const x0   = X(0);
+  const xEnd = X(tEndTan);
+  const xR0  = X(tRR0);
+  const xR1  = X(tRR1);
+
+  let tangentSvg = '';
+  if (showTangent){
+    const t1 = tInfl - 55;
+    const t2 = tEndTan + 25;
+    const a1 = aInfl + slopeTan * (t1 - tInfl);
+    const a2 = aInfl + slopeTan * (t2 - tInfl);
+    const y1 = base - a1 * K;
+    const y2 = base - a2 * K;
+    const xInfl = X(tInfl);
+    const yInfl = base - aInfl * K;
+    const labelX = clamp(xInfl, 150, W - 150);
+    const arrowY = base + 130;
+
+    tangentSvg = `
+      <line x1="${X(t1).toFixed(1)}" y1="${y1.toFixed(1)}"
+            x2="${X(t2).toFixed(1)}" y2="${y2.toFixed(1)}"
+            stroke="#dc2626" stroke-width="2.8" stroke-dasharray="11 7"
+            stroke-linecap="round" opacity="0.95"/>
+      <circle cx="${xInfl.toFixed(1)}" cy="${yInfl.toFixed(1)}" r="6"
+              fill="#dc2626" stroke="#fff" stroke-width="2.2"/>
+      <line x1="${xEnd.toFixed(1)}" y1="${base}" x2="${xEnd.toFixed(1)}" y2="${(base - 220).toFixed(1)}"
+            stroke="#dc2626" stroke-width="2.6" stroke-dasharray="8 6" opacity="0.9"/>
+      <circle cx="${xEnd.toFixed(1)}" cy="${base}" r="7.5"
+              fill="#fff" stroke="#dc2626" stroke-width="3.2"/>
+      <circle cx="${xEnd.toFixed(1)}" cy="${base}" r="2.5" fill="#dc2626"/>
+      <line x1="${x0.toFixed(1)}" y1="${arrowY}" x2="${xEnd.toFixed(1)}" y2="${arrowY}"
+            stroke="#0f172a" stroke-width="3.2"
+            marker-start="url(#arrowStart)" marker-end="url(#arrowEnd)"/>
+      <text x="${((x0 + xEnd)/2).toFixed(1)}" y="${(arrowY - 15).toFixed(1)}" font-size="24"
+            fill="#0f172a" font-weight="800" text-anchor="middle">QT</text>
+      <text x="${labelX.toFixed(1)}" y="48" font-size="22" fill="#dc2626"
+            font-weight="800" text-anchor="middle">метод касательной</text>
+      <text x="${xEnd.toFixed(1)}" y="${(base + 60).toFixed(1)}" font-size="19"
+            fill="#dc2626" font-weight="700" text-anchor="middle">конец T</text>
+    `;
+  }
+
+  el.svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  el.svg.innerHTML = `
+    <defs>
+      <clipPath id="ecgclip"><rect x="0" y="0" width="${W}" height="${H}" rx="12"/></clipPath>
+      <marker id="arrowStart" viewBox="0 0 10 10" refX="0" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M 10 0 L 0 5 L 10 10 z" fill="#0f172a"/>
+      </marker>
+      <marker id="arrowEnd" viewBox="0 0 10 10" refX="10" refY="5"
+              markerWidth="7" markerHeight="7" orient="auto">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f172a"/>
+      </marker>
+    </defs>
+    <g clip-path="url(#ecgclip)">
+      <rect x="0" y="0" width="${W}" height="${H}" fill="#fffbfa"/>
+      ${grid}
+      <line x1="0" y1="${base}" x2="${Math.max(W, xEnd + 100)}" y2="${base}"
+            stroke="#1e293b" stroke-width="2.6" stroke-dasharray="12 8" opacity="0.75"/>
+      <text x="12" y="${base - 12}" font-size="17" fill="#1e293b" font-weight="600" opacity="0.85">Изолиния</text>
+      <rect x="${x0}" y="0" width="${Math.max(0, xEnd - x0)}" height="${H}" fill="rgba(245,158,11,.12)"/>
+      <line x1="${x0}" y1="0" x2="${x0}" y2="${H}" stroke="#94a3b8" stroke-width="1.4" stroke-dasharray="7 5"/>
+      <line x1="${xEnd}" y1="0" x2="${xEnd}" y2="${H}" stroke="#f59e0b" stroke-width="1.6" stroke-dasharray="7 5"/>
+      <line x1="${xR0}" y1="0" x2="${xR0}" y2="${H}" stroke="#3b82f6" stroke-width="1.4" stroke-dasharray="4 5" opacity="0.7"/>
+      <line x1="${xR1}" y1="0" x2="${xR1}" y2="${H}" stroke="#3b82f6" stroke-width="1.8" stroke-dasharray="7 5"/>
+      <path d="${d}" fill="none" stroke="#0f172a" stroke-width="2.3" stroke-linejoin="round" stroke-linecap="round"/>
+      ${tangentSvg}
+    </g>`;
+
+  const p = t => (t - tStart) / span * 100;
+  el.bars.innerHTML = `
+    <div class="ebar qt" style="left:${p(0)}%;width:${p(tEndTan)-p(0)}%"><span>QT = ${fmt(qt,0)} мс</span></div>
+    <div class="ebar rr" style="left:${p(tRR0)}%;width:${p(tRR1)-p(tRR0)}%"><span>RR = ${fmt(rr,0)} мс &nbsp;·&nbsp; ЧСС ${fmt(state.hr,0)}</span></div>`;
+}
+
+/* ================= ОСНОВНОЙ РЕНДЕР ================= */
+function render(){
+  const rr = state.rr, hr = state.hr;
+  const qt = qtMs(), qrs = qrsMs();
+  const male = state.sex === 'm';
+  const rrs = rr / 1000;
+  const sq  = Math.sqrt(rrs);
+
+  const bazett = qt / sq;
+
+  const rowsMain = [
+    { name:'Bazett', f:'QT / √RR', v: bazett,
+      lo: male?430:440, hi: male?450:460,
+      note: hr < 60 ? 'При ЧСС < 60 уд/мин недооценивает QT'
+          : hr > 100 ? 'При ЧСС > 100 уд/мин переоценивает QT' : '' },
+    { name:'Fridericia', f:'QT / RR^(1/3)',
+      v: qt / Math.cbrt(rrs), lo: male?429:438, hi: male?441:451 },
+    { name:'Dmitrienko', f:'QT / RR^0.413',
+      v: qt / Math.pow(rrs, 0.413), lo: male?430:440, hi: male?450:460 },
+    { name:'Framingham', f:'QT + 0.154 · (1000 − RR)',
+      v: qt + 0.154 * (1000 - rr), lo: male?428:438, hi: male?440:450 },
+    { name:'Hodges', f:'QT + 1.75 · (ЧСС − 60)',
+      v: qt + 1.75 * (hr - 60), lo: male?428:436, hi: male?441:449 },
+    { name:'Rautaharju', f:'QT − 0.185 · (RR − 1000)' + (male ? ' + 0.006' : ''),
+      v: qt - 0.185 * (rr - 1000) + (male ? 0.006 : 0), lo: male?431:440, hi: male?443:454 }
+  ];
+
+  const rowsWide = [
+    { name:'Bogossian', f:'QT − 0.485 · QRS',
+      v: qt - 0.485 * qrs, lo: male?429:438, hi: male?450:460 },
+    { name:'Rautaharju (блокада ЛНПГ)',
+      f:`QT − 155·(60/ЧСС − 1) − 0.93·(QRS − 139) − ${male?22:34}`,
+      v: qt - 155 * (60 / hr - 1) - 0.93 * (qrs - 139) - (male ? 22 : 34),
+      lo: male?429:438, hi: male?450:460 },
+    { name:'Wang', f:'QT − (0.86 · QRS − 71)',
+      v: qt - (0.86 * qrs - 71), lo: male?429:438, hi: male?450:460 },
+    { name:'QTc Bazett (QRS)', f:'QTc(Bazett) − (QRS − 100)',
+      v: bazett - (qrs - 100), lo: male?430:440, hi: male?450:460 }
+  ];
+
+  const qtm     = qt - qrs / 2;
+  const qtcQRS  = qt - (qrs - 100);
+  const rowsRBBB = [
+    { name:'QTm', f:'QT − QRS/2', v: qtm, lo:null, hi:null },
+    { name:'QTm (Bazett)', f:'QTm / √RR',
+      v: qtm / sq, lo: male?430:440, hi: male?450:460 },
+    { name:'QTc (QRS)', f:'QT − (QRS − 100)',
+      v: qtcQRS, lo: male?429:438, hi: male?470:480 },
+    { name:'QTc (QRS) Bazett', f:'[QT − (QRS − 100)] / √RR',
+      v: qtcQRS / sq, lo: male?429:438, hi: male?470:480 }
+  ];
+
+  const wideActive = qrs >= 120;
+
+  /* Пул для общего вердикта:
+     - при нормальном QRS  → 6 базовых формул;
+     - при широком QRS     → 6 базовых + 4 широких + 4 БПНПГ = 14.
+     QTm имеет пороги null (это промежуточная величина, не QTc),
+     поэтому он входит в «из 14», но не может быть «удлинённым»
+     или «пограничным» — оцениваются только строки с заданными порогами. */
+  const pool = [...rowsMain, ...(wideActive ? [...rowsWide, ...rowsRBBB] : [])];
+  const evaluable = pool.filter(r => r.lo != null);
+
+  const nLong = evaluable.filter(r => r.v > r.hi).length;
+  const nBord = evaluable.filter(r => r.v >= r.lo && r.v <= r.hi).length;
+  const vCls  = nLong > 0 ? 'bad' : (nBord > 0 ? 'warn' : 'ok');
+  const vText = nLong > 0
+    ? `Удлинение QTc по ${nLong} из ${pool.length} формул — требуется клиническая оценка`
+    : nBord > 0
+      ? `Пограничные значения по ${nBord} из ${pool.length} формул`
+      : `Все ${pool.length} формул — в пределах нормы`;
+  el.verdict.innerHTML = `<div class="verdict ${vCls}">${vText}</div>`;
+
+  renderTable(el.mainRows, rowsMain, false);
+  renderTable(el.wideRows, rowsWide, !wideActive);
+  renderTable(el.rbbbRows, rowsRBBB, !wideActive);
+
+  el.wideTitle.innerHTML = `При широком QRS (ЛНПГ / внутрижелудочковые нарушения)
+    <span class="badge ${wideActive?'on':''}">${wideActive ? 'QRS ≥ 120 мс — активно' : 'QRS ' + fmt(qrs,0) + ' мс < 120 мс'}</span>`;
+
+  drawECG();
+}
+
+/* ================= СОБЫТИЯ ================= */
+el.hr.addEventListener('input', () => {
+  const v = parseFloat(el.hr.value);
+  if (!isFinite(v) || v <= 0) return;
+  state.hr = v; state.rr = 60000 / v;
+  el.rr.value = Math.round(state.rr);
+  render();
+});
+
+el.rr.addEventListener('input', () => {
+  const v = parseFloat(el.rr.value);
+  if (!isFinite(v) || v <= 0) return;
+  state.rr = v; state.hr = 60000 / v;
+  el.hr.value = Math.round(state.hr * 10) / 10;
+  render();
+});
+
+el.qt.addEventListener('input', () => {
+  const v = parseFloat(el.qt.value);
+  if (!isFinite(v)) return;
+  state.qtRaw = v; render();
+});
+
+el.qrs.addEventListener('input', () => {
+  const v = parseFloat(el.qrs.value);
+  if (!isFinite(v)) return;
+  state.qrsRaw = v; render();
+});
+
+el.qtUnit.addEventListener('change', () => {
+  const oldU = state.qtUnit, newU = el.qtUnit.value;
+  if (oldU !== newU){
+    const ms = oldU === 'ms' ? state.qtRaw : state.qtRaw * perMM();
+    state.qtRaw = newU === 'ms' ? Math.round(ms) : +(ms / perMM()).toFixed(2);
+    el.qt.value = state.qtRaw;
+  }
+  state.qtUnit = newU; render();
+});
+
+el.qrsUnit.addEventListener('change', () => {
+  const oldU = state.qrsUnit, newU = el.qrsUnit.value;
+  if (oldU !== newU){
+    const ms = oldU === 'ms' ? state.qrsRaw : state.qrsRaw * perMM();
+    state.qrsRaw = newU === 'ms' ? Math.round(ms) : +(ms / perMM()).toFixed(2);
+    el.qrs.value = state.qrsRaw;
+  }
+  state.qrsUnit = newU; render();
+});
+
+el.speed.addEventListener('change', () => {
+  state.speed = parseInt(el.speed.value, 10);
+  render();
+});
+
+el.segSex.addEventListener('click', e => {
+  const b = e.target.closest('button[data-sex]');
+  if (!b) return;
+  state.sex = b.dataset.sex;
+  [...el.segSex.querySelectorAll('button')].forEach(x => x.classList.toggle('active', x === b));
+  render();
+});
+
+el.tgTangent.addEventListener('change', e => {
+  showTangent = e.target.checked;
+  render();
+});
+
+/* ================= СТАРТ ================= */
+el.rr.value = Math.round(state.rr);
+render();
+
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="ААТ.html" title="Препараты, удлиняющие QT">Антиаритмики (EHRA 2025)</a>
+    <a href="ЖА.html" title="Классификация ЖА (РКО 2023)">Желудочковые аритмии</a>
+    <a href="ХСН.html" title="Ведение пациента с ХСН">СНсФВ</a>
+    <a href="ie.html" title="АБТ, влияющая на QT">Инфекционный эндокардит</a>
+    
+  </div>
+</div>
+</body>
+</html>

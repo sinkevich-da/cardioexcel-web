@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>АСК + ПОАК — оценка риска при стабильной ИБС</title>
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:"Segoe UI",system-ui,-apple-system,"Roboto","Helvetica Neue",Arial,sans-serif;
+    color:#0f172a;
+    line-height:1.5;
+    background:#eef2f8;
+    background-image:
+      radial-gradient(900px 420px at 12% -10%, #dbeafe 0%, rgba(219,234,254,0) 65%),
+      radial-gradient(700px 380px at 98% 0%, #ccfbf1 0%, rgba(204,251,241,0) 60%);
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1200px;margin:0 auto;padding:32px 20px 64px}
+
+  /* ---------- HERO ---------- */
+  .hero{margin-bottom:26px}
+  .eyebrow{
+    display:inline-block;font-size:11.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:#1d4ed8;background:#e0e7ff;border-radius:999px;padding:6px 14px;margin-bottom:14px;
+  }
+  .hero h1{margin:0 0 10px;font-size:clamp(21px,2.9vw,31px);line-height:1.25;letter-spacing:-.01em;max-width:940px}
+  .hero p{margin:0;color:#475569;font-size:15px;max-width:940px}
+  .hero .subtitle{margin-top:8px;font-weight:600;color:#1e293b}
+
+  /* ---------- LAYOUT ---------- */
+  .grid{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:20px;align-items:start}
+  @media (max-width:1000px){.grid{grid-template-columns:1fr}}
+  .results{position:sticky;top:24px}
+  @media (max-width:1000px){.results{position:static}}
+
+  .card{
+    background:#fff;border:1px solid #e5eaf2;border-radius:18px;padding:20px 22px;margin-bottom:18px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04),0 14px 34px -24px rgba(15,23,42,.45);
+  }
+  .sec-title{
+    display:flex;align-items:center;gap:10px;margin:0 0 16px;
+    font-size:12.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#1e293b;
+  }
+  .sec-title .num{
+    display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;
+    background:#1d4ed8;color:#fff;font-size:12px;letter-spacing:0;flex:0 0 auto;
+  }
+  .sec-title.warn .num{background:#dc2626}
+  .mini-title{
+    margin:0 0 12px;font-size:12px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;color:#64748b;
+  }
+
+  /* ---------- RADIO (КАГ) ---------- */
+  .radio-group{display:flex;flex-direction:column;gap:10px}
+  .radio{
+    display:flex;align-items:center;gap:13px;padding:13px 15px;border:1px solid #e5eaf2;border-radius:14px;
+    background:#fbfcfe;cursor:pointer;user-select:none;position:relative;
+    transition:background .15s,border-color .15s,box-shadow .15s;
+  }
+  .radio:hover{border-color:#c7d2fe;background:#f7f9ff}
+  .radio input{position:absolute;opacity:0;width:0;height:0}
+  .dot{
+    flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid #cbd5e1;background:#fff;
+    position:relative;transition:border-color .15s,box-shadow .15s;
+  }
+  .dot::after{
+    content:"";position:absolute;top:50%;left:50%;width:10px;height:10px;border-radius:50%;
+    background:#1d4ed8;transform:translate(-50%,-50%) scale(0);transition:transform .16s;
+  }
+  .radio input:checked ~ .dot{border-color:#1d4ed8}
+  .radio input:checked ~ .dot::after{transform:translate(-50%,-50%) scale(1)}
+  .radio input:focus-visible ~ .dot{box-shadow:0 0 0 4px rgba(29,78,216,.22)}
+  .radio:has(input:checked){border-color:#a5b4fc;background:#eef2ff;box-shadow:0 0 0 3px rgba(29,78,216,.06)}
+  .radio .lab{font-size:14.5px;font-weight:600;color:#1e293b;line-height:1.35}
+  .radio .lab small{display:block;font-weight:500;font-size:12.5px;color:#7c8aa0;margin-top:2px}
+  .radio:has(input:checked) .lab{color:#1d4ed8}
+  .field-hint{margin:12px 2px 0;font-size:12.5px;color:#94a3b8}
+
+  /* ---------- SWITCHES ---------- */
+  .switches{display:flex;flex-direction:column;gap:10px}
+  .switch{
+    display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid #e5eaf2;border-radius:14px;
+    background:#fbfcfe;cursor:pointer;user-select:none;position:relative;
+    transition:background .15s,border-color .15s,box-shadow .15s;
+  }
+  .switch:hover{border-color:#c7d2fe;background:#f7f9ff}
+  .switch.on{border-color:#a5b4fc;background:#eef2ff;box-shadow:0 0 0 3px rgba(29,78,216,.06)}
+  .switch.warn.on{border-color:#fca5a5;background:#fef2f2;box-shadow:0 0 0 3px rgba(220,38,38,.06)}
+  .switch input{position:absolute;opacity:0;width:0;height:0}
+  .track{position:relative;flex:0 0 auto;width:46px;height:26px;border-radius:999px;background:#cbd5e1;transition:background .18s}
+  .track::after{
+    content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;
+    box-shadow:0 1px 3px rgba(15,23,42,.32);transition:transform .18s;
+  }
+  .switch input:checked + .track{background:#1d4ed8}
+  .switch.warn input:checked + .track{background:#dc2626}
+  .switch input:checked + .track::after{transform:translateX(20px)}
+  .switch input:focus-visible + .track{box-shadow:0 0 0 4px rgba(29,78,216,.3)}
+  .switch.warn input:focus-visible + .track{box-shadow:0 0 0 4px rgba(220,38,38,.3)}
+  .txt{font-size:14.5px;font-weight:600;color:#1e293b;line-height:1.35}
+  .txt small{display:block;font-weight:500;font-size:12.5px;color:#7c8aa0;margin-top:2px}
+
+  /* ---------- ACTIONS ---------- */
+  .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:4px}
+  button{
+    font-family:inherit;font-size:14px;font-weight:700;padding:11px 20px;border-radius:12px;cursor:pointer;
+    border:1px solid #dbe2ec;background:#fff;color:#334155;transition:.15s;
+  }
+  button:hover{border-color:#a5b4fc;background:#f7f9ff;color:#1d4ed8}
+  button.primary{background:#1d4ed8;border-color:#1d4ed8;color:#fff}
+  button.primary:hover{background:#1740b6;color:#fff}
+
+  /* ---------- RESULT ---------- */
+  .result-card{border-left:6px solid #cbd5e1;transition:background .2s,border-color .2s}
+  .result-card.low{border-left-color:#059669;background:linear-gradient(180deg,#ecfdf5 0%,#fff 70%)}
+  .result-card.mid{border-left-color:#d97706;background:linear-gradient(180deg,#fffbeb 0%,#fff 70%)}
+  .result-card.high{border-left-color:#dc2626;background:linear-gradient(180deg,#fef2f2 0%,#fff 70%)}
+  .rc-label{font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8}
+  .rc-title{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:6px 0 4px;line-height:1.15}
+  .result-card.low .rc-title{color:#047857}
+  .result-card.mid .rc-title{color:#b45309}
+  .result-card.high .rc-title{color:#b91c1c}
+  .rc-sub{font-size:14px;color:#475569}
+
+  /* ---------- CHIPS ---------- */
+  .chips{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .chip{
+    display:flex;flex-direction:column;align-items:center;gap:1px;padding:10px 6px;border-radius:13px;
+    border:1px solid #e5eaf2;background:#f8fafc;transition:.2s;
+  }
+  .chip span{font-size:11.5px;font-weight:800;letter-spacing:.1em;color:#94a3b8}
+  .chip b{font-size:19px;color:#94a3b8;line-height:1.2}
+  .chip.on{border-color:#fecaca;background:#fee2e2}
+  .chip.on span,.chip.on b{color:#b91c1c}
+  .chip-legend{margin-top:12px;font-size:12px;color:#94a3b8;line-height:1.5}
+
+  /* ---------- TACTICS ---------- */
+  .tac-main{font-size:16.5px;font-weight:800;color:#0f172a;line-height:1.4}
+  .tac-main .plus{color:#1d4ed8;padding:0 2px}
+  .tac-note{margin-top:8px;font-size:13px;color:#64748b}
+  .tac-note.warn{color:#b91c1c;font-weight:600}
+
+  /* ---------- CRITERIA ---------- */
+  .crit{list-style:none;margin:0;padding:0}
+  .crit-head{
+    font-size:11.5px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:#64748b;
+    margin:14px 0 8px;
+  }
+  .crit-head:first-child{margin-top:0}
+  .crit-item{display:flex;gap:9px;align-items:flex-start;font-size:13.5px;padding:5px 0;color:#475569}
+  .crit-item .mk{
+    flex:0 0 auto;width:18px;height:18px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:900;margin-top:1px;
+  }
+  .crit-item.ok{color:#0f172a;font-weight:600}
+  .crit-item.ok .mk{background:#dcfce7;color:#15803d}
+  .crit-item.no .mk{background:#f1f5f9;color:#94a3b8}
+
+  /* ---------- INFO ---------- */
+  .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
+  @media (max-width:780px){.info-grid{grid-template-columns:1fr;gap:22px}}
+  .src{margin:0;padding-left:20px;font-size:13px;color:#475569;line-height:1.6}
+  .src li{margin-bottom:8px}
+  .abbr{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0;font-size:13px}
+  .abbr dt{font-weight:800;color:#1d4ed8;white-space:nowrap}
+  .abbr dd{margin:0;color:#475569}
+
+  .disclaimer{
+    margin-top:18px;padding-top:16px;border-top:1px dashed #e2e8f0;
+    font-size:12.5px;color:#94a3b8;line-height:1.6;
+  }
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    margin-top:26px;text-align:center;font-size:13px;color:#7c8aa0;
+  }
+  footer strong{color:#334155}
+
+  @media print{
+    body{background:#fff}
+    .actions,.eyebrow{display:none !important}
+    .results{position:static}
+    .card{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+    .wrap{padding:0}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="eyebrow">Клинический калькулятор</span>
+    <h1>Оценка риска ишемических событий и тромботических осложнений атеросклероза</h1>
+    <p class="subtitle">Выбор между монотерапией АСК и комбинированной антитромботической терапией АСК + ПОАК (ривароксабан 2,5 мг 2 раза в сутки).</p>
+    <p>у пациентов со стабильной ИБС и невысоким риском кровотечений.</p>
+  </header>
+
+  <div class="grid">
+
+    <!-- ================= ВВОД ================= -->
+    <main>
+      <section class="card">
+        <h2 class="sec-title"><span class="num">1</span> Результаты КАГ</h2>
+        <div class="radio-group" role="radiogroup" aria-label="Результаты КАГ">
+          <label class="radio">
+            <input type="radio" name="kag" value="1" checked>
+            <span class="dot"></span>
+            <span class="lab">Стеноз &lt;50% в коронарных артериях ИЛИ КАГ не проводилась</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="kag" value="2">
+            <span class="dot"></span>
+            <span class="lab">Стеноз ≥50% в 1 коронарной артерии</span>
+          </label>
+          <label class="radio">
+            <input type="radio" name="kag" value="3">
+            <span class="dot"></span>
+            <span class="lab">Стеноз ≥50% в ≥2 коронарных артериях</span>
+          </label>
+        </div>
+        <p class="field-hint">В расчётной логике признак «КАГ = 3» соответствует многососудистому поражению.</p>
+      </section>
+
+      <section class="card">
+        <h2 class="sec-title"><span class="num">2</span> Клинические факторы</h2>
+        <div class="switches">
+
+          <label class="switch">
+            <input type="checkbox" data-key="priorMI">
+            <span class="track"></span>
+            <span class="txt">Повторный ИМ<small>перенесённый инфаркт миокарда, в том числе повторный</small></span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="stenosis">
+            <span class="track"></span>
+            <span class="txt">Стеноз ≥50% других сосудистых бассейнов<small>по данным УЗДГ, КТ-ангиографии или ангиографии</small></span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="age65">
+            <span class="track"></span>
+            <span class="txt">Возраст ≥65 лет</span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="smoking">
+            <span class="track"></span>
+            <span class="txt">Курение</span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="diabetes">
+            <span class="track"></span>
+            <span class="txt">Сахарный диабет</span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="hf">
+            <span class="track"></span>
+            <span class="txt">ХСН в анамнезе<small>нетяжёлая хроническая сердечная недостаточность</small></span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="stroke">
+            <span class="track"></span>
+            <span class="txt">Нелакунарный ишемический инсульт в анамнезе<small>более 1 месяца назад</small></span>
+          </label>
+
+          <label class="switch">
+            <input type="checkbox" data-key="gfr">
+            <span class="track"></span>
+            <span class="txt">СКФ &lt;60 мл/мин/1,73 м²</span>
+          </label>
+
+        </div>
+      </section>
+
+      <!-- ================= КРИТЕРИИ ВЫСОКОГО РИСКА КРОВОТЕЧЕНИЯ ================= -->
+      <section class="card">
+        <h2 class="sec-title warn"><span class="num">!</span> Высокий риск кровотечения</h2>
+        <p style="margin:0 0 14px;font-size:13.5px;color:#475569;">Наличие любого из перечисленных критериев является противопоказанием к назначению ПОАК.</p>
+        <div class="switches">
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="ich">
+            <span class="track"></span>
+            <span class="txt">Внутричерепное кровоизлияние или другая внутричерепная патология в анамнезе<small>кроме ишемического инсульта давностью более одного месяца</small></span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="giBleed">
+            <span class="track"></span>
+            <span class="txt">Недавнее кровотечение из ЖКТ или анемия вследствие потери крови из ЖКТ</span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="giPathology">
+            <span class="track"></span>
+            <span class="txt">Другая патология ЖКТ, ассоциирующаяся с повышенным риском кровотечения</span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="liver">
+            <span class="track"></span>
+            <span class="txt">Печёночная недостаточность</span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="diathesis">
+            <span class="track"></span>
+            <span class="txt">Геморрагический диатез</span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="frailty">
+            <span class="track"></span>
+            <span class="txt">Старческий возраст и синдром «хрупкости»</span>
+          </label>
+
+          <label class="switch warn">
+            <input type="checkbox" data-key="dialysis">
+            <span class="track"></span>
+            <span class="txt">ХБП, требующая диализа или рСКФ &lt;15 мл/мин/1,73 м²</span>
+          </label>
+
+        </div>
+      </section>
+
+      <div class="actions" style="margin-top:6px">
+        <button id="btnReset" type="button">Сбросить всё</button>
+      </div>
+    </main>
+
+    <!-- ================= РЕЗУЛЬТАТ ================= -->
+    <aside class="results">
+
+      <div class="card result-card low" id="rcCard">
+        <div class="rc-label">Категория риска</div>
+        <div class="rc-title" id="rcTitle">Низкий риск</div>
+        <div class="rc-sub" id="rcSub">Комбинированная антитромботическая терапия не показана</div>
+      </div>
+
+      <div class="card">
+        <h3 class="mini-title">Индексы</h3>
+        <div class="chips">
+          <div class="chip" id="chipQ"><span>ВТР</span><b>0</b></div>
+          <div class="chip" id="chipR"><span>ВИР</span><b>0</b></div>
+          <div class="chip" id="chipS"><span>СИР</span><b>0</b></div>
+        </div>
+        <p class="chip-legend">
+          ВТР — высокий тромботический риск · ВИР — высокий ишемический риск · СИР — суммарный ишемический риск
+        </p>
+      </div>
+
+      <div class="card">
+        <h3 class="mini-title">Рекомендуемая тактика</h3>
+        <div id="tacBody">
+          <div class="tac-main">АСК 75–100 мг 1 раз в сутки</div>
+          <div class="tac-note">Добавление ПОАК не рекомендуется.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 class="mini-title">Как получен результат</h3>
+        <ul class="crit" id="critList"></ul>
+      </div>
+
+    </aside>
+  </div>
+
+  <!-- ================= СПРАВКА ================= -->
+  <section class="card" style="margin-top:6px">
+    <h2 class="sec-title"><span class="num">i</span> Справочная информация</h2>
+    <div class="info-grid">
+
+      <div>
+        <h3 class="mini-title">Источники</h3>
+        <ol class="src">
+          <li>Eikelboom J.W., Connolly S.J., Bosch J., et al. Rivaroxaban with or without Aspirin in Stable Cardiovascular Disease (COMPASS). <i>N Engl J Med.</i> 2017;377(14):1319–1330.</li>
+          <li>Knuuti J., Wijns W., Saraste A., et al. 2019 ESC Guidelines for the diagnosis and management of chronic coronary syndromes. <i>Eur Heart J.</i> 2020;41(3):407–477.</li>
+          <li>Collet J.-P., Thiele H., Barbato E., et al. 2020 ESC Guidelines for the management of acute coronary syndromes in patients presenting without persistent ST-segment elevation. <i>Eur Heart J.</i> 2021;42(14):1289–1367.</li>
+          <li>Vrints C., Andreotti F., Koskinas K.C., et al. 2024 ESC Guidelines for the management of chronic coronary syndromes. <i>Eur Heart J.</i> 2024;45(36):3415–3537.</li>
+        </ol>
+      </div>
+
+      <div>
+        <h3 class="mini-title">Сокращения</h3>
+        <dl class="abbr">
+          <dt>АСК</dt><dd>ацетилсалициловая кислота</dd>
+          <dt>ПОАК</dt><dd>прямой пероральный антикоагулянт</dd>
+          <dt>ИБС</dt><dd>ишемическая болезнь сердца</dd>
+          <dt>ИМ</dt><dd>инфаркт миокарда</dd>
+          <dt>КАГ</dt><dd>коронароангиография</dd>
+          <dt>СД</dt><dd>сахарный диабет</dd>
+          <dt>ХСН</dt><dd>хроническая сердечная недостаточность</dd>
+          <dt>СКФ</dt><dd>скорость клубочковой фильтрации</dd>
+          <dt>ЖКТ</dt><dd>желудочно-кишечный тракт</dd>
+          <dt>ХБП</dt><dd>хроническая болезнь почек</dd>
+          <dt>ВТР</dt><dd>высокий тромботический риск</dd>
+          <dt>ВИР</dt><dd>высокий ишемический риск</dd>
+          <dt>СИР</dt><dd>суммарный ишемический риск</dd>
+          <dt>ESC</dt><dd>European Society of Cardiology — Европейское общество кардиологов</dd>
+        </dl>
+      </div>
+    </div>
+
+    <p class="disclaimer">
+      Приложение является инструментом информационной поддержки врача и не заменяет индивидуальное клиническое решение.
+      Расчёт применим к пациентам со стабильной ИБС и невысоким риском кровотечений; перед назначением комбинированной
+      терапии необходимо оценить риск кровотечений и сопутствующую терапию.
+    </p>
+  </section>
+
+
+
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- состояние ---------- */
+  var state = {
+    kag: '1',
+    priorMI: false,
+    stenosis: false,
+    age65: false,
+    smoking: false,
+    diabetes: false,
+    hf: false,
+    stroke: false,
+    gfr: false,
+    // Bleeding risk factors
+    ich: false,
+    giBleed: false,
+    giPathology: false,
+    liver: false,
+    diathesis: false,
+    frailty: false,
+    dialysis: false
+  };
+
+  var META = {
+    low:     { title:'Низкий риск',               sub:'Комбинированная антитромботическая терапия не показана', cls:'low'  },
+    mid:     { title:'Умеренный / средний риск',  sub:'Класс рекомендаций IIb, уровень A',                     cls:'mid'  },
+    highA:   { title:'Высокий риск',              sub:'Класс рекомендаций IIa, уровень A',                     cls:'high' },
+    compass: { title:'Высокий риск',              sub:'По критериям исследования COMPASS · класс IIa B',       cls:'high' },
+    bleeding:{ title:'Высокий риск кровотечения', sub:'Комбинированная антитромботическая терапия противопоказана', cls:'high' }
+  };
+
+  var $ = function (id) { return document.getElementById(id); };
+
+  var rcCard  = $('rcCard'),
+      rcTitle = $('rcTitle'),
+      rcSub   = $('rcSub'),
+      chipQ   = $('chipQ'),
+      chipR   = $('chipR'),
+      chipS   = $('chipS'),
+      tacBody = $('tacBody'),
+      critList= $('critList');
+
+  function setChip(el, v) {
+    el.classList.toggle('on', v === 1);
+    el.querySelector('b').textContent = v;
+  }
+
+  /* ---------- расчёт + отрисовка ---------- */
+  function render() {
+    var kag3 = state.kag === '3';
+
+    var mi = state.priorMI, st = state.stenosis, age = state.age65,
+        sm = state.smoking, dm = state.diabetes, hf = state.hf,
+        strk = state.stroke, gfr = state.gfr;
+
+    var minors = [sm, dm, hf, strk, gfr].filter(Boolean).length;
+
+    /* Bleeding risk check */
+    var bleedingKeys = ['ich', 'giBleed', 'giPathology', 'liver', 'diathesis', 'frailty', 'dialysis'];
+    var hasBleedingRisk = bleedingKeys.some(function(k) { return state[k]; });
+
+    /* ВТР */
+    var c1 = mi;
+    var c2 = kag3 && st;
+    var c3 = kag3 && age;
+    var c4 = minors >= 2;
+    var Q  = (c1 || c2 || c3 || c4) ? 1 : 0;
+
+    /* ВИР / СИР */
+    var vascular = !!(mi || st || dm || hf || gfr);
+    var R = (kag3 && vascular) ? 1 : 0;
+    var S = (kag3 || vascular) ? 1 : 0;
+
+    /* категория */
+    var key;
+    if (hasBleedingRisk) {
+      key = 'bleeding';
+    } else if (Q && R) {
+      key = 'highA';
+    } else if (Q) {
+      key = 'compass';
+    } else if (R) {
+      key = 'highA';
+    } else if (S) {
+      key = 'mid';
+    } else {
+      key = 'low';
+    }
+
+    var meta = META[key];
+    rcCard.className = 'card result-card ' + meta.cls;
+    rcTitle.textContent = meta.title;
+    rcSub.textContent   = meta.sub;
+
+    setChip(chipQ, Q);
+    setChip(chipR, R);
+    setChip(chipS, S);
+
+    /* тактика */
+    if (key === 'bleeding') {
+      tacBody.innerHTML =
+        '<div class="tac-main">АСК 75–100 мг 1 раз в сутки</div>' +
+        '<div class="tac-note warn">ПОАК не рекомендуется из-за высокого риска кровотечений.</div>';
+    } else if (key === 'low') {
+      tacBody.innerHTML =
+        '<div class="tac-main">АСК 75–100 мг 1 раз в сутки</div>' +
+        '<div class="tac-note">Добавление ПОАК не рекомендуется.</div>';
+    } else {
+      tacBody.innerHTML =
+        '<div class="tac-main">АСК 75–100 мг <span class="plus">+</span> Ривароксабан 2,5 мг 2 раза в сутки</div>' +
+        '<div class="tac-note">При условии невысокого риска кровотечений.</div>';
+    }
+
+    /* разбор */
+    var items = [];
+
+    if (hasBleedingRisk) {
+      items.push({ h: 'Высокий риск кровотечения (противопоказание к ПОАК)' });
+      items.push({ ok: true, t: 'Выявлен хотя бы один критерий высокого риска кровотечения' });
+    }
+
+    items.push(
+      { h: 'ВТР — высокий тромботический риск (достаточно одного пункта)' },
+      { ok: !!c1, t: 'ИМ в анамнезе' },
+      { ok: !!c2, t: 'КАГ = 3 и стеноз ≥50% других сосудистых бассейнов' },
+      { ok: !!c3, t: 'КАГ = 3 и возраст ≥65 лет' },
+      { ok: !!c4, t: '≥2 факторов: курение, СД, ХСН, инсульт, СКФ &lt;60 (отмечено: ' + minors + ')' },
+      { h: 'ВИР — высокий ишемический риск' },
+      { ok: R === 1, t: 'КАГ = 3 и хотя бы одно из: ИМ, стеноз ≥50%, СД, ХСН, СКФ &lt;60' },
+      { h: 'СИР — суммарный ишемический риск' },
+      { ok: S === 1, t: 'КАГ = 3 или хотя бы одно из: ИМ, стеноз ≥50%, СД, ХСН, СКФ &lt;60' }
+    );
+
+    critList.innerHTML = items.map(function (it) {
+      if (it.h) return '<li class="crit-head">' + it.h + '</li>';
+      return '<li class="crit-item ' + (it.ok ? 'ok' : 'no') + '">' +
+               '<span class="mk">' + (it.ok ? '✓' : '–') + '</span>' +
+               '<span>' + it.t + '</span>' +
+             '</li>';
+    }).join('');
+  }
+
+  /* ---------- обработчики ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.switch input'), function (inp) {
+    inp.addEventListener('change', function () {
+      state[inp.dataset.key] = inp.checked;
+      inp.closest('.switch').classList.toggle('on', inp.checked);
+      render();
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="kag"]'), function (inp) {
+    inp.addEventListener('change', function () {
+      if (inp.checked) {
+        state.kag = inp.value;
+        render();
+      }
+    });
+  });
+
+  $('btnReset').addEventListener('click', function () {
+    Array.prototype.forEach.call(document.querySelectorAll('.switch input'), function (inp) {
+      inp.checked = false;
+      inp.closest('.switch').classList.remove('on');
+    });
+    Object.keys(state).forEach(function (k) {
+      if (typeof state[k] === 'boolean') state[k] = false;
+    });
+    state.kag = '1';
+    document.querySelector('input[name="kag"][value="1"]').checked = true;
+    render();
+  });
+
+  /* ---------- старт ---------- */
+  render();
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="af.html" title="CHA₂DS₂-VA, HAS-BLED при фибрилляции предсердий">ФП · ОАК</a>
+    <a href="поак.html" title="Сроки отмены/возобновления антикоагулянтов">Операция и ПОАК</a>
+    <a href="ARC-HBR.html" title="Оценка высокого риска кровотечений">ARC-HBR</a>
+    <a href="IBS.html" title="Алгоритм при стабильной ИБС">ПТВ ИБС</a>
+    
+  </div>
+</div>
+</body>
+</html>

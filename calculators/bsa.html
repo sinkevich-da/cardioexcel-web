@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор ИМТ и ППТ с поправкой на ампутацию конечностей</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        }
+        body {
+            background: #f4f7fb;
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .app {
+            max-width: 1180px;
+            width: 100%;
+            background: white;
+            border-radius: 28px;
+            box-shadow: 0 20px 40px rgba(0, 20, 40, 0.08), 0 8px 20px rgba(0, 0, 0, 0.02);
+            padding: 2.2rem 2.2rem 2.6rem;
+        }
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            color: #0b2b4a;
+            letter-spacing: -0.02em;
+        }
+        .subhead {
+            color: #4a657d;
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            background: #f0f7ff;
+            border-radius: 0 12px 12px 0;
+            padding: 0.8rem 1.2rem;
+            line-height: 1.5;
+        }
+        
+        /* Сетка: слева ввод, справа результаты */
+        .layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+            gap: 2rem;
+            align-items: stretch;
+        }
+        @media (max-width: 860px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .col {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: #ffffff;
+            border: 1px solid #e2eaf1;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Стили заголовков */
+        .card h2 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #1e3a5f;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+            white-space: nowrap;
+        }
+        .card h2 span {
+            background: #dbeafe;
+            color: #1e4a7a;
+            font-size: 0.8rem;
+            font-weight: 500;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Стили ввода */
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #2c4b6b;
+            margin-bottom: 0.3rem;
+        }
+        input, select {
+            width: 100%;
+            padding: 0.7rem 0.9rem;
+            border: 1px solid #cfdde9;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            background: #fafcfe;
+            transition: 0.15s;
+            margin-bottom: 0.9rem;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+            background: white;
+        }
+
+        .amputations-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.4rem 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .amputations-grid .item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.3rem 0;
+            border-bottom: 1px dashed #e2eaf1;
+        }
+        .amputations-grid .item label {
+            margin-bottom: 0;
+            font-weight: 400;
+            font-size: 0.9rem;
+            flex: 1;
+        }
+        .amputations-grid .item select {
+            width: auto;
+            margin-bottom: 0;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            background: white;
+        }
+
+        /* Стили результатов */
+        .result-box {
+            background: #f8fbfe;
+            border-radius: 16px;
+            padding: 1.2rem 1.4rem;
+            border-left: 4px solid #3b82f6;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0.5rem 0;
+            font-size: 1rem;
+            border-bottom: 1px solid #e7eef5;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        .result-row .label {
+            color: #3e5a75;
+            font-weight: 500;
+        }
+        .result-row .value {
+            font-weight: 600;
+            color: #0b2b4a;
+        }
+        .value.big {
+            font-size: 1.4rem;
+        }
+        .value.muted {
+            color: #9aacbd;
+            font-weight: 500;
+        }
+        .note {
+            font-size: 0.8rem;
+            color: #6b7e91;
+            margin-top: 1rem;
+            line-height: 1.5;
+            background: #f2f6fa;
+            padding: 0.8rem 1rem;
+            border-radius: 12px;
+        }
+        .error {
+            color: #b91c1c;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            font-weight: 500;
+            min-height: 1.1em;
+        }
+        
+        /* Стили источников */
+        .sources {
+            margin-top: 2.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #e2eaf1;
+            font-size: 0.75rem;
+            color: #6b7e91;
+            line-height: 1.5;
+        }
+        .sources h3 {
+            font-size: 0.9rem;
+            color: #3e5a75;
+            margin: 0 0 0.8rem 0;
+        }
+        .sources ul {
+            padding-left: 1.2rem;
+            margin: 0;
+        }
+        .sources li {
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+<div class="app">
+    <h1>ИМТ и ППТ с поправкой на ампутацию конечностей</h1>
+    <div class="subhead">
+        Введите ваши показатели слева. Значения автоматически пересчитываются для обоих методов: 
+        ИМТ корректируется <br/>по процентам массы тела (метод Osterkamp), 
+        ППТ — по процентам площади поверхности (метод Colangelo).
+    </div>
+
+    <div class="layout">
+        <!-- ЛЕВАЯ КОЛОНКА: ВВОД ДАННЫХ (единый блок) -->
+        <div class="col">
+            <div class="card">
+                <h2>Ввод данных <span>общий для расчётов</span></h2>
+                
+                <label>Рост (см)</label>
+                <input type="text" inputmode="decimal" id="heightInput" value="175,0" placeholder="например, 175,0">
+                
+                <label>Вес (кг)</label>
+                <input type="text" inputmode="decimal" id="weightInput" value="70,0" placeholder="например, 70,0">
+
+                <div style="margin: 0.8rem 0 0.4rem; font-weight: 500; color: #2c4b6b; font-size: 0.9rem;">
+                    Ампутированные сегменты
+                </div>
+                <div class="amputations-grid" id="amputationsContainer">
+                    <!-- Заполняется JS -->
+                </div>
+                <div id="inputError" class="error"></div>
+                
+                <div class="note" style="margin-top: auto;">
+                    <strong>Для ИМТ:</strong> кисть 0,7 %, предплечье 1,6 %, плечо 2,7 %, стопа 1,5 %, голень 4,4 %, бедро 10,1 %.<br>
+                    <strong>Для ППТ:</strong> кисть 2,8 %, предплечье 4,0 %, плечо 5,9 %, стопа 3,1 %, голень 6,0 %, бедро 11,9 %.
+                </div>
+            </div>
+        </div>
+
+        <!-- ПРАВАЯ КОЛОНКА: РЕЗУЛЬТАТЫ -->
+        <div class="col">
+            <!-- Результат ИМТ -->
+            <div class="card">
+                <h2>Индекс массы тела (ИМТ) <span>метод Osterkamp</span></h2>
+                <div class="result-box">
+                    <div class="result-row">
+                        <span class="label">Скорректированный вес</span>
+                        <span class="value" id="adjWeight">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="label">Стандартный ИМТ</span>
+                        <span class="value" id="stdBmi">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="label">Скорректированный ИМТ</span>
+                        <span class="value big" id="adjBmi">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="label">Суммарная потеря массы</span>
+                        <span class="value" id="lossWeightPercent">—</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Результат BSA -->
+            <div class="card">
+                <h2>Площадь поверхности тела (ППТ) <span>метод Colangelo</span></h2>
+                <div class="result-box">
+                    <div class="result-row">
+                        <span class="label">Стандартная ППТ (Haycock)</span>
+                        <span class="value" id="stdBsa">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="label">Скорректированная ППТ</span>
+                        <span class="value big" id="adjBsa">—</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="label">Вычтено (сумма % ППТ)</span>
+                        <span class="value" id="lossBsaPercent">—</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- БЛОК ИСТОЧНИКОВ -->
+    <div class="sources">
+        <h3>Источники</h3>
+        <ul>
+            <li>Osterkamp LK. Current perspective on assessment of human body proportions of relevance to amputees. J Am Diet Assoc. 1995 Feb;95(2):215-8. doi: 10.1016/S0002-8223(95)00050-X. PMID: 7852688.</li>
+            <li>Philip M. Colangelo, Dennis W. Welch, Darryl S. Rich, Louis P. Jeffrey, Two methods for estimating body surface area in adult amputees, American Journal of Hospital Pharmacy, Volume 41, Issue 12, 1 December 1984, Pages 2650–2655.</li>
+        </ul>
+    </div>
+</div>
+
+<script>
+    // ---------- МАТЕМАТИЧЕСКОЕ ОКРУГЛЕНИЕ ----------
+    function roundHalfUp(value, decimals) {
+        if (!isFinite(value)) return value;
+        const sign = Math.sign(value) || 1;
+        const factor = Math.pow(10, decimals);
+        const scaled = Math.abs(value) * factor;
+        const rounded = Math.floor(scaled + 0.5 + 1e-9);
+        return sign * rounded / factor;
+    }
+
+    function fmt(value, decimals) {
+        const rounded = roundHalfUp(value, decimals);
+        return rounded.toFixed(decimals).replace('.', ',');
+    }
+
+    function parseNum(str) {
+        if (typeof str === 'number') return str;
+        if (!str) return NaN;
+        const cleaned = String(str).trim().replace(/\s/g, '').replace(',', '.');
+        return parseFloat(cleaned);
+    }
+
+    // ---------- ДАННЫЕ ----------
+    const WEIGHT_PERCENT = {
+        hand: 0.7,
+        forearm: 1.6,
+        upperArm: 2.7,
+        foot: 1.5,
+        lowerLeg: 4.4,
+        thigh: 10.1
+    };
+
+    const BSA_PERCENT = {
+        hand: 2.80,
+        forearm: 4.00,
+        upperArm: 5.90,
+        foot: 3.11,
+        lowerLeg: 6.04,
+        thigh: 11.89
+    };
+
+    const SEGMENT_NAMES = {
+        hand: 'Кисть',
+        forearm: 'Предплечье',
+        upperArm: 'Плечо',
+        foot: 'Стопа',
+        lowerLeg: 'Голень',
+        thigh: 'Бедро'
+    };
+
+    // ---------- ГЕНЕРАЦИЯ ПОЛЕЙ ВЫБОРА ----------
+    function createAmputationSelectors(containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        for (const key in SEGMENT_NAMES) {
+            const div = document.createElement('div');
+            div.className = 'item';
+            const label = document.createElement('label');
+            label.textContent = SEGMENT_NAMES[key];
+            const select = document.createElement('select');
+            select.id = 'amp_' + key;
+            select.innerHTML = `
+                <option value="0">Нет</option>
+                <option value="1">Левая / одна</option>
+                <option value="2">Правая / одна</option>
+                <option value="3">Обе</option>
+            `;
+            div.appendChild(label);
+            div.appendChild(select);
+            container.appendChild(div);
+        }
+    }
+
+    createAmputationSelectors('amputationsContainer');
+
+    // ---------- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ----------
+    function getCount(selectValue) {
+        const v = parseInt(selectValue, 10);
+        if (v === 0) return 0;
+        if (v === 1 || v === 2) return 1;
+        if (v === 3) return 2;
+        return 0;
+    }
+
+    function calculateTotalWeightPercent() {
+        let total = 0;
+        for (const key in WEIGHT_PERCENT) {
+            const select = document.getElementById('amp_' + key);
+            if (!select) continue;
+            const count = getCount(select.value);
+            total += WEIGHT_PERCENT[key] * count;
+        }
+        return total;
+    }
+
+    function calculateTotalBsaPercent() {
+        let total = 0;
+        for (const key in BSA_PERCENT) {
+            const select = document.getElementById('amp_' + key);
+            if (!select) continue;
+            const count = getCount(select.value);
+            total += BSA_PERCENT[key] * count;
+        }
+        return total;
+    }
+
+    // ---------- ГЛАВНАЯ ФУНКЦИЯ РАСЧЁТА ----------
+    function calculateAll() {
+        const heightCm = parseNum(document.getElementById('heightInput').value);
+        const weightKg = parseNum(document.getElementById('weightInput').value);
+        const errorDiv = document.getElementById('inputError');
+
+        const ids = [
+            'stdBmi', 'adjWeight', 'adjBmi', 'lossWeightPercent', 
+            'stdBsa', 'adjBsa', 'lossBsaPercent'
+        ];
+
+        // Валидация
+        if (isNaN(heightCm) || isNaN(weightKg) || heightCm <= 0 || weightKg <= 0) {
+            errorDiv.textContent = 'Введите корректные рост и вес.';
+            ids.forEach(id => {
+                const el = document.getElementById(id);
+                el.textContent = '—';
+                el.classList.add('muted');
+            });
+            return;
+        }
+        errorDiv.textContent = '';
+
+        const heightM = heightCm / 100;
+        const weightPercent = calculateTotalWeightPercent();
+        const bsaPercent = calculateTotalBsaPercent();
+
+        // --- 1. Расчёт ИМТ ---
+        const stdBmi = weightKg / (heightM * heightM);
+        const adjustedWeight = weightPercent > 0 ? weightKg / (1 - weightPercent / 100) : weightKg;
+        const adjBmi = adjustedWeight / (heightM * heightM);
+
+        document.getElementById('stdBmi').textContent = fmt(stdBmi, 1) + ' кг/м²';
+        document.getElementById('adjWeight').textContent = fmt(adjustedWeight, 1) + ' кг';
+        document.getElementById('adjBmi').textContent = fmt(adjBmi, 1) + ' кг/м²';
+        document.getElementById('lossWeightPercent').textContent = fmt(weightPercent, 1) + ' %';
+
+        // --- 2. Расчёт BSA ---
+        const stdBsa = Math.pow(weightKg, 0.5378) * Math.pow(heightCm, 0.3964) * 0.024265;
+        const adjBsa = stdBsa * (1 - bsaPercent / 100);
+
+        document.getElementById('stdBsa').textContent = fmt(stdBsa, 1) + ' м²';
+        document.getElementById('adjBsa').textContent = fmt(adjBsa, 1) + ' м²';
+        document.getElementById('lossBsaPercent').textContent = fmt(bsaPercent, 1) + ' %';
+
+        // Убираем затенение
+        ids.forEach(id => document.getElementById(id).classList.remove('muted'));
+    }
+
+    // ---------- АВТОМАТИЧЕСКИЙ ПЕРЕСЧЁТ ----------
+    document.querySelectorAll('input[type="text"], select')
+        .forEach(el => {
+            el.addEventListener('input', calculateAll);
+            el.addEventListener('change', calculateAll);
+        });
+
+    // Первичный расчёт
+    calculateAll();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="maxЧСС.html" title="Тренировочные зоны ЧСС">Зоны пульса</a>
+    <a href="EGFR.html" title="Расчёт для дозирования">рСКФ / ХБП</a>
+    <a href="операция.html" title="Антропометрия перед операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

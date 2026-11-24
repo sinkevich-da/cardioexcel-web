@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Зоны пульса (ЧСС) — калькулятор по формуле Inbar</title>
+<style>
+  :root{
+    --bg1:#eef3f8;
+    --bg2:#e4ebf2;
+    --card:#ffffff;
+    --text:#17262e;
+    --muted:#64757f;
+    --line:#e3e9ee;
+    --soft:#f5f8fa;
+    --accent:#c62828;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    background:linear-gradient(180deg,var(--bg1) 0%,var(--bg2) 100%);
+    background-attachment:fixed;
+    color:var(--text);
+    -webkit-font-smoothing:antialiased;
+    padding:28px 16px 56px;
+    line-height:1.5;
+  }
+  .wrap{max-width:880px;margin:0 auto}
+
+  /* ---------- Шапка ---------- */
+  header.top{
+    display:flex;align-items:center;gap:14px;margin-bottom:22px;
+  }
+  .logo{
+    width:52px;height:52px;flex:0 0 52px;border-radius:16px;
+    background:linear-gradient(140deg,#ef5350,#b71c1c);
+    display:flex;align-items:center;justify-content:center;
+    box-shadow:0 8px 20px rgba(198,40,40,.28);
+  }
+  .logo svg{width:26px;height:26px;fill:#fff}
+  header.top h1{
+    margin:0;font-size:24px;font-weight:800;letter-spacing:-.4px;
+  }
+  header.top p{
+    margin:2px 0 0;font-size:13.5px;color:var(--muted);
+  }
+
+  /* ---------- Карточка возраста ---------- */
+  .panel{
+    background:var(--card);border-radius:20px;padding:20px 22px;
+    box-shadow:0 2px 4px rgba(23,38,46,.05),0 12px 32px rgba(23,38,46,.07);
+    border:1px solid rgba(255,255,255,.8);
+    margin-bottom:18px;
+  }
+  .panel-label{
+    font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;
+    color:var(--muted);margin:0 0 12px;
+  }
+  .age-row{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .age-input{
+    display:flex;align-items:center;gap:8px;
+    background:var(--soft);border:1.5px solid var(--line);border-radius:14px;
+    padding:6px 14px;transition:border-color .2s, box-shadow .2s;
+  }
+  .age-input:focus-within{border-color:#c62828;box-shadow:0 0 0 4px rgba(198,40,40,.1)}
+  .age-input input[type=number]{
+    width:76px;border:none;background:transparent;font-size:26px;font-weight:800;
+    color:var(--text);text-align:center;outline:none;font-family:inherit;
+    -moz-appearance:textfield;
+  }
+  .age-input input[type=number]::-webkit-outer-spin-button,
+  .age-input input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+  .age-input span{font-size:13px;color:var(--muted);font-weight:600}
+
+  input[type=range]{
+    -webkit-appearance:none;appearance:none;flex:1 1 220px;height:6px;border-radius:6px;
+    background:linear-gradient(90deg,#c62828 0%,#ffb300 55%,#43a047 100%);
+    outline:none;cursor:pointer;min-width:180px;
+  }
+  input[type=range]::-webkit-slider-thumb{
+    -webkit-appearance:none;width:24px;height:24px;border-radius:50%;
+    background:#fff;border:3px solid #c62828;cursor:pointer;
+    box-shadow:0 2px 8px rgba(0,0,0,.22);transition:transform .15s;
+  }
+  input[type=range]::-webkit-slider-thumb:active{transform:scale(1.12)}
+  input[type=range]::-moz-range-thumb{
+    width:20px;height:20px;border-radius:50%;background:#fff;border:3px solid #c62828;
+    cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.22);
+  }
+
+  /* ---------- Максимальный пульс ---------- */
+  .maxhr{
+    margin-top:18px;border-radius:16px;padding:18px 20px;
+    background:linear-gradient(135deg,#2b3a42,#17262e);
+    color:#fff;display:flex;align-items:center;justify-content:space-between;
+    gap:16px;flex-wrap:wrap;position:relative;overflow:hidden;
+  }
+  .maxhr::after{
+    content:"";position:absolute;right:-30px;top:-40px;width:170px;height:170px;
+    border-radius:50%;background:radial-gradient(circle,rgba(239,83,80,.5),transparent 70%);
+  }
+  .maxhr .left{position:relative;z-index:1}
+  .maxhr .cap{font-size:12.5px;letter-spacing:.6px;text-transform:uppercase;color:#9fb3bd;font-weight:700}
+  .maxhr .val{font-size:40px;font-weight:800;line-height:1.1;letter-spacing:-1px}
+  .maxhr .val small{font-size:15px;font-weight:600;color:#9fb3bd;margin-left:6px;letter-spacing:0}
+  .maxhr .formula{
+    position:relative;z-index:1;font-size:13px;color:#b9c9d2;
+    background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);
+    padding:8px 14px;border-radius:10px;font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- Зоны ---------- */
+  .zones-head{
+    display:flex;align-items:center;justify-content:space-between;
+    gap:12px;margin:26px 4px 12px;flex-wrap:wrap;
+  }
+  .zones-head h2{
+    margin:0;font-size:15px;font-weight:800;letter-spacing:.3px;
+    text-transform:uppercase;color:#3c4d57;
+  }
+
+  .card{
+    --c:#999;
+    background:var(--card);border-radius:18px;padding:16px 18px;
+    border:1.5px solid var(--line);
+    box-shadow:0 1px 2px rgba(23,38,46,.04);
+    margin-bottom:12px;position:relative;overflow:hidden;
+  }
+  .card::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:5px;
+    background:var(--c);opacity:.75;
+  }
+
+  .card-head{display:flex;align-items:flex-start;gap:14px}
+  .card-titles{flex:1;min-width:0}
+  .card-titles h3{
+    margin:0;font-size:15.5px;font-weight:750;letter-spacing:-.2px;
+    display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;
+  }
+  .badge{
+    display:inline-block;font-size:11.5px;font-weight:800;color:#fff;
+    background:var(--c);padding:2px 9px;border-radius:20px;letter-spacing:.3px;
+    vertical-align:middle;
+  }
+  .card-sub{
+    margin:3px 0 0;font-size:12.5px;color:var(--muted);font-style:italic;
+  }
+
+  /* Полоса положения зоны */
+  .track{
+    height:6px;border-radius:6px;background:#eef2f5;margin:14px 0 12px;
+    position:relative;overflow:hidden;
+  }
+  .seg{
+    position:absolute;top:0;bottom:0;border-radius:6px;background:var(--c);
+    opacity:.75;
+  }
+
+  .card-body{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+  .desc{margin:0;font-size:13.5px;color:#465761;max-width:430px;flex:1 1 240px}
+  .range{
+    display:flex;align-items:baseline;gap:6px;flex:0 0 auto;
+    font-variant-numeric:tabular-nums;
+  }
+  .range .rlab{
+    font-size:11px;color:var(--muted);font-weight:700;
+    text-transform:uppercase;letter-spacing:.5px;margin-right:3px;
+  }
+  .range b{
+    font-size:23px;font-weight:800;letter-spacing:-.5px;color:#22343d;
+  }
+  .range .dash{color:#c3ced6;font-weight:700;margin:0 4px}
+  .range .unit{font-size:12px;color:var(--muted);font-weight:600;margin-left:2px}
+
+  .card.danger{--c:#8e1616}
+  .card.danger .desc{color:#8e1616;font-weight:600}
+
+  /* ---------- Примечания ---------- */
+  .notes{
+    background:var(--card);border-radius:18px;padding:20px 22px;margin-top:22px;
+    border:1px solid var(--line);box-shadow:0 1px 2px rgba(23,38,46,.04);
+  }
+  .notes h2{
+    margin:0 0 12px;font-size:13px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.7px;color:#3c4d57;
+  }
+  .notes ol{margin:0;padding-left:20px}
+  .notes li{font-size:14px;margin-bottom:10px;color:#31434d}
+  .notes li:last-child{margin-bottom:0}
+  .pulse-list{
+    list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px;
+  }
+  .pulse-list li{
+    display:flex;align-items:center;gap:12px;font-size:13.5px;
+    background:var(--soft);border-radius:11px;padding:10px 14px;margin:0;
+  }
+  .dot{width:10px;height:10px;border-radius:50%;flex:0 0 10px}
+  .dot.g{background:#43a047}.dot.y{background:#ffb300}.dot.r{background:#e53935}
+  .pulse-list b{font-variant-numeric:tabular-nums;min-width:118px;font-weight:800}
+
+  /* ---------- Инфо-блок ---------- */
+  .info{
+    background:var(--card);border-radius:18px;padding:18px 20px;
+    border:1px solid var(--line);box-shadow:0 1px 2px rgba(23,38,46,.04);
+    margin-top:22px;
+  }
+  .info h2{
+    margin:0 0 12px;font-size:13px;font-weight:800;text-transform:uppercase;
+    letter-spacing:.7px;color:#3c4d57;
+  }
+  .info ol{margin:0;padding-left:18px}
+  .info ol li{font-size:12.8px;color:#465761;margin-bottom:9px;line-height:1.5}
+  .info ol li:last-child{margin-bottom:0}
+
+  .disclaimer{
+    margin-top:16px;font-size:12px;color:#7b8b94;line-height:1.6;
+    background:rgba(255,255,255,.6);border:1px dashed #cfd9e0;border-radius:14px;
+    padding:14px 16px;
+  }
+
+  /* ---------- Подвал ---------- */
+  footer{
+    margin-top:28px;text-align:center;padding-top:20px;border-top:1px solid #d9e1e8;
+  }
+  footer .copy{
+    font-size:13px;font-weight:700;color:#3c4d57;letter-spacing:.2px;
+  }
+  footer .copy span{color:var(--accent)}
+  footer .sub{margin-top:4px;font-size:11.5px;color:#8697a1}
+
+  @media print{
+    body{background:#fff;padding:0}
+    .card{break-inside:avoid;box-shadow:none}
+  }
+  @media (max-width:520px){
+    body{padding:18px 12px 40px}
+    header.top h1{font-size:20px}
+    .maxhr .val{font-size:33px}
+    .range b{font-size:20px}
+    .card-body{flex-direction:column;align-items:flex-start}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.7-9.6-9.2C.7 8.3 2.6 4.8 6 4.2c2.1-.4 4.1.6 5.2 2.3h1.6c1.1-1.7 3.1-2.7 5.2-2.3 3.4.6 5.3 4.1 3.6 7.6C19.5 16.3 12 21 12 21z"/></svg>
+    </div>
+    <div>
+      <h1>Зоны пульса (ЧСС)</h1>
+      <p>Расчёт тренировочных зон по формуле Inbar · HRmax = 205,8 − 0,685 × возраст</p>
+    </div>
+  </header>
+
+  <!-- Возраст + максимальный пульс -->
+  <section class="panel">
+    <p class="panel-label">Укажите свой возраст</p>
+    <div class="age-row">
+      <label class="age-input" for="ageNum">
+        <input type="number" id="ageNum" min="10" max="100" value="44" inputmode="numeric" aria-label="Возраст, лет">
+        <span>лет</span>
+      </label>
+      <input type="range" id="ageRange" min="10" max="100" value="44" aria-label="Возраст, ползунок">
+    </div>
+
+    <div class="maxhr">
+      <div class="left">
+        <div class="cap">Пульс по формуле Inbar</div>
+        <div class="val"><span id="hrMax">176</span><small>уд/мин</small></div>
+      </div>
+      <div class="formula" id="formulaTxt">205,8 − 0,685 × 44 = 175,7</div>
+    </div>
+  </section>
+
+  <!-- Зоны -->
+  <div class="zones-head">
+    <h2>Зоны пульса</h2>
+  </div>
+
+  <div id="zones"></div>
+
+  <!-- Примечания -->
+  <section class="notes">
+    <h2>Примечание</h2>
+    <ol>
+      <li>В норме восстановление пульса после активных нагрузок происходит в течение 10–15 минут отдыха.</li>
+      <li>
+        Если перед тренировкой пульс:
+        <ul class="pulse-list">
+          <li><span class="dot g"></span><b>48–60 уд/мин</b><span>отлично</span></li>
+          <li><span class="dot y"></span><b>до 89 уд/мин</b><span>удовлетворительно</span></li>
+          <li><span class="dot r"></span><b>более 90 уд/мин</b><span>неудовлетворительно, тренировку начинать не желательно</span></li>
+        </ul>
+      </li>
+    </ol>
+  </section>
+
+  <!-- Источники -->
+  <section class="info">
+    <h2>Источники</h2>
+    <ol>
+      <li>Inbar O., Oren A., Scheinowitz M., Rotstein A., Dlin R., Casaburi R. <i>Normal cardiopulmonary responses during incremental exercise in 20- to 70-yr-old men.</i> Med Sci Sports Exerc. 1994;26(5):538–546. — формула оценки максимальной ЧСС: HRmax = 205,8 − 0,685 × возраст.</li>
+      <li>ACSM's Guidelines for Exercise Testing and Prescription. American College of Sports Medicine. — классификация интенсивности нагрузки по проценту от максимальной ЧСС.</li>
+    </ol>
+  </section>
+
+  <p class="disclaimer">
+    Материал носит информационно-справочный характер и не является медицинской рекомендацией.
+    Индивидуальные зоны пульса, а также допуск к тренировкам следует согласовать с лечащим врачом.
+  </p>
+
+  
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- Данные зон ---------- */
+  var ZONES = [
+    {
+      id: "z1", from: 0.50, to: 0.60, color: "#43a047",
+      name: "50–60 %", title: "Зона лёгкой активности",
+      sub: "утренняя зарядка, разминка",
+      desc: "Низкая нагрузка. Развивает аэробную базу и помогает восстановиться."
+    },
+    {
+      id: "z2", from: 0.60, to: 0.70, color: "#9ccc65",
+      name: "60–70 %", title: "Начало жиросжигающей зоны",
+      sub: "быстрая ходьба, гимнастика",
+      desc: "Средняя нагрузка. Повышает выносливость и оптимально сжигает калории."
+    },
+    {
+      id: "z3", from: 0.70, to: 0.80, color: "#ffb300",
+      name: "70–80 %", title: "Аэробная зона",
+      sub: "бег, велоспорт",
+      desc: "Высокая нагрузка. Способствует повышению кардиовыносливости."
+    },
+    {
+      id: "z4", from: 0.80, to: 0.90, color: "#fb8c00",
+      name: "80–90 %", title: "Анаэробная нагрузка",
+      sub: "силовая тренировка",
+      desc: "Улучшает физическую выносливость."
+    },
+    {
+      id: "z5", from: 0.90, to: 0.99, color: "#e53935",
+      name: "90–99 %", title: "Максимальная нагрузка",
+      sub: "",
+      desc: "Помогает повысить отдачу энергии и скорость."
+    }
+  ];
+
+  var zonesEl   = document.getElementById("zones");
+  var ageNum    = document.getElementById("ageNum");
+  var ageRange  = document.getElementById("ageRange");
+  var hrMaxEl   = document.getElementById("hrMax");
+  var formulaEl = document.getElementById("formulaTxt");
+
+  /* ---------- Построение карточек ---------- */
+  function build() {
+    ZONES.forEach(function (z) {
+      var card = document.createElement("article");
+      card.className = "card";
+      card.style.setProperty("--c", z.color);
+
+      var leftPct  = ((z.from - 0.50) / 0.50) * 100;
+      var widthPct = ((z.to - z.from) / 0.50) * 100;
+
+      card.innerHTML =
+        '<div class="card-head">' +
+          '<div class="card-titles">' +
+            '<h3><span class="badge">' + z.name + '</span>' + z.title + '</h3>' +
+            (z.sub ? '<p class="card-sub">' + z.sub + '</p>' : '') +
+          '</div>' +
+        '</div>' +
+        '<div class="track"><span class="seg" style="left:' + leftPct + '%;width:' + widthPct + '%"></span></div>' +
+        '<div class="card-body">' +
+          '<p class="desc">' + z.desc + '</p>' +
+          '<div class="range">' +
+            '<span class="rlab">от</span><b data-f="' + z.id + '">—</b>' +
+            '<span class="dash">—</span>' +
+            '<span class="rlab">до</span><b data-t="' + z.id + '">—</b>' +
+            '<span class="unit">уд/мин</span>' +
+          '</div>' +
+        '</div>';
+
+      zonesEl.appendChild(card);
+    });
+
+    /* Карточка 100 % */
+    var danger = document.createElement("article");
+    danger.className = "card danger";
+    danger.style.setProperty("--c", "#8e1616");
+    danger.innerHTML =
+      '<div class="card-head">' +
+        '<div class="card-titles">' +
+          '<h3><span class="badge">100 %</span>Максимальный пульс</h3>' +
+          '<p class="card-sub">предельная частота сердечных сокращений</p>' +
+        '</div>' +
+      '</div>' +
+      '<div class="track"><span class="seg" style="left:0;width:100%"></span></div>' +
+      '<div class="card-body">' +
+        '<p class="desc">Опасно. Достижение максимального пульса недопустимо при самостоятельных тренировках.</p>' +
+        '<div class="range"><b id="hrMaxCard">—</b><span class="unit">уд/мин</span></div>' +
+      '</div>';
+    zonesEl.appendChild(danger);
+  }
+
+  /* ---------- Пересчёт ---------- */
+  function round(n) { return Math.round(n); }
+
+  function update() {
+    var age = parseInt(ageNum.value, 10);
+    if (isNaN(age)) age = 44;
+    age = Math.min(100, Math.max(10, age));
+
+    var hr = 205.8 - 0.685 * age;
+
+    hrMaxEl.textContent = round(hr);
+    var cardMax = document.getElementById("hrMaxCard");
+    if (cardMax) cardMax.textContent = round(hr);
+
+    formulaEl.textContent =
+      "205,8 − 0,685 × " + age + " = " + hr.toFixed(1).replace(".", ",");
+
+    ZONES.forEach(function (z) {
+      var f = document.querySelector('[data-f="' + z.id + '"]');
+      var t = document.querySelector('[data-t="' + z.id + '"]');
+      if (f) f.textContent = round(hr * z.from);
+      if (t) t.textContent = round(hr * z.to);
+    });
+  }
+
+  /* ---------- Синхронизация возраста ---------- */
+  function syncAge(val) {
+    var v = Math.min(100, Math.max(10, val));
+    ageNum.value = v;
+    ageRange.value = v;
+    update();
+  }
+
+  ageNum.addEventListener("input", function () {
+    var v = parseInt(ageNum.value, 10);
+    if (isNaN(v)) return;
+    ageRange.value = Math.min(100, Math.max(10, v));
+    update();
+  });
+  ageNum.addEventListener("blur", function () {
+    var v = parseInt(ageNum.value, 10);
+    syncAge(isNaN(v) ? 44 : v);
+  });
+  ageRange.addEventListener("input", function () {
+    syncAge(parseInt(ageRange.value, 10));
+  });
+
+  /* ---------- Инициализация ---------- */
+  build();
+  update();
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="bsa.html" title="Антропометрия для расчётов">ИМТ и ППТ</a>
+    <a href="ХСН.html" title="Ведение пациента с сердечной недостаточностью">СНсФВ</a>
+    <a href="операция.html" title="Стратификация перед операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

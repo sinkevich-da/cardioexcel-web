@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Рецептурный бланк формы № 107-1/у — печать (A5, 2 на лист A4)</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Times New Roman','Liberation Serif',Times,serif;background:#dfe4ea;color:#000;font-size:14px}
+
+/* ================= ШАПКА ПРИЛОЖЕНИЯ ================= */
+.app-header{position:sticky;top:0;z-index:200;background:#2c3e50;color:#fff;padding:9px 16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.tabs{display:flex;gap:4px}
+.tab{background:transparent;border:1px solid #6b7c8c;color:#cfd8dc;padding:6px 14px;border-radius:4px;cursor:pointer;font-size:14px;font-family:inherit;transition:.15s}
+.tab:hover{background:rgba(255,255,255,.08)}
+.tab.active{background:#3498db;border-color:#3498db;color:#fff}
+.btn{background:#3498db;color:#fff;border:none;padding:7px 14px;border-radius:4px;cursor:pointer;font-size:14px;font-family:inherit;transition:.15s}
+.btn:hover{background:#2980b9}
+.btn.secondary{background:#7f8c8d}.btn.secondary:hover{background:#6c7a7b}
+.btn.danger{background:#e74c3c}.btn.danger:hover{background:#c0392b}
+.btn.green{background:#27ae60}.btn.green:hover{background:#1f8b4d}
+.btn.small{padding:3px 8px;font-size:12px}
+.doctor-field{display:flex;align-items:center;gap:6px;margin-left:auto;font-size:14px;white-space:nowrap}
+.doctor-field input{padding:6px 8px;border-radius:4px;border:1px solid #6b7c8c;width:230px;font-size:14px;font-family:inherit}
+.copyright{display:flex;flex-direction:column;gap:2px;padding:4px 12px;border-left:3px solid #3498db;font-family:Arial,sans-serif;line-height:1.3}
+.copyright-line{font-size:12px;white-space:nowrap}
+.copyright-sub{font-size:10.5px;color:#9fb0bd}
+
+.toolbar{padding:9px 20px;display:flex;gap:16px;align-items:center;background:#ecf0f1;border-bottom:1px solid #cfd8dc;flex-wrap:wrap;font-size:13.5px}
+.toolbar label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.toolbar .hint{margin-left:auto;color:#5d6d7e;font-size:12.5px;max-width:620px;line-height:1.35}
+
+/* ---- быстрый ввод: последние и самые назначаемые препараты ---- */
+.quick-wrap{padding:8px 20px 10px;background:#f7f9fa;border-bottom:1px solid #dfe6ea;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.quick-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.quick-title{color:#5d6d7e;min-width:190px}
+.quick-note{color:#7f8c8d;font-size:12px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{background:#fff;border:1px solid #b8c4cc;border-radius:14px;padding:3px 11px;font-size:12.5px;cursor:pointer;
+      font-family:inherit;color:#1a2733;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip:hover{background:#eaf4fd;border-color:#3498db}
+.chip-badge{background:#3498db;color:#fff;border-radius:9px;padding:0 6px;font-size:11px;margin-left:5px}
+.chips-empty{color:#9aa7b0;font-size:12.5px}
+@keyframes flashIn{0%{background-color:rgba(52,152,219,.5)}100%{background-color:rgba(52,152,219,.07)}}
+.a5 input.flash{animation:flashIn 1.1s ease-out}
+
+.sheets{padding:20px;display:flex;flex-direction:column;align-items:flex-start;gap:26px;overflow-x:auto}
+.sheet{display:flex;flex-direction:row;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.28)}
+
+/* ================= БЛАНК A5 (148,5 x 210 мм) ================= */
+.a5{width:148.5mm;height:210mm;flex:0 0 148.5mm;padding:6mm 6mm 4mm;background:#fff;
+    font-size:9pt;line-height:1.25;color:#000;position:relative;display:flex;flex-direction:column;overflow:visible}
+.a5 + .a5{border-left:1px dashed #ccc}
+@media screen{
+  .a5{outline:1px dashed #c3cdd5;outline-offset:-1px}
+  .a5.hide-screen{display:none!important}
+  .a5 input,.a5 textarea{background-color:rgba(52,152,219,.07);border-radius:2px}
+  .a5 input:focus,.a5 textarea:focus{background-color:rgba(52,152,219,.20)}
+}
+.a5 input,.a5 textarea{font-family:inherit;font-size:inherit;line-height:inherit;color:inherit;border:none;background-color:transparent;padding:0;margin:0;outline:none;width:100%;resize:none;vertical-align:baseline}
+
+/* строки для заполнения — в виде частых точек */
+.a5 input[type="text"]{border-bottom:1px dotted #000}
+
+/* --- шапка бланка --- */
+.r-header{display:flex;justify-content:space-between;margin-bottom:1.5mm;line-height:1.3}
+.r-header-left{flex:1}
+.r-header-right{flex:1;text-align:right}
+.ministry{font-size:9pt;line-height:1.3}
+.med-doc{text-align:left;font-size:9pt;margin:1.5mm 0 1mm 0}
+.code-line{font-size:7.5pt;margin:.6mm 0}
+.code-line input{display:inline-block;width:24mm;font-size:7.5pt;text-align:center}
+
+.stamp-row{display:flex;gap:3mm;margin-bottom:1.5mm;align-items:flex-start}
+.stamp-box{flex:1.2;padding:0 2mm 0 0;font-size:6.5pt;line-height:1.3;text-align:left}
+.form-info{flex:1;display:flex;flex-direction:column;padding:0;gap:1mm}
+.form-number{font-size:10pt;text-align:center;font-weight:normal}
+.approval{font-size:7pt;font-style:italic;text-align:center;line-height:1.3}
+.special-note-wrapper{display:flex;align-items:flex-start;gap:1.5mm;margin-top:.5mm}
+.special-note{flex:1;font-size:7.5pt;line-height:1.35;white-space:pre-wrap;text-align:left}
+.btn-clear-note{padding:1px 5px;font-size:10px;border:1px solid #999;border-radius:2px;cursor:pointer;background:#f0f0f0;line-height:1;flex-shrink:0;font-family:Arial,sans-serif}
+.btn-clear-note:hover{background:#e0e0e0}
+
+.r-title{text-align:center;font-size:14pt;font-weight:bold;margin:1.5mm 0 .5mm 0;letter-spacing:1px}
+.patient-type{text-align:center;font-size:7pt;margin-bottom:2mm}
+.patient-type .pt{cursor:pointer}
+.patient-type .pt.u{text-decoration:underline}
+@media print{.patient-type .pt{cursor:default}}
+
+.privacy-note{
+  margin:6px 0 10px;padding:8px 12px;background:#fff8e6;border:1px solid #f0d89e;
+  border-left:4px solid #e8a000;border-radius:6px;font-size:12px;color:#7a5000;line-height:1.45;
+}
+
+.date-line{display:flex;align-items:baseline;justify-content:center;margin:1.5mm 0;font-size:9pt;white-space:nowrap}
+.date-line input{display:inline-block;text-align:center;font-size:9pt;padding:0 2px}
+.date-line input.day{width:10mm}
+.date-line input.month{width:32mm}
+.date-line input.year{width:9mm}
+
+.info-row{display:flex;margin:1mm 0}
+.info-row.column{flex-direction:column;align-items:flex-start}
+.info-label{font-size:7pt;line-height:1.25}
+.info-row.column .info-label{margin-bottom:.5mm}
+.info-input{width:100%;font-size:9pt;padding:1px 3px}
+
+.rx-block{margin-top:2mm}
+.rx-item{display:flex;align-items:stretch;gap:2mm;margin:1.6mm 0}
+.rx-money{flex:0 0 15mm;width:15mm;padding:0 0 0 .5mm;font-size:6.8pt;
+          display:flex;flex-direction:column;justify-content:center;gap:1.2mm}
+.rx-money-row{display:flex;align-items:baseline;gap:.6mm}
+.rx-money-row span{flex:0 0 auto}
+.rx-money-row input{flex:1;min-width:0;font-size:7pt}
+.rx-lines{flex:1;min-width:0}
+.rx-row{display:flex;align-items:baseline;margin:.5mm 0;width:100%}
+.rx-label{font-weight:bold;font-style:italic;font-size:9pt;min-width:14mm;flex-shrink:0}
+.rx-label-small{font-size:7.5pt}
+.rx-input{flex:1;font-size:9pt;padding:1px 3px;width:100%}
+.rx-input.duplicate{color:#c0392b}
+
+.signature-block{position:relative;margin:7mm 0 1mm 0;font-size:7pt;min-height:15mm}
+.signature-left{max-width:52mm}
+.signature-line{position:absolute;left:50%;transform:translateX(-50%);top:9mm;width:44mm;border-top:1px solid #000}
+.signature-right{position:absolute;right:0;top:9mm;font-size:8pt}
+
+.validity-block{font-size:7pt;margin-top:auto;padding-bottom:1mm}
+.validity-line{display:flex;align-items:baseline;margin:.5mm 0;font-size:7pt}
+.validity-line input{display:inline-block;width:16mm;text-align:center;font-size:8pt;padding:0 2px}
+
+/* --- оборотная сторона --- */
+.commission-block{border:1px solid #000;padding:2mm;min-height:48mm;font-size:8pt}
+.commission-title{font-weight:bold;margin-bottom:1.5mm;font-size:8pt;line-height:1.2}
+.commission-text{width:100%;height:38mm;font-size:8pt;line-height:1.3}
+.pharmacy-table{width:100%;border-collapse:collapse;margin-top:3mm;font-size:8pt}
+.pharmacy-table td{border:1px solid #000;padding:1.5mm;text-align:center;width:33.33%}
+.pharmacy-table .ph-label{font-weight:normal;padding-bottom:1mm}
+.pharmacy-table .ph-line{height:12mm;vertical-align:top}
+.pharmacy-table .ph-line input{text-align:center;font-size:8pt}
+
+/* ================= АВТОДОПОЛНЕНИЕ ================= */
+.autocomplete-wrapper{position:relative;flex:1}
+.ac-list{position:absolute;z-index:1000;top:100%;left:0;right:0;max-height:58mm;overflow-y:auto;
+         background:#fff8d6;border:2px solid #8b5a2b;border-radius:3px;box-shadow:0 4px 10px rgba(139,90,43,.45);display:none}
+.ac-list.on{display:block}
+.ac-item{padding:1.6mm 2.5mm;cursor:pointer;border-bottom:1px solid #e6cf8b;color:#5a2d0c;font-size:8.5pt}
+.ac-item:last-child{border-bottom:none}
+.ac-item:hover,.ac-item.sel{background:#f2c14e;color:#3a1c00}
+.ac-item .ac-n{font-weight:bold}
+.ac-item .ac-d{font-size:7.5pt;color:#7a5330}
+
+/* ================= БАЗА ПРЕПАРАТОВ ================= */
+.drugs-wrap{padding:20px;max-width:1180px;margin:0 auto}
+.drugs-wrap h2{margin:0 0 12px}
+.drug-form{display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fff;padding:14px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,.08);margin-bottom:12px}
+.drug-form input{padding:8px 10px;border:1px solid #bdc3c7;border-radius:4px;font-size:14px;font-family:inherit;flex:1 1 180px;min-width:140px}
+.drug-form input#drugName{flex:2 1 240px}
+.drug-tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.drug-tools input[type=search]{padding:7px 10px;border:1px solid #bdc3c7;border-radius:4px;font-size:14px;font-family:inherit;min-width:260px}
+.drug-table{width:100%;border-collapse:collapse;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.drug-table th,.drug-table td{padding:8px 12px;text-align:left;border-bottom:1px solid #ecf0f1;font-size:14px;vertical-align:top}
+.drug-table th{background:#34495e;color:#fff;font-weight:500}
+.drug-table tr:last-child td{border-bottom:none}
+.drug-table td.num{width:44px;color:#7f8c8d}
+.drug-table td.actions{white-space:nowrap;width:1%}
+.drug-table tr.is-dup td{background:#fdecea}
+.drug-table tr.is-dup td.num{color:#c0392b;font-weight:bold}
+.error{background:#fdecea;color:#c0392b;border:1px solid #f5c6cb;padding:10px 14px;border-radius:4px;margin-bottom:12px}
+.ok{background:#eafaf1;color:#1e7e34;border:1px solid #b7e4c7;padding:10px 14px;border-radius:4px;margin-bottom:12px}
+[hidden]{display:none!important}
+.overflow-warn{background:#fff3cd;color:#8a6d3b;border:1px solid #ffe08a;padding:8px 12px;border-radius:4px;margin:0 20px 12px;font-size:13px}
+.info-note{background:#eaf4fd;color:#1c4c73;border:1px solid #b8dcf5;padding:8px 12px;border-radius:4px;margin:0 20px 12px;font-size:13px}
+
+/* ================= ПЕЧАТЬ ================= */
+@media print{
+  @page{size:A4 landscape;margin:0}
+  html,body{background:#fff!important;margin:0!important;padding:0!important;width:297mm}
+  .no-print{display:none!important}
+  #tab-drugs{display:none!important}
+  .overflow-warn{display:none!important}
+  .sheets{padding:0;margin:0;gap:0;display:block;overflow:visible}
+  .sheet{width:297mm;height:210mm;display:flex;flex-direction:row;justify-content:flex-start;
+         box-shadow:none;background:#fff;overflow:hidden;margin:0;padding:0;position:relative;
+         page-break-after:always;break-after:page;page-break-inside:avoid;break-inside:avoid}
+  .sheet.back-sheet{page-break-after:auto;break-after:auto}
+
+  /* Линия разреза — всегда ровно по центру, независимо от зеркалирования */
+  .sheet::after{
+    content:'';
+    position:absolute;
+    left:50%;
+    top:0;
+    height:100%;
+    border-left:1px dashed #999;
+    pointer-events:none;
+    z-index:10;
+  }
+  .a5 + .a5{border-left:none!important}
+
+  body.no-back .sheet.back-sheet{display:none!important}
+  body.no-back .sheet.front-sheet{page-break-after:auto;break-after:auto}
+  body.mirror-back .sheet.back-sheet{flex-direction:row-reverse}
+
+  .a5{flex:0 0 148.5mm;width:148.5mm;height:210mm;outline:none!important;box-shadow:none;background:#fff!important;overflow:hidden;padding:5mm 5mm 3.5mm}
+  .a5 input,.a5 textarea{background-color:transparent!important;border-radius:0}
+  .a5 input::placeholder,.a5 textarea::placeholder{color:transparent!important}
+  /* Непечатаемая половина остаётся белым блоком, содержимое полностью убирается */
+  .a5.hide-print{display:flex!important;background:#fff!important}
+  .a5.hide-print > *{display:none!important}
+  .ac-list{display:none!important}
+  .btn-clear-note{display:none!important}
+  .privacy-note{display:none!important}
+}
+</style>
+</head>
+<body>
+
+<header class="app-header no-print">
+  <div class="tabs">
+    <button class="tab active" data-tab="recept">Рецепт</button>
+    <button class="tab" data-tab="drugs">База препаратов</button>
+  </div>
+  <label class="doctor-field">Врач:
+    <input id="doctorTop" placeholder="Фамилия И.О." autocomplete="off">
+  </label>
+  <button class="btn green" id="printBtn">🖨 Печать</button>
+  <div class="copyright">
+    <div class="copyright-line">© 2026 Врач-кардиолог, к.м.н. <b>Синкевич Д.А.</b></div>
+    <div class="copyright-line copyright-sub">г. Иркутск · Форма 107-1/у · ред. 2026</div>
+  </div>
+</header>
+
+<main>
+  <section id="tab-recept">
+    <div class="toolbar no-print" autocomplete="off">
+      <button class="btn danger" id="clearBtn">Очистить бланки</button>
+      <label><input type="checkbox" id="printBack" autocomplete="off" checked> Печатать оборотную сторону</label>
+      <label><input type="checkbox" id="mirrorBack" autocomplete="off"> Зеркалить оборот (для дуплекса «по короткому краю»)</label>
+      <label><input type="checkbox" id="autoCopy" autocomplete="off" checked> Автоперенос ФИО и даты рождения во 2-й бланк</label>
+      <label><input type="checkbox" id="forceBoth" autocomplete="off"> Печатать оба бланка, даже если 2-й пустой</label>
+      <label title="ФИО и дата рождения — персональные данные. По умолчанию они НЕ сохраняются на устройстве и исчезают при закрытии окна. Включите, чтобы хранить их в браузере.">
+        <input type="checkbox" id="persistPatient" autocomplete="off"> Сохранять ФИО и дату рождения на устройстве
+      </label>
+    </div>
+    <div class="privacy-note no-print" id="privacyNote">
+      ФИО пациента и дата рождения хранятся только в памяти этой вкладки и не сохраняются на устройстве,
+      пока не включён пункт «Сохранять ФИО и дату рождения на устройстве». Персональные данные никуда не передаются.
+    </div>
+
+    <div class="quick-wrap no-print">
+      <div class="quick-row">
+        <span class="quick-title">Последние 5 препаратов:</span>
+        <div class="chips" id="recentChips"></div>
+      </div>
+      <div class="quick-row">
+        <span class="quick-title">Самые назначаемые (топ-5):</span>
+        <div class="chips" id="topChips"></div>
+      </div>
+      <div class="quick-row">
+        <span class="quick-note">Нажмите на препарат — он подставится в свободную строку Rp текущего бланка вместе с D. t. d. N. и S.</span>
+        <button class="btn small secondary" id="resetUsageBtn" type="button" style="margin-left:auto">Сбросить статистику</button>
+      </div>
+    </div>
+    <div class="overflow-warn no-print" id="overflowWarn" hidden>⚠ Содержимое одного из бланков не помещается на A5. Сократите текст в полях.</div>
+    <div class="info-note no-print" id="secondHint" hidden>ℹ Второй бланк открыт для заполнения, но на печать он не выводится, пока в нём нет ни одного препарата. Нужен пустой второй бланк на печати — включите «Печатать оба бланка».</div>
+    <div class="sheets" id="sheets"></div>
+  </section>
+
+  <section id="tab-drugs" hidden>
+    <div class="drugs-wrap">
+      <h2>База лекарственных препаратов</h2>
+      <form id="drugForm" class="drug-form" autocomplete="off">
+        <input id="drugName" placeholder="Название препарата (Rp.:)" required>
+        <input id="drugDtd" placeholder="D. t. d. N.">
+        <input id="drugS" placeholder="S.">
+        <button class="btn" type="submit" id="drugSubmitBtn">Добавить</button>
+        <button class="btn secondary" type="button" id="drugCancelBtn" hidden>Отмена</button>
+      </form>
+      <div id="drugMsg" class="error" hidden></div>
+
+      <div class="drug-tools">
+        <input type="search" id="drugSearch" placeholder="Поиск по названию, D. t. d. N., S.">
+        <button class="btn secondary" type="button" id="dupCheckBtn">Проверить базу на повторы</button>
+        <button class="btn secondary" type="button" id="exportBtn">Экспорт базы (JSON)</button>
+        <button class="btn secondary" type="button" id="importBtn">Импорт базы (JSON)</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+        <button class="btn danger" type="button" id="resetDbBtn">Сбросить к исходной</button>
+        <span id="drugCount" style="color:#5d6d7e"></span>
+      </div>
+
+      <table class="drug-table">
+        <thead><tr><th style="width:44px">№</th><th>Название</th><th>D. t. d. N.</th><th>S.</th><th></th></tr></thead>
+        <tbody id="drugTbody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+/* =====================================================================
+   КОНСТАНТЫ И localStorage
+   ===================================================================== */
+const MONTHS = ['января','февраля','марта','апреля','мая','июня',
+                'июля','августа','сентября','октября','ноября','декабря'];
+const DEFAULT_SPECIAL = 'По спец.назначению.\nЕжемесячно.\nВр.Синкевич Д.А.';
+const LS = { drugs:'drugDB_107_v3', doctor:'doctorName_107', forms:'recept107_forms_v5' };
+const LS_SETTINGS = 'recept107_settings_v1';
+
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad2 = n => String(n).padStart(2,'0');
+const norm = s => String(s == null ? '' : s).toLowerCase().replace(/\s+/g,' ').replace(/[.\u00a0]+$/,'').trim();
+
+function lsGet(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+function lsJSON(k,def){ try{ const v = JSON.parse(lsGet(k)); return v == null ? def : v; }catch(e){ return def; } }
+
+/* =====================================================================
+   НАСТРОЙКИ ПЕЧАТИ (сохраняются в localStorage — независимо от браузера)
+   ===================================================================== */
+const DEFAULT_SETTINGS = { forceBoth:false, printBack:true, mirrorBack:false, autoCopy:true, persistPatient:false };
+
+function loadSettings(){
+  const s = Object.assign({}, DEFAULT_SETTINGS, lsJSON(LS_SETTINGS, {}) || {});
+  document.getElementById('forceBoth').checked      = !!s.forceBoth;
+  document.getElementById('printBack').checked      = !!s.printBack;
+  document.getElementById('persistPatient').checked = !!s.persistPatient;
+  document.getElementById('mirrorBack').checked = !!s.mirrorBack;
+  document.getElementById('autoCopy').checked   = !!s.autoCopy;
+}
+function saveSettings(){
+  lsSet(LS_SETTINGS, JSON.stringify({
+    forceBoth:  document.getElementById('forceBoth').checked,
+    printBack:  document.getElementById('printBack').checked,
+    mirrorBack: document.getElementById('mirrorBack').checked,
+    autoCopy:   document.getElementById('autoCopy').checked,
+    persistPatient: document.getElementById('persistPatient').checked
+  }));
+}
+function isPersistPatient(){
+  try { return !!document.getElementById('persistPatient').checked; }
+  catch(_) { return false; }
+}
+
+/* Сохранение форм. По умолчанию персональные данные пациента (ФИО, дата
+   рождения) НЕ записываются в localStorage. Препараты, врач и прочие
+   настройки формы сохраняются как раньше. ФИО/дата рождения перед записью
+   затираются, если не включён persistPatient — это исключает их
+   попадание на устройство без явного согласия пользователя. */
+function saveForms(){
+  let data = forms;
+  if (!isPersistPatient()){
+    data = forms.map(f => {
+      const c = Object.assign({}, f);
+      c.patientName = '';
+      c.birthDate = '';
+      return c;
+    });
+  }
+  lsSet(LS.forms, JSON.stringify(data));
+}
+
+/* =====================================================================
+   ИСХОДНАЯ БАЗА ПРЕПАРАТОВ
+   ===================================================================== */
+const DEFAULT_DRUGS = [
+  { name: "Hydroxyzini 25 mg", dtd: "25 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Венлафаксин 75 мг", dtd: "30 in capsulis", s: "По 1 капсуле 1 раз в день внутрь" },
+  { name: "Perindoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Lisinoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Ramiprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Indapamidi 2,5 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Chlortalidoni 12,5 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Hydrochlorothiazidi 12,5 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Torasemidi", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Spironolactoni 25 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Losartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Valsartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Гипосарт 8 мг", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Telmisartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Azilsartani 40 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Норваск 10 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Lercanidipini", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Moxonidini", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Nifedipini 30 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Methyldopae 250 mg", dtd: "50 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Labetaloli 100 mg", dtd: "100 in tabulettis", s: "По 2 таблетки 2 раза в день внутрь." },
+  { name: "Metoprololi succinatis 25 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Бемпедоевая кислота 180 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Indapamidi et Lisinoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Lisinoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Indapamidi et Perindoprili", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Perindoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Bisoprololi et Perindoprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Indapamidi et Ramiprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Ramiprili", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Телинстар 1,5 мг+40 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Telmisartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Hydrochlorothiazidi et Candesartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Hydrochlorothiazidi et Telmisartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Candesartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Hydrochlorothiazidi et Valsartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Valsartani", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Valsartani et Sacubitril 50 mg (25,7 mg+24,3 mg)", dtd: "56 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Valsartani et Sacubitril 100 mg (51,4 mg+48,6 mg)", dtd: "56 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Valsartani et Sacubitril 200 mg (102,8 mg+97,2 mg)", dtd: "56 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Amlodipini et Losartani", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Azilsartani et Chlortalidoni", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Amlodipini et Irbesartani 10 mg + 300 mg", dtd: "56 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Торвазин Плюс 20 мг+ 10 мг", dtd: "90 in capsulis", s: "По 1 капсуле 1 раз в день внутрь." },
+  { name: "Rosuvastatini", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Pitavastatini", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Липобон 10 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Acidi bempedoici 180 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Форсига 10 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Empagliflozini 10 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Eplerenoni 25 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Bisoprololi", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Carvediloli 25 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Amiodaroni 200 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Digoxini 0,25 mg", dtd: "50 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Соталол 160 мг", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Propafenoni 150 mg", dtd: "50 in tabulettis", s: "По 1 таблетке 3 раза в день внутрь." },
+  { name: "Flecainidi 100 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Этацизин/Этацунорм 50 mg", dtd: "50 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Acidi acetylsalicylici 75 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Clopidogreli 75 mg", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Ривароксабан 20 мг", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь во время еды." },
+  { name: "Apixabani", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Dabigatrani etexilatis 150 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Rosuvastatini et Ezetimibi", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Atorvastatini et Ezetimibi", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Finerenoni 10 mg", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Sertralini 100 mg", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Escitaloprami 10 mg", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Tofisopami 50 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Etifoxini 50 mg", dtd: "60 in capsulis", s: "По 1 капсуле 2 раза в день внутрь." },
+  { name: "Mirtazapini Q-tab disp 15 mg", dtd: "60 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Sertralini 50 mg", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Урсосан 250 мг", dtd: "300 in capsulis", s: "По 2 капсулы 3 раза в день внутрь." },
+  { name: "Апроваск 10мг+300 мг", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Супрозафен 10мг+145 мг", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Конкор 5 мг", dtd: "50 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Аминофенилмасляная кислота", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Адаптол 500 мг", dtd: "60 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Милдронат 500 мг", dtd: "160 in capsulis", s: "По 1 капсуле 2 раза в день внутрь (курсами осень-весна)" },
+  { name: "Вамлосет 5 мг+160 мг", dtd: "360 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Милурит 100 мг", dtd: "300 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Зенон 10мг + 10 мг", dtd: "90 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Доксициклин Солюшн Таблетс 100 мг", dtd: "10 in tabulettis", s: "По 2 таблетки однократно внутрь." },
+  { name: "Андрогель 10 мг/г", dtd: "30 пакет для наружного применения", s: "По 1 пакету наружно" },
+  { name: "Алимемазин 5 мг", dtd: "50 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "ВальсакорИНДА 160мг + 1,5 мг", dtd: "30 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Аллапинин 25 мг", dtd: "30 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." },
+  { name: "Флуоксетин", dtd: "30 in capsulis", s: "По 1 капсуле 1 раз в день внутрь" },
+  { name: "Дулоксетин 60 мг", dtd: "30 in capsulis", s: "По 1 капсуле 1 раз в день внутрь" },
+  { name: "Бринтелликс 5 мг", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Бринтелликс 10 мг", dtd: "28 in tabulettis", s: "По 1 таблетке 1 раз в день внутрь." },
+  { name: "Венлафаксин 150 мг", dtd: "30 in capsulis", s: "По 1 капсуле 1 раз в день внутрь" },
+  { name: "Аминофенилмасляной кислоты гидрохлорид (Фенибут) 250 мг", dtd: "50 in tabulettis", s: "По 1 таблетке 2 раза в день внутрь." }
+];
+
+/* =====================================================================
+   СОСТОЯНИЕ
+   ===================================================================== */
+function emptyDrug(){ return { name:'', dtd:'', s:'' }; }
+
+function emptyForm(){
+  const t = new Date();
+  return {
+    okud:'', okpo:'',
+    dateDay: pad2(t.getDate()), dateMonth: MONTHS[t.getMonth()], dateYear: String(t.getFullYear()).slice(-2),
+    patientName:'', birthDate:'', patientType:'',
+    drugs:[ emptyDrug(), emptyDrug(), emptyDrug() ],
+    rub:'', kop:'',
+    validityDays:'',
+    commission:'', special: DEFAULT_SPECIAL,
+    prepared:'', checked:'', issued:''
+  };
+}
+
+const TEXT_KEYS = ['okud','okpo','dateDay','dateMonth','dateYear','patientName','birthDate','patientType',
+                   'rub','kop','validityDays','commission','special','prepared','checked','issued'];
+
+function formFrom(o){
+  const f = emptyForm();
+  if (o && typeof o === 'object'){
+    TEXT_KEYS.forEach(k => { if (typeof o[k] === 'string') f[k] = o[k]; });
+    if (Array.isArray(o.drugs)){
+      for (let i=0;i<3;i++){
+        const d = o.drugs[i];
+        if (d) f.drugs[i] = { name:String(d.name||''), dtd:String(d.dtd||''), s:String(d.s||'') };
+      }
+    }
+  }
+  return f;
+}
+
+function loadDrugs(){
+  const raw = lsJSON(LS.drugs, null);
+  if (Array.isArray(raw) && raw.length){
+    return raw.map(d => ({ name:String(d && d.name || ''), dtd:String(d && d.dtd || ''), s:String(d && d.s || '') }))
+              .filter(d => d.name);
+  }
+  return DEFAULT_DRUGS.map(d => ({ ...d }));
+}
+
+let drugs  = loadDrugs();
+let forms  = (() => { const a = lsJSON(LS.forms, null); return [ formFrom(a && a[0]), formFrom(a && a[1]) ]; })();
+let doctor = lsGet(LS.doctor) || '';
+/* Последние значения, которые мы сами записали во 2-й бланк автопереносом.
+   Нужны, чтобы дозаполнять 2-й бланк при изменении 1-го, но не затирать
+   ручные правки, сделанные во 2-м бланке. */
+let autoFilledPatient = { patientName:'', birthDate:'' };
+
+function saveDrugs(){ lsSet(LS.drugs, JSON.stringify(drugs)); }
+
+/* =====================================================================
+   ДОСТУП К ПОЛЯМ
+   ===================================================================== */
+function getVal(path){
+  if (path === 'doctor') return doctor;
+  const p = path.split('.');
+  let o = forms;
+  for (let i=0;i<p.length;i++){ o = o[p[i]]; if (o == null) return ''; }
+  return o;
+}
+function setVal(path, val){
+  if (path === 'doctor'){ doctor = val; return; }
+  const p = path.split('.');
+  let o = forms;
+  for (let i=0;i<p.length-1;i++) o = o[p[i]];
+  o[p[p.length-1]] = val;
+}
+
+/* =====================================================================
+   РАЗМЕТКА БЛАНКА
+   ===================================================================== */
+function rpHTML(i, k){
+  return `
+  <div class="rx-item">
+    <div class="rx-money">
+      <div class="rx-money-row"><span>руб.</span><input type="text" maxlength="6" data-bind="${i}.rub"></div>
+      <div class="rx-money-row"><span>коп.</span><input type="text" maxlength="6" data-bind="${i}.kop"></div>
+    </div>
+    <div class="rx-lines">
+      <div class="rx-row">
+        <div class="rx-label">Rp.:</div>
+        <div class="autocomplete-wrapper">
+          <input type="text" class="rx-input drug-name" data-bind="${i}.drugs.${k}.name" data-drug="${i}.${k}" autocomplete="off">
+        </div>
+      </div>
+      <div class="rx-row">
+        <div class="rx-label rx-label-small">D. t. d. N.</div>
+        <input type="text" class="rx-input" data-bind="${i}.drugs.${k}.dtd" data-dtd="${i}.${k}">
+      </div>
+      <div class="rx-row">
+        <div class="rx-label rx-label-small">S.</div>
+        <input type="text" class="rx-input" data-bind="${i}.drugs.${k}.s" data-s="${i}.${k}">
+      </div>
+    </div>
+  </div>`;
+}
+
+function frontHTML(i){
+  return `
+<div class="a5 front" data-form="${i}" data-side="front">
+
+  <div class="r-header">
+    <div class="r-header-left">
+      <div class="ministry">Министерство здравоохранения<br>Российской Федерации</div>
+      <div class="med-doc">Медицинская документация</div>
+    </div>
+    <div class="r-header-right">
+      <div class="code-line">Код формы по ОКУД <input data-bind="${i}.okud"></div>
+      <div class="code-line">Код учреждения по ОКПО <input data-bind="${i}.okpo"></div>
+    </div>
+  </div>
+
+  <div class="stamp-row">
+    <div class="stamp-box">
+      Наименование (штамп) медицинской организации<br>
+      Наименование (штамп) индивидуального предпринимателя<br>
+      (указать адрес, номер и дату лицензии,<br>
+      наименование органа государственной власти,<br>
+      выдавшего лицензию)
+    </div>
+    <div class="form-info">
+      <div class="form-number">Форма N 107-1/у</div>
+      <div class="approval">
+        Утверждена приказом Министерства<br>
+        здравоохранения Российской Федерации<br>
+        от 24 ноября 2021 г. N 1094н
+      </div>
+      <div class="special-note-wrapper">
+        <textarea class="special-note" rows="3" data-bind="${i}.special"></textarea>
+        <button type="button" class="btn-clear-note" data-clear-special="${i}" title="Очистить">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="r-title">РЕЦЕПТ</div>
+  <div class="patient-type" data-ptype="${i}">(<span class="pt" data-pt="adult">Взрослый</span>, <span class="pt" data-pt="child">Детский</span> — нужное подчеркнуть)</div>
+
+  <div class="date-line">
+    <span>«</span><input type="text" class="day" maxlength="2" data-bind="${i}.dateDay"><span>»</span><input type="text" class="month" data-bind="${i}.dateMonth"><span>20</span><input type="text" class="year" maxlength="2" data-bind="${i}.dateYear"><span>г.</span>
+  </div>
+
+  <div class="info-row column">
+    <div class="info-label">Фамилия, инициалы имени и отчества (последнее — при наличии) пациента</div>
+    <input type="text" class="info-input" data-bind="${i}.patientName" data-patient="${i}">
+  </div>
+  <div class="info-row column">
+    <div class="info-label">Дата рождения</div>
+    <input type="text" class="info-input" data-bind="${i}.birthDate" data-birth="${i}" inputmode="numeric" maxlength="10">
+  </div>
+  <div class="info-row column">
+    <div class="info-label">Фамилия, инициалы имени и отчества (последнее — при наличии) лечащего врача (фельдшера, акушерки)</div>
+    <input type="text" class="info-input" data-bind="doctor">
+  </div>
+
+  <div class="rx-block">
+    ${rpHTML(i,0)}
+    ${rpHTML(i,1)}
+    ${rpHTML(i,2)}
+  </div>
+
+  <div class="signature-block">
+    <div class="signature-left">
+      Подпись и печать лечащего врача<br>(подпись фельдшера, акушерки)
+    </div>
+    <div class="signature-line"></div>
+    <div class="signature-right">М.П.</div>
+  </div>
+
+  <div class="validity-block">
+    <div>Рецепт действителен в течение 60 дней, до 1 года</div>
+    <div class="validity-line">
+      <span>(нужное подчеркнуть) (</span><input type="text" data-bind="${i}.validityDays"><span>) (указать количество дней)</span>
+    </div>
+  </div>
+</div>`;
+}
+
+function backHTML(i){
+  return `
+<div class="a5 back" data-form="${i}" data-side="back">
+  <div class="commission-block">
+    <div class="commission-title">Отметка о назначении лекарственного препарата по решению врачебной комиссии</div>
+    <textarea class="commission-text" data-bind="${i}.commission" spellcheck="false"></textarea>
+  </div>
+
+  <table class="pharmacy-table">
+    <tbody>
+      <tr><td class="ph-label">Приготовил</td><td class="ph-label">Проверил</td><td class="ph-label">Отпустил</td></tr>
+      <tr>
+        <td class="ph-line"><input type="text" data-bind="${i}.prepared"></td>
+        <td class="ph-line"><input type="text" data-bind="${i}.checked"></td>
+        <td class="ph-line"><input type="text" data-bind="${i}.issued"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>`;
+}
+
+/* =====================================================================
+   РЕНДЕР
+   ===================================================================== */
+const sheetsEl = document.getElementById('sheets');
+
+function render(){
+  sheetsEl.innerHTML =
+    `<div class="sheet front-sheet" id="frontSheet">${frontHTML(0)}${frontHTML(1)}</div>
+     <div class="sheet back-sheet" id="backSheet">${backHTML(0)}${backHTML(1)}</div>`;
+  bindAll();
+  initAutoFilledPatient();
+  document.getElementById('doctorTop').value = doctor;
+  updatePtype(0); updatePtype(1);
+  refreshVisibility();
+}
+
+/* =====================================================================
+   ДАТА РОЖДЕНИЯ И ВОЗРАСТ
+   ===================================================================== */
+function formatBirth(v){
+  const d = String(v).replace(/\D/g,'').slice(0,8);
+  if (d.length <= 2) return d;
+  if (d.length <= 4) return d.slice(0,2) + '.' + d.slice(2);
+  return d.slice(0,2) + '.' + d.slice(2,4) + '.' + d.slice(4);
+}
+function parseBirth(str){
+  const m = String(str||'').match(/(\d{1,2})[.\-\/\s](\d{1,2})[.\-\/\s](\d{2,4})/);
+  if (!m) return null;
+  let d = +m[1], mo = +m[2], y = +m[3];
+  if (y < 100) y += (y > 30 ? 1900 : 2000);
+  if (mo < 1 || mo > 12 || d < 1 || d > 31) return null;
+  const dt = new Date(y, mo-1, d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
+function ageNow(birth, ref){
+  let a = ref.getFullYear() - birth.getFullYear();
+  const m = ref.getMonth() - birth.getMonth();
+  if (m < 0 || (m === 0 && ref.getDate() < birth.getDate())) a--;
+  return a;
+}
+
+function updatePtype(i){
+  const box = document.querySelector(`[data-ptype="${i}"]`);
+  if (!box) return;
+  const f = forms[i];
+  let type = f.patientType;
+  if (type !== 'adult' && type !== 'child'){
+    const bd = parseBirth(f.birthDate);
+    type = bd ? (ageNow(bd, new Date()) >= 18 ? 'adult' : 'child') : 'adult';
+  }
+  box.querySelectorAll('.pt').forEach(el => el.classList.toggle('u', el.dataset.pt === type));
+}
+
+/* =====================================================================
+   АВТОПЕРЕНОС ФИО И ДАТЫ РОЖДЕНИЯ ИЗ 1-го БЛАНКА ВО 2-й
+   ===================================================================== */
+
+/* Инициализация «состояния автозаполнения» при загрузке:
+   если в обеих формах одинаковые непустые значения, считаем,
+   что они попали туда автопереносом в прошлой сессии. */
+function initAutoFilledPatient(){
+  autoFilledPatient = { patientName:'', birthDate:'' };
+  const f0 = forms[0], f1 = forms[1];
+  ['patientName','birthDate'].forEach(field => {
+    if (f0[field] && f0[field] === f1[field]){
+      autoFilledPatient[field] = f1[field];
+    }
+  });
+}
+
+/* Автоперенос ФИО и даты рождения ИЗ 1-го бланка ВО 2-й.
+   - срабатывает при любом изменении и ФИО, и даты рождения;
+   - переносит поля независимо друг от друга;
+   - перезаписывает поле во 2-м бланке, только если оно пустое
+     или содержит значение, которое мы же туда и записали. */
+function autoCopyPatient(srcIdx){
+  if (srcIdx !== 0) return;                                /* только из 1-го во 2-й */
+  if (!document.getElementById('autoCopy').checked) return;
+
+  const src = forms[0], dst = forms[1];
+  let changed = false;
+
+  ['patientName','birthDate'].forEach(field => {
+    const sVal = String(src[field] || '');
+    if (!sVal.trim()) return;                              /* нечего копировать */
+
+    const dVal = String(dst[field] || '');
+    const wasAuto = (autoFilledPatient[field] === dVal);   /* это наше прошлое значение? */
+    if (!dVal.trim() || wasAuto){
+      if (dVal !== sVal){
+        dst[field] = sVal;
+        autoFilledPatient[field] = sVal;
+        const el = document.querySelector(`[data-bind="1.${field}"]`);
+        if (el) el.value = sVal;
+        changed = true;
+      }
+    }
+  });
+
+  if (changed){
+    updatePtype(1);
+    saveForms();
+  }
+}
+
+/* =====================================================================
+   ПРИВЯЗКА ПОЛЕЙ
+   ===================================================================== */
+function bindAll(){
+  document.querySelectorAll('[data-bind]').forEach(el => {
+    const path = el.dataset.bind;
+    el.value = getVal(path) == null ? '' : getVal(path);
+
+    el.addEventListener('input', () => {
+      let val = el.value;
+      if (el.dataset.birth !== undefined){
+        const fmtd = formatBirth(val);
+        if (val !== fmtd) el.value = fmtd;
+        val = fmtd;
+      }
+      setVal(path, val);
+
+      if (path === 'doctor') syncDoctor(el);
+      saveForms();
+      refreshVisibility();
+
+      if (el.dataset.birth !== undefined){
+        updatePtype(+el.dataset.birth);
+        autoCopyPatient(+el.dataset.birth);        /* дата рождения тоже триггерит перенос */
+      }
+      if (el.dataset.patient !== undefined){
+        updatePtype(+el.dataset.patient);
+        autoCopyPatient(+el.dataset.patient);
+      }
+      if (el.dataset.drug !== undefined) checkRxDuplicates(el.dataset.drug);
+    });
+  });
+
+  document.querySelectorAll('.drug-name').forEach(inp => attachAutocomplete(inp));
+
+  document.querySelectorAll('.patient-type').forEach(box => {
+    const i = +box.dataset.ptype;
+    box.querySelectorAll('.pt').forEach(sp => {
+      sp.addEventListener('click', () => {
+        const cur = forms[i].patientType;
+        forms[i].patientType = (cur === sp.dataset.pt) ? '' : sp.dataset.pt;
+        saveForms(); updatePtype(i);
+      });
+    });
+  });
+
+  document.querySelectorAll('[data-clear-special]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = +btn.dataset.clearSpecial;
+      forms[i].special = '';
+      const el = document.querySelector(`[data-bind="${i}.special"]`);
+      if (el) el.value = '';
+      saveForms();
+    });
+  });
+}
+
+function syncDoctor(srcEl){
+  document.querySelectorAll('[data-bind="doctor"]').forEach(el => { if (el !== srcEl) el.value = doctor; });
+  const top = document.getElementById('doctorTop');
+  if (top !== srcEl) top.value = doctor;
+  lsSet(LS.doctor, doctor);
+}
+
+/* =====================================================================
+   АВТОДОПОЛНЕНИЕ
+   ===================================================================== */
+let acList = null, acIndex = -1, acItems = [];
+
+function closeAc(){ if (acList){ acList.classList.remove('on'); acList.innerHTML = ''; } acItems = []; acIndex = -1; }
+
+function attachAutocomplete(input){
+  const [fi, di] = input.dataset.drug.split('.').map(Number);
+
+  input.addEventListener('focus', () => { lastDrugField = { i: fi, k: di }; });
+
+  input.addEventListener('input', () => {
+    const q = norm(input.value);
+    if (q.length < 2){ closeAc(); return; }
+    const found = drugs.filter(d => norm(d.name).includes(q)).slice(0, 12);
+    if (!found.length){ closeAc(); return; }
+    const host = input.closest('.autocomplete-wrapper') || input.parentElement;
+    if (!acList || acList.parentElement !== host){
+      if (acList) acList.remove();
+      acList = document.createElement('div');
+      acList.className = 'ac-list';
+      host.appendChild(acList);
+    }
+    acItems = found;
+    acIndex = -1;
+    acList.innerHTML = found.map((d, idx) => `
+      <div class="ac-item" data-i="${idx}">
+        <div class="ac-n">${esc(d.name)}</div>
+        <div class="ac-d">${esc(d.dtd)}${d.dtd && d.s ? ' • ' : ''}${esc(d.s)}</div>
+      </div>`).join('');
+    acList.classList.add('on');
+    acList.querySelectorAll('.ac-item').forEach(it => {
+      it.addEventListener('mousedown', e => { e.preventDefault(); pickAc(+it.dataset.i); });
+    });
+  });
+
+  input.addEventListener('keydown', e => {
+    if (!acList || !acList.classList.contains('on')) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+      e.preventDefault();
+      acIndex = e.key === 'ArrowDown'
+        ? Math.min(acIndex + 1, acItems.length - 1)
+        : Math.max(acIndex - 1, 0);
+      [...acList.children].forEach((c, idx) => c.classList.toggle('sel', idx === acIndex));
+      if (acList.children[acIndex]) acList.children[acIndex].scrollIntoView({block:'nearest'});
+    } else if (e.key === 'Enter'){
+      if (acIndex >= 0){ e.preventDefault(); pickAc(acIndex); }
+    } else if (e.key === 'Escape'){ closeAc(); }
+  });
+
+  input.addEventListener('blur', () => {
+    const nm = norm(input.value);
+    if (nm){
+      const hit = drugs.find(d => norm(d.name) === nm);
+      if (hit){
+        const f = forms[fi].drugs[di];
+        const dtdEl = document.querySelector(`[data-dtd="${fi}.${di}"]`);
+        const sEl   = document.querySelector(`[data-s="${fi}.${di}"]`);
+        if (!f.dtd.trim() && hit.dtd){ f.dtd = hit.dtd; if (dtdEl) dtdEl.value = hit.dtd; }
+        if (!f.s.trim()   && hit.s  ){ f.s   = hit.s;   if (sEl)   sEl.value   = hit.s;   }
+        saveForms();
+      }
+    }
+    noteDrug(fi, di, input.value);
+    setTimeout(closeAc, 150);
+  });
+}
+
+function pickAc(idx){
+  const d = acItems[idx];
+  if (!d || !acList) return;
+  const input = acList.parentElement.querySelector('.drug-name');
+  if (!input) return;
+  const [fi, di] = input.dataset.drug.split('.').map(Number);
+  input.value = d.name;
+  forms[fi].drugs[di].name = d.name;
+  forms[fi].drugs[di].dtd  = d.dtd || '';
+  forms[fi].drugs[di].s    = d.s   || '';
+  const dtdEl = document.querySelector(`[data-dtd="${fi}.${di}"]`);
+  const sEl   = document.querySelector(`[data-s="${fi}.${di}"]`);
+  if (dtdEl) dtdEl.value = forms[fi].drugs[di].dtd;
+  if (sEl)   sEl.value   = forms[fi].drugs[di].s;
+  saveForms();
+  closeAc();
+  checkRxDuplicates(`${fi}.${di}`);
+  lastDrugField = { i: fi, k: di };
+  noteDrug(fi, di, d.name);
+  refreshVisibility();
+}
+
+/* =====================================================================
+   ПОВТОР ВНУТРИ ОДНОГО РЕЦЕПТА
+   ===================================================================== */
+function checkRxDuplicates(key){
+  const [fi, di] = key.split('.').map(Number);
+  const cur = norm(forms[fi].drugs[di].name);
+  const others = forms[fi].drugs.filter((d, idx) => idx !== di && norm(d.name)).map(d => norm(d.name));
+  const dup = !!cur && others.includes(cur);
+  const inp = document.querySelector(`[data-bind="${fi}.drugs.${di}.name"]`);
+  if (inp) inp.classList.toggle('duplicate', dup);
+}
+
+/* =====================================================================
+   ОДИН ИЛИ ДВА БЛАНКА НА ЛИСТЕ
+   ===================================================================== */
+function formHasDrugs(i){
+  return forms[i].drugs.some(d => String(d.name||'').trim() !== '');
+}
+function formIsFull(i){
+  return forms[i].drugs.every(d => String(d.name||'').trim() !== '');
+}
+
+function refreshVisibility(){
+  const forceBoth = document.getElementById('forceBoth').checked;
+  const secondHasDrugs = formHasDrugs(1);
+
+  const printSecond = forceBoth || secondHasDrugs || !formHasDrugs(0);
+  const showSecond  = forceBoth || secondHasDrugs || formIsFull(0);
+
+  document.querySelectorAll('[data-form="1"]').forEach(el => {
+    el.classList.toggle('hide-screen', !showSecond);
+    el.classList.toggle('hide-print',  !printSecond);
+  });
+
+  const hint = document.getElementById('secondHint');
+  if (hint) hint.hidden = !(showSecond && !printSecond);
+
+  const warn = document.getElementById('overflowWarn');
+  if (warn){
+    let over = false;
+    document.querySelectorAll('.a5').forEach(el => { if (el.scrollHeight > el.clientHeight + 2) over = true; });
+    warn.hidden = !over;
+  }
+}
+
+/* =====================================================================
+   БАЗА ПРЕПАРАТОВ
+   ===================================================================== */
+const drugForm   = document.getElementById('drugForm');
+const drugNameEl = document.getElementById('drugName');
+const drugDtdEl  = document.getElementById('drugDtd');
+const drugSEl    = document.getElementById('drugS');
+const drugMsg    = document.getElementById('drugMsg');
+const drugTbody  = document.getElementById('drugTbody');
+const drugSearch = document.getElementById('drugSearch');
+let editingIndex = -1;
+
+function showMsg(text, kind){
+  drugMsg.textContent = text;
+  drugMsg.className = kind === 'ok' ? 'ok' : 'error';
+  drugMsg.hidden = false;
+}
+function hideMsg(){ drugMsg.hidden = true; }
+
+function duplicateIndexes(){
+  const seen = new Map(), dups = new Set();
+  drugs.forEach((d, i) => {
+    const k = norm(d.name);
+    if (!k) return;
+    if (seen.has(k)){ dups.add(i); dups.add(seen.get(k)); }
+    else seen.set(k, i);
+  });
+  return dups;
+}
+
+function renderDrugs(){
+  const q = norm(drugSearch ? drugSearch.value : '');
+  const dups = duplicateIndexes();
+  const rows = drugs.map((d,i) => ({d,i}))
+                    .filter(({d}) => !q || norm(d.name).includes(q) || norm(d.dtd).includes(q) || norm(d.s).includes(q));
+  if (!rows.length){
+    drugTbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:#7f8c8d;padding:22px">${drugs.length ? 'Ничего не найдено.' : 'База пуста. Добавьте препараты.'}</td></tr>`;
+  } else {
+    drugTbody.innerHTML = rows.map(({d,i}) => `
+      <tr class="${dups.has(i) ? 'is-dup' : ''}">
+        <td class="num">${i+1}</td>
+        <td>${esc(d.name)}${dups.has(i) ? ' <span style="color:#c0392b;font-size:12px">(повтор)</span>' : ''}</td>
+        <td>${esc(d.dtd)}</td>
+        <td>${esc(d.s)}</td>
+        <td class="actions">
+          <button class="btn small secondary" data-edit="${i}" title="Редактировать" type="button">✎</button>
+          <button class="btn small danger" data-del="${i}" title="Удалить" type="button">✕</button>
+        </td>
+      </tr>`).join('');
+    drugTbody.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => startEdit(+b.dataset.edit));
+    drugTbody.querySelectorAll('[data-del]').forEach(b => b.onclick = () => delDrug(+b.dataset.del));
+  }
+  const el = document.getElementById('drugCount');
+  el.textContent = `Всего: ${drugs.length}` + (dups.size ? ` • повторов: ${dups.size}` : '');
+}
+
+function resetDrugForm(){
+  drugForm.reset(); editingIndex = -1;
+  document.getElementById('drugSubmitBtn').textContent = 'Добавить';
+  document.getElementById('drugCancelBtn').hidden = true;
+  hideMsg();
+}
+function startEdit(i){
+  editingIndex = i;
+  drugNameEl.value = drugs[i].name;
+  drugDtdEl.value  = drugs[i].dtd;
+  drugSEl.value    = drugs[i].s;
+  document.getElementById('drugSubmitBtn').textContent = 'Сохранить';
+  document.getElementById('drugCancelBtn').hidden = false;
+  hideMsg();
+  drugNameEl.focus();
+}
+function delDrug(i){
+  if (!confirm(`Удалить препарат «${drugs[i].name}»?`)) return;
+  drugs.splice(i,1);
+  saveDrugs();
+  if (editingIndex === i) resetDrugForm();
+  else if (editingIndex > i) editingIndex--;
+  renderDrugs();
+}
+
+drugForm.addEventListener('submit', e => {
+  e.preventDefault(); hideMsg();
+  const name = drugNameEl.value.trim();
+  const dtd  = drugDtdEl.value.trim();
+  const s    = drugSEl.value.trim();
+  if (!name){ showMsg('Введите название препарата.'); drugNameEl.focus(); return; }
+
+  const key = norm(name);
+  const same = [];
+  drugs.forEach((d, idx) => { if (idx !== editingIndex && norm(d.name) === key) same.push(idx); });
+  if (same.length){
+    showMsg(`Препарат «${name}» уже есть в базе (строка ${same[0]+1}${same.length > 1 ? ' и ещё ' + (same.length-1) : ''}). `
+          + `Если нужно исправить — откройте эту строку кнопкой ✎; если это другой препарат — уточните название.`);
+    renderDrugs();
+    return;
+  }
+  const loose = drugs.map((d, idx) => ({ idx, k: norm(d.name).replace(/[\s,.-]/g,'') }))
+                     .filter(o => o.idx !== editingIndex && o.k === key.replace(/[\s,.-]/g,''));
+
+  const wasEdit = editingIndex >= 0;
+  if (wasEdit) drugs[editingIndex] = { name, dtd, s };
+  else drugs.push({ name, dtd, s });
+  saveDrugs();
+  resetDrugForm();
+  renderDrugs();
+
+  if (loose.length){
+    showMsg(`«${name}» ${wasEdit ? 'сохранён' : 'добавлен'}. Внимание: в строке ${loose[0].idx+1} уже есть похожее название — проверьте, не повтор ли это.`, 'error');
+  } else {
+    showMsg(`${wasEdit ? 'Сохранено' : 'Добавлено'}: «${name}». Всего препаратов: ${drugs.length}.`, 'ok');
+  }
+});
+
+document.getElementById('drugCancelBtn').addEventListener('click', resetDrugForm);
+drugSearch.addEventListener('input', renderDrugs);
+
+document.getElementById('dupCheckBtn').addEventListener('click', () => {
+  const dups = [...duplicateIndexes()].sort((a,b) => a-b);
+  renderDrugs();
+  if (!dups.length){ showMsg('Повторов в базе не найдено.', 'ok'); }
+  else {
+    const names = dups.map(i => `«${drugs[i].name}» (стр. ${i+1})`).join(', ');
+    showMsg(`Найдены повторы: ${names}. Строки подсвечены красным — удалите лишние кнопкой ✕.`, 'error');
+  }
+});
+
+document.getElementById('exportBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(drugs, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'baza_preparatov_107-1u.json';
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+});
+
+document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
+document.getElementById('importFile').addEventListener('change', function(){
+  const file = this.files && this.files[0];
+  if (!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{
+      const arr = JSON.parse(rd.result);
+      if (!Array.isArray(arr)) throw new Error('не массив');
+      const added = [], skipped = [];
+      arr.forEach(d => {
+        const nm = String(d && d.name || '').trim();
+        if (!nm) return;
+        if (drugs.some(x => norm(x.name) === norm(nm))){ skipped.push(nm); return; }
+        drugs.push({ name:nm, dtd:String(d.dtd||''), s:String(d.s||'') });
+        added.push(nm);
+      });
+      saveDrugs(); renderDrugs();
+      showMsg(`Импорт: добавлено ${added.length}${skipped.length ? ', пропущено повторов: ' + skipped.length : ''}.`, added.length ? 'ok' : 'error');
+    }catch(err){ showMsg('Не удалось прочитать файл: ' + err.message, 'error'); }
+    this.value = '';
+  };
+  rd.readAsText(file, 'utf-8');
+});
+
+document.getElementById('resetDbBtn').addEventListener('click', () => {
+  if (!confirm('Заменить текущую базу исходным списком препаратов? Изменения будут потеряны.')) return;
+  drugs = DEFAULT_DRUGS.map(d => ({...d}));
+  saveDrugs(); resetDrugForm(); renderDrugs();
+  showMsg('База восстановлена к исходной.', 'ok');
+});
+
+/* =====================================================================
+   ВКЛАДКИ, ВРАЧ, ОЧИСТКА, ПЕЧАТЬ
+   ===================================================================== */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-recept').hidden = t.dataset.tab !== 'recept';
+    document.getElementById('tab-drugs').hidden  = t.dataset.tab !== 'drugs';
+    if (t.dataset.tab === 'drugs') renderDrugs();
+  });
+});
+
+document.getElementById('doctorTop').addEventListener('input', function(){
+  doctor = this.value;
+  lsSet(LS.doctor, doctor);
+  document.querySelectorAll('[data-bind="doctor"]').forEach(el => el.value = doctor);
+  saveForms();
+});
+
+/* =====================================================================
+   УЧЁТ НАЗНАЧЕНИЙ
+   ===================================================================== */
+const LS_USAGE = 'recept107_usage';
+
+function loadUsage(){
+  const u = lsJSON(LS_USAGE, null);
+  return {
+    counts: (u && typeof u.counts === 'object' && u.counts) ? u.counts : {},
+    names:  (u && typeof u.names  === 'object' && u.names)  ? u.names  : {},
+    last:   (u && Array.isArray(u.last)) ? u.last.filter(k => typeof k === 'string') : []
+  };
+}
+let usage = loadUsage();
+function saveUsage(){ lsSet(LS_USAGE, JSON.stringify(usage)); }
+
+const recordedKeys = new Set();
+function noteDrug(fi, di, name){
+  const nm = String(name || '').trim();
+  if (!nm) return;
+  const vk = `${fi}.${di}=${norm(nm)}`;
+  if (recordedKeys.has(vk)) return;
+  recordedKeys.add(vk);
+  bumpUsage(nm);
+}
+function bumpUsage(name){
+  const key = norm(name);
+  if (!key) return;
+  usage.counts[key] = (usage.counts[key] || 0) + 1;
+  usage.names[key]  = String(name).trim();
+  usage.last = [key, ...usage.last.filter(k => k !== key)].slice(0, 30);
+  saveUsage();
+  renderQuick();
+}
+
+const chipHTML = (name, badge) =>
+  `<button type="button" class="chip" data-name="${esc(name)}" title="${esc(name)}">${esc(name)}` +
+  (badge ? `<span class="chip-badge">${esc(badge)}</span>` : '') + `</button>`;
+
+function renderQuick(){
+  const recEl = document.getElementById('recentChips');
+  const topEl = document.getElementById('topChips');
+  if (!recEl || !topEl) return;
+
+  const lastKeys = usage.last.slice(0, 5);
+  recEl.innerHTML = lastKeys.length
+    ? lastKeys.map(k => chipHTML(usage.names[k] || k, String(usage.counts[k] || 1) + '×')).join('')
+    : '<span class="chips-empty">пока нет данных</span>';
+
+  const pos = k => { const p = usage.last.indexOf(k); return p === -1 ? 999 : p; };
+  const topKeys = Object.keys(usage.counts)
+    .filter(k => usage.counts[k] > 0)
+    .sort((a, b) => usage.counts[b] - usage.counts[a] || pos(a) - pos(b))
+    .slice(0, 5);
+  topEl.innerHTML = topKeys.length
+    ? topKeys.map(k => chipHTML(usage.names[k] || k, usage.counts[k] + '×')).join('')
+    : '<span class="chips-empty">пока нет данных</span>';
+
+  document.querySelectorAll('#recentChips .chip, #topChips .chip').forEach(ch => {
+    ch.addEventListener('click', () => insertDrug(ch.dataset.name));
+  });
+}
+
+let lastDrugField = null;
+
+function insertDrug(name){
+  const nm = String(name || '').trim();
+  if (!nm) return;
+  const db  = drugs.find(d => norm(d.name) === norm(nm));
+  const dtd = db ? (db.dtd || '') : '';
+  const s   = db ? (db.s   || '') : '';
+
+  let target = null;
+  if (lastDrugField && !String(forms[lastDrugField.i].drugs[lastDrugField.k].name || '').trim()){
+    target = lastDrugField;
+  }
+  if (!target){
+    for (let i = 0; i < 2 && !target; i++){
+      for (let k = 0; k < 3 && !target; k++){
+        if (!String(forms[i].drugs[k].name || '').trim()) target = { i, k };
+      }
+    }
+  }
+  if (!target) target = lastDrugField || { i:0, k:0 };
+
+  const { i, k } = target;
+  forms[i].drugs[k] = { name: nm, dtd, s };
+
+  const nEl = document.querySelector(`[data-bind="${i}.drugs.${k}.name"]`);
+  const dEl = document.querySelector(`[data-dtd="${i}.${k}"]`);
+  const sEl = document.querySelector(`[data-s="${i}.${k}"]`);
+  if (nEl){ nEl.value = nm; nEl.classList.add('flash'); setTimeout(() => nEl.classList.remove('flash'), 1200); }
+  if (dEl) dEl.value = dtd;
+  if (sEl) sEl.value = s;
+
+  saveForms();
+  checkRxDuplicates(`${i}.${k}`);
+  lastDrugField = { i, k };
+  noteDrug(i, k, nm);
+  refreshVisibility();
+  if (nEl) nEl.scrollIntoView({ block:'center', behavior:'smooth' });
+}
+
+document.getElementById('resetUsageBtn').addEventListener('click', () => {
+  if (!confirm('Сбросить статистику назначений (списки «Последние 5» и «Топ-5»)?')) return;
+  usage = { counts:{}, names:{}, last:[] };
+  recordedKeys.clear();
+  saveUsage();
+  renderQuick();
+});
+
+document.getElementById('clearBtn').addEventListener('click', () => {
+  if (!confirm('Очистить оба бланка? Имя врача и база препаратов сохранятся.')) return;
+  const keepSpecial = forms[0].special || DEFAULT_SPECIAL;
+  forms = [ emptyForm(), emptyForm() ];
+  forms[0].special = keepSpecial; forms[1].special = keepSpecial;
+  recordedKeys.clear();
+  saveForms(); render();
+});
+
+const printBack  = document.getElementById('printBack');
+const mirrorBack = document.getElementById('mirrorBack');
+const forceBoth  = document.getElementById('forceBoth');
+
+function updatePrintClasses(){
+  document.body.classList.toggle('no-back', !printBack.checked);
+  document.body.classList.toggle('mirror-back', mirrorBack.checked);
+}
+
+/* Обработчики чекбоксов: сохраняем настройки и пересчитываем видимость */
+['forceBoth','printBack','mirrorBack','autoCopy','persistPatient'].forEach(id => {
+  const box = document.getElementById(id);
+  box.addEventListener('change', () => {
+    saveSettings();
+    // смена persistPatient меняет, что попадает в localStorage, поэтому обновляем
+    saveForms();
+    updatePrintClasses();
+    refreshVisibility();
+  });
+});
+
+document.getElementById('printBtn').addEventListener('click', () => {
+  updatePrintClasses(); refreshVisibility();
+  setTimeout(() => window.print(), 60);
+});
+window.addEventListener('beforeprint', () => { updatePrintClasses(); refreshVisibility(); });
+
+/* =====================================================================
+   СТАРТ
+   ===================================================================== */
+loadSettings();     /* загружаем настройки до первого refreshVisibility */
+render();
+updatePrintClasses();
+renderDrugs();
+renderQuick();
+
+/* Перезагружаем настройки после того, как браузер мог восстановить формы
+   (Firefox и некоторые другие восстанавливают чекбоксы при перезагрузке).
+   pageshow срабатывает и при обычной загрузке, и при возврате «назад». */
+window.addEventListener('pageshow', () => {
+  loadSettings();
+  updatePrintClasses();
+  refreshVisibility();
+});
+
+if (/#(drugs|db|база)/i.test(location.hash)) document.querySelector('.tab[data-tab="drugs"]').click();
+</script>
+</body>
+</html>

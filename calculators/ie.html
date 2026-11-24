@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Инфекционный эндокардит — схемы антибактериальной терапии</title>
+<style>
+:root{
+  --ink:#1c2733; --line:#cfd8dc; --soft:#f5f7f9;
+  --blue:#1565c0; --blue-soft:#e3f2fd;
+  --green:#43a047; --orange:#fb8c00; --yellow:#fdd835;
+  --pink:#ec407a; --gray:#90a4ae;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:'Inter','Segoe UI',system-ui,-apple-system,Arial,sans-serif;
+  background:#eef1f4; color:var(--ink); font-size:13px; line-height:1.45;
+}
+.wrap{max-width:1420px;margin:0 auto;padding:14px}
+.board{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;align-items:start}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+
+.cell{background:#fff;border:1px solid var(--line);border-radius:4px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 1px 2px rgba(20,40,60,.04)}
+.cell-head{padding:8px 11px;text-align:center;font-weight:700;font-size:13px;color:#fff;letter-spacing:.01em}
+.h-green{background:var(--green)}
+.h-orange{background:var(--orange)}
+.h-yellow{background:var(--yellow);color:#3a2f00}
+.h-pink{background:var(--pink)}
+.h-gray{background:var(--gray)}
+.cell-body{padding:10px 11px 12px;display:flex;flex-direction:column;gap:8px}
+
+.field-label{font-size:11px;color:#607d8b;font-weight:600;margin-bottom:3px;letter-spacing:.02em}
+.fields-row{display:flex;gap:10px;flex-wrap:wrap}
+.fields-row > .fb{flex:1;min-width:120px}
+.fb{border:1px solid var(--line);border-radius:4px;padding:6px 8px 7px;background:#fbfcfd}
+.radios{display:flex;flex-direction:column;gap:3px}
+.radios label,.check{display:flex;align-items:flex-start;gap:6px;font-size:12px;cursor:pointer;padding:1px 0;line-height:1.35}
+.radios input,.check input{margin:2px 0 0 0;flex:0 0 auto;accent-color:#0f6e6e}
+.check{margin-top:3px;padding:5px 6px;border-radius:4px;background:#f4f8fb;border:1px solid #e2ebf0;font-size:11.5px}
+.check input{accent-color:#ec407a}
+
+.scheme-label{margin-top:6px;background:var(--blue-soft);color:var(--blue);padding:4px 8px;font-size:11.5px;font-weight:700;border-radius:4px;letter-spacing:.02em}
+.scheme-text{padding:9px 10px;font-size:12px;white-space:pre-line;background:#f7f9fa;border:1px solid #eceff2;border-radius:4px;min-height:52px;line-height:1.55}
+.scheme-text.empty{color:#90a4ae;font-style:italic;background:transparent;border-style:dashed}
+
+.note{font-size:11px;color:#607d8b;padding-top:5px;border-top:1px dashed var(--line);line-height:1.4}
+.note-strong{color:#b3261e;font-weight:600}
+
+.side-list{font-size:12px;line-height:1.55}
+.side-list b{color:#b3261e}
+.side-list .k{color:#455a64;font-weight:600}
+
+footer{background:#1b2a33;color:#c9d7de;padding:18px 16px 22px;margin-top:20px}
+.foot-inner{max-width:1420px;margin:0 auto;display:flex;gap:20px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;font-size:11.5px;line-height:1.55}
+.foot-left{flex:1 1 500px;max-width:900px}
+.foot-left .src-title{color:#8fd3c2;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:10.5px;margin-bottom:5px}
+.foot-left .src-text{opacity:.9}
+.foot-left .doi{color:#8fd3c2}
+.foot-right{display:flex;flex-direction:column;align-items:flex-end;gap:6px}
+.foot-right .handle{font-size:15px;font-weight:700;color:#4dd0e1;letter-spacing:.02em}
+.foot-right .vk{display:inline-flex;align-items:center;gap:6px;background:#0077ff;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none}
+.footnote{max-width:1420px;margin:6px auto 0;padding:0 16px;font-size:11.5px;color:#78909c}
+.footnote b{color:#37474f}
+
+@media (max-width:1000px){.board{grid-template-columns:1fr 1fr}}
+@media (max-width:660px){.board{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="board">
+
+    <!-- ================= КОЛОНКА 1 ================= -->
+    <div class="col col-1">
+
+      <!-- 1.1 Эмпирическая АБТ -->
+      <div class="cell" id="c-emp">
+        <div class="cell-head h-green">Эмпирическая антибактериальная терапия ИЭ</div>
+        <div class="cell-body">
+          <div class="field-label">Вариант ИЭ</div>
+          <div class="radios" data-g="emp-var">
+            <label><input type="radio" name="emp-var" value="1">Внебольничный ИЭ нативного клапана</label>
+            <label><input type="radio" name="emp-var" value="2">Поздний ИЭ протеза клапана (≥12 мес после операции)</label>
+            <label><input type="radio" name="emp-var" value="3">Ранний ИЭ протеза клапана (&lt;12 мес после операции)</label>
+            <label><input type="radio" name="emp-var" value="4">Внутрибольничный ИЭ</label>
+            <label><input type="radio" name="emp-var" value="5">Нозокомиальный ИЭ, связанный с оказанием медицинской помощи</label>
+          </div>
+          <label class="check"><input type="checkbox" data-g="emp-allergy">Аллергия на β-лактамные антибиотики (пенициллины, цефалоспорины, карбапенемы или монобактамы)</label>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+        </div>
+      </div>
+
+      <!-- 1.2 Str. viridans -->
+      <div class="cell" id="c-vir">
+        <div class="cell-head h-green">Str. viridans, Str. gallolyticus</div>
+        <div class="cell-body">
+          <div class="fields-row">
+            <div class="fb">
+              <div class="field-label">Пенициллин</div>
+              <div class="radios" data-g="v-s">
+                <label><input type="radio" name="v-s" value="1">Чувствительный</label>
+                <label><input type="radio" name="v-s" value="2">Резистентный</label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Тип клапана</div>
+              <div class="radios" data-g="v-v">
+                <label><input type="radio" name="v-v" value="1">Нативный</label>
+                <label><input type="radio" name="v-v" value="2">Протез</label>
+              </div>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" data-g="v-a">Аллергия на β-лактамные антибиотики</label>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+        </div>
+      </div>
+
+      <!-- 1.3 Str. pneumoniae -->
+      <div class="cell" id="c-pne">
+        <div class="cell-head h-green">Str. pneumoniae</div>
+        <div class="cell-body">
+          <div class="fields-row">
+            <div class="fb">
+              <div class="field-label">Пенициллин</div>
+              <div class="radios" data-g="p-s">
+                <label><input type="radio" name="p-s" value="1">Чувствительный</label>
+                <label><input type="radio" name="p-s" value="2">Резистентный</label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Тип клапана</div>
+              <div class="radios" data-g="p-v">
+                <label><input type="radio" name="p-v" value="1">Нативный</label>
+                <label><input type="radio" name="p-v" value="2">Протез</label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Менингит</div>
+              <div class="radios" data-g="p-m">
+                <label><input type="radio" name="p-m" value="2">Нет</label>
+                <label><input type="radio" name="p-m" value="1">Есть</label>
+              </div>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" data-g="p-a">Аллергия на β-лактамные антибиотики</label>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+        </div>
+      </div>
+
+    </div><!-- /col1 -->
+
+    <!-- ================= КОЛОНКА 2 ================= -->
+    <div class="col col-2">
+
+      <!-- 2.1 S. aureus и CoNS -->
+      <div class="cell" id="c-staph">
+        <div class="cell-head h-orange">Staphylococcus aureus и CoNS*</div>
+        <div class="cell-body">
+          <div class="fields-row">
+            <div class="fb">
+              <div class="field-label">Метициллин</div>
+              <div class="radios" data-g="st-s">
+                <label><input type="radio" name="st-s" value="1">Чувствительный</label>
+                <label><input type="radio" name="st-s" value="2">Резистентный</label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Тип клапана</div>
+              <div class="radios" data-g="st-v">
+                <label><input type="radio" name="st-v" value="1">Нативный</label>
+                <label><input type="radio" name="st-v" value="2">Протез</label>
+              </div>
+            </div>
+          </div>
+          <label class="check"><input type="checkbox" data-g="st-a">Аллергия на β-лактамные антибиотики</label>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+          <div class="note">* CoNS — коагулазонегативные стафилококки</div>
+        </div>
+      </div>
+
+      <!-- 2.2 Энтерококк — «нет устойчивых» -->
+      <div class="cell" id="c-ent">
+        <div class="cell-head h-orange">Энтерококковый ИЭ</div>
+        <div class="cell-body">
+          <div class="fields-row">
+            <div class="fb">
+              <div class="field-label">Штаммы, устойчивые</div>
+              <div class="radios" data-g="en-r">
+                <label><input type="radio" name="en-r" value="sus">нет устойчивых</label>
+                <label><input type="radio" name="en-r" value="ag">к аминогликозидам</label>
+                <label><input type="radio" name="en-r" value="bl">к бета-лактамам</label>
+                <label><input type="radio" name="en-r" value="vn">к ванкомицину</label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Тип клапана</div>
+              <div class="radios" data-g="en-v">
+                <label><input type="radio" name="en-v" value="1">Нативный</label>
+                <label><input type="radio" name="en-v" value="2">Протез</label>
+              </div>
+            </div>
+          </div>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+        </div>
+      </div>
+
+      <!-- 2.3 HACEK / не-HACEK -->
+      <div class="cell" id="c-hacek">
+        <div class="cell-head h-yellow">Возбудители группы HACEK и не-HACEK</div>
+        <div class="cell-body">
+          <div class="fields-row">
+            <div class="fb">
+              <div class="field-label">Возбудители</div>
+              <div class="radios" data-g="h-g">
+                <label><input type="radio" name="h-g" value="H">HACEK<br><span style="color:#607d8b;font-size:11px">Haemophilus sp., Aggregatibacter sp., Cardiobacterium sp., Eikenella sp., Kingella sp.</span></label>
+                <label><input type="radio" name="h-g" value="NN">не-HACEK<br><span style="color:#607d8b;font-size:11px">Pseudomonas aeruginosa, Citrobacter sp., Enterobacter sp., Escherichia coli, Klebsiella pneumoniae</span></label>
+              </div>
+            </div>
+            <div class="fb">
+              <div class="field-label">Тип клапана</div>
+              <div class="radios" data-g="h-v">
+                <label><input type="radio" name="h-v" value="1">Нативный</label>
+                <label><input type="radio" name="h-v" value="2">Протез</label>
+              </div>
+            </div>
+          </div>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите параметры — схема появится автоматически.</div>
+        </div>
+      </div>
+
+    </div><!-- /col2 -->
+
+    <!-- ================= КОЛОНКА 3 ================= -->
+    <div class="col col-3">
+
+      <!-- 3.1 Грибковый ИЭ (перемещён наверх) -->
+      <div class="cell" id="c-fun">
+        <div class="cell-head h-gray">Грибковый ИЭ</div>
+        <div class="cell-body">
+          <div class="fb">
+            <div class="field-label">Возбудители</div>
+            <div class="radios" data-g="f-g">
+              <label><input type="radio" name="f-g" value="1">Candida sp.</label>
+              <label><input type="radio" name="f-g" value="2">Aspergillus sp.</label>
+            </div>
+          </div>
+          <div class="note">Прим.: тип клапана не имеет значения</div>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите возбудителя — схема появится автоматически.</div>
+        </div>
+      </div>
+
+      <!-- 3.2 Редкие возбудители -->
+      <div class="cell" id="c-rare">
+        <div class="cell-head h-pink">Редкие возбудители</div>
+        <div class="cell-body">
+          <div class="fb">
+            <div class="field-label">Возбудители</div>
+            <div class="radios" data-g="r-g">
+              <label><input type="radio" name="r-g" value="1">Coxiella burnetii</label>
+              <label><input type="radio" name="r-g" value="2">Bartonella sp.</label>
+              <label><input type="radio" name="r-g" value="3">Legionella sp.</label>
+              <label><input type="radio" name="r-g" value="4">Mycoplasma sp.</label>
+              <label><input type="radio" name="r-g" value="5">Brucella sp.</label>
+              <label><input type="radio" name="r-g" value="6">Tropheryma whipplei</label>
+            </div>
+          </div>
+          <div class="note">Прим.: тип клапана не имеет значения</div>
+          <div class="scheme-label">Рекомендуемая схема:</div>
+          <div class="scheme-text empty" data-out>Выберите возбудителя — схема появится автоматически.</div>
+        </div>
+      </div>
+
+      <!-- 3.3 Группы риска -->
+      <div class="cell">
+        <div class="cell-head h-pink">Группы риска</div>
+        <div class="cell-body side-list">
+          <div><span class="k">Только в эндемичных районах.</span></div>
+          <div>Профессиональные контакты с сельскохозяйственными животными (овцы, крупный рогатый скот, козы).</div>
+          <div>Употребление непастеризованного молока/сыра/необработанного мяса.</div>
+          <div>Поездки на Ближний Восток.</div>
+        </div>
+      </div>
+
+      <!-- 3.4 Частота и группы риска грибкового ИЭ -->
+      <div class="cell">
+        <div class="cell-head h-pink">Частота и группы риска грибкового ИЭ</div>
+        <div class="cell-body side-list">
+          <div>Частота от ИЭ с отрицательными результатами: <b>1–2%</b></div>
+          <div style="margin-top:6px"><span class="k">Группы риска:</span></div>
+          <div>ВИЧ положительные.</div>
+          <div>Постоянный венозный катетер.</div>
+          <div>Предшествующие операции на сердце.</div>
+        </div>
+      </div>
+
+    </div><!-- /col3 -->
+
+  </div><!-- /board -->
+  <div class="footnote"><b>* CoNS</b> — коагулазонегативные стафилококки</div>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-left">
+      <div class="src-title">Источники</div>
+      <div class="src-text">
+        Котова Е. О., Кобалова Ж. Д. Практические подходы к антибактериальной терапии инфекционного эндокардита в аспекте национальных и европейских клинических рекомендаций. Рациональная Фармакотерапия в Кардиологии. 2024;20(1):85–102.
+        <span class="doi">DOI: 10.20996/1819-6446-2024-3006.</span>
+      </div>
+      
+    </div>
+    
+  </div>
+</footer>
+
+<script>
+/* ================================================================
+   ДАННЫЕ СХЕМ
+   ================================================================ */
+
+const EMP = {
+  '1|0': 'Amoxicillin/Ampicillin 12 г/сут в/в в 4–6 дозах\n+ Oxacillin или Ceftriaxone 4 г/сут в/в или в/м в 2 дозах\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '1|1': 'Cefazolin 6 г/сут в/в в 3 дозы\nили\nVancomycin 30 мг/кг/сут в/в в 2 дозах\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '2|0': 'Amoxicillin/Ampicillin 12 г/сут в/в в 4–6 дозах\n+ Oxacillin или Ceftriaxone 4 г/сут в/в или в/м в 2 дозах\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '2|1': 'Cefazolin 6 г/сут в/в в 3 дозы\nили\nVancomycin 30 мг/кг/сут в/в в 2 дозах\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '3|0': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\n+ Rifampicin 900–1200 мг/сут в/в или per os в 2–3 равных дозах\n(с 3–5-х суток)',
+  '3|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\n+ Rifampicin 900–1200 мг/сут в/в или per os в 2–3 равных дозах\n(с 3–5-х суток)',
+  '4|0': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '4|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '5|0': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе',
+  '5|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nили\nDaptomycin 10 мг/кг/сут в/в в 1 дозе\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе'
+};
+
+const VIR = {
+  '1|1|0': 'Penicillin G 12–18 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 100–200 мг/кг/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе.\n\nДлительность: 4 недели',
+  '1|2|0': 'Penicillin G 12–18 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 100–200 мг/кг/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе.\n\nДлительность: 6 недель',
+  '1|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 4 недели',
+  '1|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 6 недель',
+  '2|1|0': 'Penicillin G 24 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 2 г/сут в/в в 6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 4 недели (основной) + 2 недели (Gentamicin)',
+  '2|2|0': 'Penicillin G 24 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 2 г/сут в/в в 6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 6 недель (основной) + 2 недели (Gentamicin)',
+  '2|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 4 недели (Vancomycin) + 2 недели (Gentamicin)',
+  '2|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 6 недель (Vancomycin) + 2 недели (Gentamicin)'
+};
+
+const ST = {
+  '1|1|0': 'Oxacillin 12 г/сут в/в в 4–6 дозах\nили\nCefazolin 6 г/сут в/в в 3 дозах.\n\nДлительность: 4–6 нед.',
+  '1|2|0': 'Oxacillin 12 г/сут в/в в 4–6 дозах\nили\nCefazolin 6 г/сут в/в в 3 дозах.\n\nДлительность: 6 нед.\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\nДлительность: 2 нед.\n+ Rifampicin 900 мг/сут в/в или per os в 3 равных дозах (на 3–5-й день).\nДлительность: 6 нед.',
+  '1|1|1': 'Cefazolin 6 г/сут в/в в 3 дозах.\n\nДлительность: 4–6 нед.',
+  '1|2|1': 'Cefazolin 6 г/сут в/в в 3 дозах.\n\nДлительность: 6 нед.\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\nДлительность: 2 нед.\n+ Rifampicin 900 мг/сут в/в или per os в 3 равных дозах (на 3–5-й день).\nДлительность: 6 нед.',
+  '2|1|0': 'Основная схема:\nVancomycin 30 мг/кг/сут в/в в 2 дозах.\nДлительность: 4–6 нед.\n____\nАльтернативная схема:\nDaptomycin 10 мг/кг/сут в/в в 1 дозе.\nДлительность: 4–6 нед.\n+ Oxacillin 12 г/сут в/в в 6 дозах\nили\nCeftaroline 1800 мг/сут в/в в 3 дозах\nили\nFosfomycin 8–12 г/сут в/в в 4 дозах.\nДлительность: 4–6 нед.',
+  '2|2|0': 'Основная схема:\nVancomycin 30 мг/кг/сут в/в в 2 дозах. Длительность: 6 нед.\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе. Длительность: 2 нед.\n+ Rifampicin 900 мг/сут в/в или per os в 3 равных дозах (на 3–5 день). Длительность: 6 нед.\n_____\nАльтернативная схема:\nDaptomycin 10 мг/кг/сут в/в в 1 дозе. Длительность: 6 нед.\n+ Oxacillin 12 г/сут в/в в 6 дозах\nили\nCeftaroline 1800 мг/сут в/в в 3 дозах\nили\nFosfomycin 8–12 г/сут в/в в 4 дозах.\nДлительность: 6 нед.\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе. Длительность: 2 нед.\n+ Rifampicin 900 мг/сут в/в или per os в 3 равных дозах (на 3–5 день). Длительность: 6 нед.',
+  '2|1|1': 'Основная схема:\nVancomycin 30 мг/кг/сут в/в в 2 дозах.\nДлительность: 4–6 нед.\n____\nАльтернативная схема:\nDaptomycin 10 мг/кг/сут в/в в 1 дозе.\nДлительность: 4–6 нед.',
+  '2|2|1': 'Основная схема:\nVancomycin 30 мг/кг/сут в/в в 2 дозах. Длительность: 6 нед.\n+ Gentamicin 3 мг/кг/сут в/в или в/м в 1 дозе. Длительность: 2 нед.\n+ Rifampicin 900 мг/сут в/в или per os в 3 равных дозах (на 3–5 день). Длительность: 6 нед.'
+};
+
+/* Энтерококк — ключ 'sus' подписан как «нет устойчивых» */
+const ENT = {
+  'sus': 'Amoxicillin 200 мг/кг/сут в/в в 4–6 дозах\nили\nAmpicillin 12 г/сут в/в в 4–6 дозах\nДлительность: 6 нед.\n+\nCeftriaxone 4 г/сут в/в в 2 дозах\nДлительность: 6 нед.',
+  'ag':  'Основная схема 1:\nAmoxicillin 200 мг/кг/сут в/в в 4–6 дозах\nили\nAmpicillin 12 г/сут в/в в 4–6 дозах\nДлительность: 6 нед.\n+\nCeftriaxone 4 г/сут в/в в 2 дозах\nДлительность: 6 нед.\n_____\nОсновная схема 2:\nAmoxicillin 200 мг/кг/сут в/в в 4–6 дозах\nили\nAmpicillin 12 г/сут в/в в 4–6 дозах\nДлительность: 6 нед.\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 2 нед.',
+  'bl':  'Vancomycin 30 мг/кг/сут в/в в 2 дозах\nДлительность: 6 нед.\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 2 нед.',
+  'vn':  'Daptomycin 10–12 мг/кг/сут в/в в 1 дозе\nДлительность: 6 нед.\n+\nAmpicillin 200 мг/кг/сут в/в в 4–6 дозах\nили\nCeftaroline 1800 мг/сут в/в в 3 дозах\nили\nErtapenem 4 г/сут в/в или в/м в 1 дозе\nили\nFosfomycin 12 г/сут в/в в 4 дозах\nДлительность: 6 нед.'
+};
+
+const PNE = {
+  '1|2|1|0': 'Penicillin G 12–18 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 100–200 мг/кг/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе.\n\nДлительность: 4 нед.',
+  '1|2|2|0': 'Penicillin G 12–18 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 100–200 мг/кг/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе.\n\nДлительность: 6 нед.',
+  '1|2|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 4 нед.',
+  '1|2|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 6 нед.',
+  '1|1|1|0': 'Ceftriaxone 2 г/сут в/в в 1 дозе\n+\nVancomycin 30 мг/кг/сут в/в в 2 дозы.\n\nДлительность: 4 нед.',
+  '1|1|2|0': 'Ceftriaxone 2 г/сут в/в в 1 дозе\n+\nVancomycin 30 мг/кг/сут в/в в 2 дозы.\n\nДлительность: 6 нед.',
+  '1|1|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 4 нед.',
+  '1|1|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 6 нед.',
+  '2|2|1|0': 'Penicillin G 24 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 2 г/сут в/в в 6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 4 нед (Gentamicin 2 нед).',
+  '2|2|2|0': 'Penicillin G 24 млн Ед/сут в/в в 4–6 дозах\nили\nAmoxicillin/Ampicillin 2 г/сут в/в в 6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 6 нед (Gentamicin 2 нед).',
+  '2|2|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 4 нед.',
+  '2|2|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе.\n\nДлительность: 6 нед (Gentamicin 2 нед).',
+  '2|1|1|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 4 нед.',
+  '2|1|2|1': 'Vancomycin 30 мг/кг/сут в/в в 2 дозах.\n\nДлительность: 6 нед.',
+  '2|1|2|0': 'Ceftriaxone 2 г/сут в/в в 1 дозе\n+\nVancomycin 30 мг/кг/сут в/в в 2 дозы.\n\nДлительность: 6 нед.',
+  '2|1|1|0': 'Ceftriaxone 2 г/сут в/в в 1 дозе\n+\nVancomycin 30 мг/кг/сут в/в в 2 дозы.\n\nДлительность: 4 нед.'
+};
+
+const HACEK = {
+  'H|1': 'Основная схема 1\nCeftriaxone 2 г/сут в/в в 1 дозе.\nДлительность: 4 нед.\n_____\nОсновная схема 2\nAmpicillin 12 г/сут в/в в 4–6 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 4 нед (Gentamicin 2 нед).\n_____\nАльтернативная схема\nCiprofloxacinum 400 мг каждые 8–12 ч в/в или 750 мг каждые 12 ч per os.\nДлительность: 4 нед',
+  'H|2': 'Основная схема 1\nCeftriaxone 2 г/сут в/в в 1 дозе.\nДлительность: 6 нед.\n_____\nОсновная схема 2\nAmpicillin 12 г/сут в/в в 4–6 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 6 нед (Gentamicin 2 нед).\n_____\nАльтернативная схема\nCiprofloxacinum 400 мг каждые 8–12 ч в/в или 750 мг каждые 12 ч per os.\nДлительность: 6 нед',
+  'NN|1': 'Основная схема\nAmpicillin 12 г/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\nили\nCefepime 4–6 г/сут в/в в 2–3 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 6 нед (Gentamicin 2 нед).\n_____\nАльтернативная схема\nCefepime 4–6 г/сут в/в в 2–3 дозах\nили\nMeropenem 0,5–2 г 3 р/сут в/в\nили\nErtapenem 1 г/сут в/в в 1 дозе\n+\nCiprofloxacinum 200–400 мг 2 р/сут в/в\nДлительность: 6 нед (Ciprofloxacinum 6 нед).',
+  'NN|2': 'Основная схема\nAmpicillin 12 г/сут в/в в 4–6 дозах\nили\nCeftriaxone 2 г/сут в/в в 1 дозе\nили\nCefepime 4–6 г/сут в/в в 2–3 дозах\n+\nGentamicin 3 мг/кг/сут в/в или в/м в 1 дозе\nДлительность: 6 нед (Gentamicin 2 нед).\n_____\nАльтернативная схема\nCefepime 4–6 г/сут в/в в 2–3 дозах\nили\nMeropenem 0,5–2 г 3 р/сут в/в\nили\nErtapenem 1 г/сут в/в в 1 дозе\n+\nCiprofloxacinum 200–400 мг 2 р/сут в/в\nДлительность: 6 нед (Ciprofloxacinum 6 нед).'
+};
+
+const RARE = {
+  '1': 'Doxycycline 200 мг/сут\n+\nHydroxychloroquine 200–600 мг/сут per os\nДлительность: >18 мес\n\nКритерий эффективности:\n↓ титра антител IgG < 1:400;\n↓ титра IgA и IgM < 1:50.',
+  '2': 'Doxycycline 100 мг 2 р/сут per os\n+\nGentamicin 3 мг/кг/сут в 1 дозе в/в или в/м\nДлительность: 4 нед (Gentamicin 2 нед).\n_________\nAmpicillin 12 г/сут в 4–6 дозах в/в\nили\nCeftriaxone 2 г/сут в 1 дозе в/в\n+\nGentamicin 3 мг/кг/сут в 1 дозе в/в или в/м\nДлительность: 4 нед (Gentamicin 2 нед).',
+  '3': 'Levofloxacin 500 мг 2 р/сут в/в или per os.\nДлительность: ≥6 нед.\nили\nClarithromycin 500 мг 2 р/сут в/в + per os.\nДлительность: 2 нед (per os 4 нед)\n+\nRifampicin 300–1200 мг/сут в/в или per os.\nДлительность: ≥6 нед.',
+  '4': 'Levofloxacin 500 мг 2 р/сут в/в или per os\nДлительность: ≥6 нед',
+  '5': 'Doxycycline 200 мг/сут\n+\nCo-trimoxazole 960 мг 2 р/сут\n+\nRifampicin 300–600 мг/сут per os\n± Gentamicin 3 мг/кг/сут в 1 дозе в/в или в/м\nДлительность: ≥3–6 мес (Gentamicin 3 нед).\n\nКритерий эффективности:\n↓ титра антител < 1:60',
+  '6': 'Doxycycline 200 мг/сут\n+\nHydroxychloroquine 200–600 мг/сут per os\nДлительность: ≥18 мес\n_________\nCeftriaxone 2 г/сут в 1 дозе в/в\nили\nPenicillin G 12–18 млн Ед/сут в 4–6 дозах в/в\n+\nGentamicin 3 мг/кг/сут в 1 дозе в/в или в/м\nДлительность: 4 нед (Gentamicin 2 нед).\n\nДалее Co-trimoxazol 800 мг 2 р/сут per os\nДлительность: не менее 12 мес'
+};
+
+const FUN = {
+  '1': 'Основная схема\nMicafungin 200 мг/сут в/в\nили\nCaspofungin 70 мг/сут в первый день, далее 50–100 мг/сут в/в\nили\nAnidulafungin 200 мг/сут в первый день, далее 100–200 мг/сут в/в\nили\nAmphotericin B 1 мг/кг/сут в/в\nили\nAmphotericin B [cholesteryl sulphate complex] 4 мг/кг/сут в/в\nили\nAmphotericin B [liposomal] 3 мг/кг/сут в/в\nили\nAmphotericin B [complexus lipidus] 5 мг/кг/сут в/в\n+/-\nFluconazole 800 мг/сут в/в\nили\nVoriconazole 200 мг/сут в/в\nДлительно, сроки не определены, не менее 6 нед.\n______\nПродленное лечение\nFluconazole 400 мг/сут в 2 дозах per os\nДлительно, до пожизненного',
+  '2': 'Основная схема\nVoriconazole 6 мг/кг каждые 12 ч первые сутки, затем 4 мг/кг каждые 12 ч в/в\n+/-\nAnidulafungin 200 мг/сут в первый день, далее 100–200 мг/сут в/в\nили\nAmphotericin B 1 мг/кг/сут в/в\nили\nAmphotericin B [cholesteryl sulphate complex] 4 мг/кг/сут в/в\nили\nAmphotericin B [liposomal] 3 мг/кг/сут в/в\nили\nAmphotericin B [complexus lipidus] 5 мг/кг/сут в/в\nДлительно, сроки не определены, не менее 6 нед\n______\nПродленное лечение\nVoriconazole 400 мг/сут в 2 дозах per os\nДлительно, до пожизненного'
+};
+
+/* ================================================================
+   ЛОГИКА
+   ================================================================ */
+
+const EMPTY_MSG = 'Выберите параметры — схема появится автоматически.';
+const NOT_FOUND = 'Схема не найдена — проверьте комбинацию условий.';
+
+function bindCell(cellId, keyFn, db) {
+  const cell = document.getElementById(cellId);
+  if (!cell) return;
+  const out = cell.querySelector('[data-out]');
+
+  function getState() {
+    const st = {};
+    cell.querySelectorAll('input').forEach(inp => {
+      const host = inp.closest('[data-g]');
+      const g = (inp.dataset && inp.dataset.g) || (host ? host.dataset.g : null);
+      if (!g) return;
+      if (inp.type === 'radio') {
+        if (inp.checked) st[g] = inp.value;
+      } else {
+        st[g] = inp.checked ? '1' : '0';
+      }
+    });
+    return st;
+  }
+
+  function render() {
+    const st = getState();
+    const key = keyFn(st);
+    if (!key) {
+      out.className = 'scheme-text empty';
+      out.textContent = EMPTY_MSG;
+      return;
+    }
+    const val = db[key];
+    if (!val) {
+      out.className = 'scheme-text empty';
+      out.textContent = NOT_FOUND;
+      return;
+    }
+    out.className = 'scheme-text';
+    out.innerHTML = val
+      .replace(/\n/g, '<br>')
+      .replace(/_____+/g, '<hr style="border:none;border-top:1px solid #cfd8dc;margin:6px 0">');
+  }
+
+  cell.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('change', render);
+  });
+  render();
+}
+
+/* Эмпирическая */
+bindCell('c-emp', st => {
+  const v = st['emp-var'];
+  if (!v) return null;
+  const a = st['emp-allergy'] || '0';
+  return v + '|' + a;
+}, EMP);
+
+/* Str. viridans */
+bindCell('c-vir', st => {
+  const s = st['v-s'], v = st['v-v'], a = st['v-a'];
+  if (!s || !v || a === undefined) return null;
+  return s + '|' + v + '|' + a;
+}, VIR);
+
+/* Str. pneumoniae */
+bindCell('c-pne', st => {
+  const s = st['p-s'], v = st['p-v'], m = st['p-m'], a = st['p-a'];
+  if (!s || !v || !m || a === undefined) return null;
+  return s + '|' + m + '|' + v + '|' + a;
+}, PNE);
+
+/* S. aureus */
+bindCell('c-staph', st => {
+  const s = st['st-s'], v = st['st-v'], a = st['st-a'];
+  if (!s || !v || a === undefined) return null;
+  return s + '|' + v + '|' + a;
+}, ST);
+
+/* Энтерококк: 'sus' = нет устойчивых */
+bindCell('c-ent', st => {
+  const r = st['en-r'];
+  if (!r) return null;
+  return r; /* 'sus' | 'ag' | 'bl' | 'vn' */
+}, ENT);
+
+/* HACEK */
+bindCell('c-hacek', st => {
+  const g = st['h-g'], v = st['h-v'];
+  if (!g || !v) return null;
+  return g + '|' + v;
+}, HACEK);
+
+/* Грибковый — теперь наверху третьей колонки */
+bindCell('c-fun', st => {
+  const g = st['f-g'];
+  if (!g) return null;
+  return g;
+}, FUN);
+
+/* Редкие */
+bindCell('c-rare', st => {
+  const g = st['r-g'];
+  if (!g) return null;
+  return g;
+}, RARE);
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="qt.html" title="АБТ и интервал QT">Интервал QT</a>
+    <a href="клапаны.html" title="Поражение клапанов при эндокардите">Клапанная болезнь</a>
+    <a href="операция.html" title="Стратификация перед операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

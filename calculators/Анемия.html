@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>АНЕМИЯ — клинический калькулятор · ХСН, дефицит железа</title>
+<style>
+:root{
+  --bg:#eef3f8; --card:#ffffff; --ink:#10202c; --muted:#5d7486; --line:#dae6ef;
+  --brand:#0f6d8c; --brand-dark:#0a5570; --accent:#12a0bb;
+  --ok:#1a7f5a; --ok-bg:#e9f7f1; --ok-line:#bfe6d5;
+  --warn:#8a6d1b; --warn-bg:#fdf7e6; --warn-line:#f0e0b0;
+  --bad:#b23a30; --bad-bg:#fdeeec; --bad-line:#f2c9c4;
+  --info-bg:#eaf5fa; --info-line:#c6e2ee;
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;scroll-behavior:smooth}
+body{
+  font-family:"Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg); color:var(--ink); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* ---------- Header ---------- */
+.topbar{background:linear-gradient(135deg,#0b5570 0%,#0f6d8c 45%,#12a0bb 100%);color:#fff;padding:20px 0 22px;box-shadow:0 2px 14px rgba(10,60,80,.18)}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.logo{width:54px;height:54px;border-radius:15px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.38);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:20px;letter-spacing:.5px}
+.brand h1{margin:0;font-size:22px;letter-spacing:2px;font-weight:700}
+.brand p{margin:3px 0 0;font-size:12.5px;opacity:.88}
+.author{font-size:12.5px;text-align:right;opacity:.92;line-height:1.5}
+
+/* ---------- Tabs ---------- */
+.tabs{position:sticky;top:0;z-index:30;background:rgba(238,243,248,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.tabs .wrap{display:flex;gap:6px;overflow-x:auto;padding:8px 16px;scrollbar-width:none}
+.tabs .wrap::-webkit-scrollbar{display:none}
+.tab{border:1px solid transparent;background:transparent;color:var(--muted);padding:9px 15px;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap;font-family:inherit;transition:.15s}
+.tab:hover{background:#fff;color:var(--brand)}
+.tab.active{background:var(--brand);color:#fff;box-shadow:0 2px 10px rgba(15,109,140,.28)}
+
+/* ---------- Pane / Card ---------- */
+.pane{display:none}
+.pane.active{display:block;animation:fade .22s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin:18px 0;box-shadow:0 1px 3px rgba(16,50,70,.05)}
+.card h2{margin:0;font-size:17px;font-weight:700;letter-spacing:.2px}
+.card h3{margin:20px 0 8px;font-size:14px;font-weight:700;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.6px}
+.card-head{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-bottom:14px;border-bottom:1px dashed var(--line)}
+.sub{font-size:12.5px;color:var(--muted);margin-top:4px}
+
+/* ---------- Step badge ---------- */
+.step-badge{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;padding:5px 13px;border-radius:99px;font-size:12.5px;font-weight:700;letter-spacing:.4px}
+.step-badge .n{background:rgba(255,255,255,.22);width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px}
+
+/* ---------- Instruction block ---------- */
+.instruction{margin-top:14px;background:#f0f8fb;border-left:4px solid var(--accent);padding:13px 16px;border-radius:0 10px 10px 0;font-size:13.8px;line-height:1.7;color:#25404f}
+.instruction b{color:var(--brand-dark)}
+.instruction .lbl{display:block;font-size:11.5px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);margin-bottom:4px}
+
+/* ---------- Fields ---------- */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:16px}
+.field label{display:block;font-size:12.5px;font-weight:700;color:var(--muted);margin-bottom:6px;letter-spacing:.2px}
+.field input{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:10px;font-size:15px;font-family:inherit;background:#fbfdfe;color:var(--ink);transition:.15s}
+.field input:focus{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px rgba(15,109,140,.13);background:#fff}
+.field .unit{font-weight:500;color:#8fa3b1}
+.hint{margin-top:14px;font-size:12.8px;color:var(--muted);background:#f6fafc;border-left:3px solid var(--info-line);padding:10px 13px;border-radius:0 8px 8px 0}
+.hint b{color:var(--brand-dark)}
+
+/* ---------- Result ---------- */
+.result{margin-top:18px}
+.verdict{padding:13px 16px;border-radius:12px;font-weight:600;font-size:14.5px;border:1px solid;display:flex;gap:10px;align-items:flex-start;margin-bottom:12px}
+.verdict .ico{font-size:16px;line-height:1.3;flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800}
+.verdict.ok{background:var(--ok-bg);border-color:var(--ok-line);color:var(--ok)}
+.verdict.ok .ico{background:var(--ok);color:#fff}
+.verdict.bad{background:var(--bad-bg);border-color:var(--bad-line);color:var(--bad)}
+.verdict.bad .ico{background:var(--bad);color:#fff}
+.verdict.warn{background:var(--warn-bg);border-color:var(--warn-line);color:var(--warn)}
+.verdict.warn .ico{background:var(--warn);color:#fff}
+.verdict.info{background:var(--info-bg);border-color:var(--info-line);color:var(--brand-dark)}
+.verdict.info .ico{background:var(--brand);color:#fff}
+.rec{background:#f7fbfd;border:1px solid var(--info-line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
+.rec .t{font-size:12px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;color:var(--brand);margin-bottom:8px}
+.rec .body{font-size:14.2px;line-height:1.65}
+.rec .body b{color:var(--brand-dark)}
+.rec .body ul{margin:6px 0 0;padding-left:18px}
+.rec .body li{margin:3px 0}
+
+.dates{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.date-box{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:12px 14px}
+.date-box.hl{border-style:solid;border-color:var(--accent);background:#f0f8fb}
+.date-box .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.date-box .val{font-size:16px;font-weight:700;color:var(--brand-dark);margin-top:3px}
+
+/* ---------- Nav button ---------- */
+.nav-btn{display:inline-flex;align-items:center;gap:8px;background:var(--brand);color:#fff;border:none;padding:11px 20px;border-radius:10px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:16px;transition:.15s;text-decoration:none}
+.nav-btn:hover{background:var(--brand-dark);transform:translateY(-1px);box-shadow:0 4px 12px rgba(15,109,140,.3)}
+.nav-btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--brand)}
+.nav-btn.ghost:hover{background:var(--brand);color:#fff}
+
+details{margin-top:14px;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fbfdfe}
+details summary{cursor:pointer;padding:11px 15px;font-size:13.5px;font-weight:700;color:var(--brand-dark);list-style:none;user-select:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"▸ ";color:var(--brand)}
+details[open] summary::before{content:"▾ "}
+details .dbody{padding:0 15px 15px;font-size:13.6px;color:#2c4252;line-height:1.65}
+
+/* ---------- Table ---------- */
+table{width:100%;border-collapse:collapse;margin-top:10px;font-size:13.2px}
+th,td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#f2f8fb;color:var(--brand-dark);font-weight:700;font-size:12.3px}
+tbody tr:nth-child(even){background:#fafcfe}
+
+/* ---------- Ref lists ---------- */
+.ref-list{margin:0;padding-left:0;list-style:none}
+.ref-list li{padding:9px 0 9px 26px;position:relative;border-bottom:1px dashed var(--line);font-size:14px}
+.ref-list li:last-child{border-bottom:none}
+.ref-list li::before{content:"›";position:absolute;left:8px;color:var(--accent);font-weight:800;font-size:16px}
+.abbr{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px 22px;margin-top:8px}
+.abbr div{font-size:13.8px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.abbr b{color:var(--brand-dark)}
+
+/* ---------- Image-like tables (воспроизведение изображений) ---------- */
+.figure{margin:20px 0 0}
+.figure-caption{font-size:12.5px;color:var(--muted);margin-top:8px;font-style:italic;text-align:center}
+.img-frame{border:1px solid var(--line);border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 2px 10px rgba(16,50,70,.06)}
+.img-title{background:linear-gradient(135deg,#0b5570,#12a0bb);color:#fff;text-align:center;padding:11px 14px;font-size:14px;font-weight:800;letter-spacing:.8px}
+
+/* Таблица диагностических критериев */
+.diag-table{width:100%;border-collapse:collapse;font-size:12.4px;table-layout:fixed}
+.diag-table th,.diag-table td{border:1px solid #cfd9e2;padding:5px 7px;text-align:center;vertical-align:middle}
+.diag-table thead th{background:#1c3d5a;color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.4px;padding:8px 6px}
+.diag-table thead tr:first-child th{background:#0f2c44}
+.diag-table tbody td:first-child{background:#eef3f8;font-weight:700;color:#1c3d5a;text-align:left}
+.diag-table .val{color:#b23a30;font-weight:700}
+.diag-table .val-n{color:#5d7486;font-weight:600}
+.diag-table .sub-row td{background:#dfe9f1;font-weight:800;color:#0f2c44;text-align:left;letter-spacing:.3px;font-size:12.6px}
+
+/* Таблица биохимии */
+.bio-layout{display:grid;grid-template-columns:150px 1fr;gap:0}
+.bio-cats{display:flex;flex-direction:column;background:#152a3e;color:#fff}
+.bio-cats .cat{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11.5px;font-weight:800;letter-spacing:.5px;padding:12px 8px;border-bottom:1px solid rgba(255,255,255,.14);text-transform:uppercase;line-height:1.35}
+.bio-cats .cat:last-child{border-bottom:none}
+.bio-table{width:100%;border-collapse:collapse;font-size:12.6px}
+.bio-table th{background:#e0455c;color:#fff;font-weight:800;letter-spacing:.6px;padding:9px 8px;text-align:center;border:none;font-size:12.3px}
+.bio-table td{border:1px solid #e3e9ef;padding:6px 10px;text-align:center}
+.bio-table td:first-child{text-align:left;background:#f8fafc;font-weight:600;color:#1c3d5a}
+.bio-table tr:nth-child(even) td:not(:first-child){background:#fdf3f5}
+.bio-table tr:nth-child(even) td:first-child{background:#f2f6f9}
+
+/* ---------- Footer ---------- */
+footer{margin-top:26px;padding:22px 0 34px;border-top:1px solid var(--line);color:var(--muted);font-size:12.6px}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.disclaim{background:#fff8e9;border:1px solid #f0e0b0;color:#7a5f14;padding:11px 14px;border-radius:10px;font-size:12.8px;margin-top:14px}
+
+@media(max-width:640px){
+  .brand h1{font-size:19px}
+  .author{text-align:left;font-size:12px}
+  .card{padding:16px}
+  .bio-layout{grid-template-columns:1fr}
+  .bio-cats{flex-direction:row;overflow-x:auto}
+  .bio-cats .cat{flex:0 0 auto;padding:8px 12px;border-bottom:none;border-right:1px solid rgba(255,255,255,.14)}
+  .diag-table{font-size:11px}
+  .diag-table th,.diag-table td{padding:4px 3px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo">Fe</div>
+      <div>
+        <h1>АНЕМИЯ</h1>
+        <p>Дефицит железа при ХСН · диагностика · расчёт дозы железа карбоксимальтозата</p>
+      </div>
+    </div>
+    
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="wrap">
+    <button class="tab active" data-target="pane-hf">ХСН и ФВ&lt;50%</button>
+    <button class="tab" data-target="pane-nohf">Без ХСН</button>
+    <button class="tab" data-target="pane-dd">ЖДА / АХЗ</button>
+    <button class="tab" data-target="pane-tsat">Сатурация трансферрина</button>
+    <button class="tab" data-target="pane-ref">Справка</button>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <!-- ============================================================
+       ПАНЕЛЬ 1. ХСН — Неделя 0 → Неделя 6 → Неделя 12/24/36
+       ============================================================ -->
+  <section class="pane active" id="pane-hf">
+
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Лечение анемии при ХСН и ФВ &lt; 50 %</h2>
+          <div class="sub">Пошаговый протокол наблюдения: Неделя 0 → Неделя 6 → Неделя 12 / 24 / 36</div>
+        </div>
+        <span class="step-badge"><span class="n">3</span> этапа</span>
+      </div>
+    </div>
+
+    <!-- ---------- НЕДЕЛЯ 0 ---------- -->
+    <div class="card" id="hf-week0">
+      <div class="card-head">
+        <div>
+          <h2>Неделя 0</h2>
+          <div class="sub">Первичная оценка · стартовая доза Феринжекта®</div>
+        </div>
+        <span class="step-badge"><span class="n">0</span> старт</span>
+      </div>
+
+      <div class="instruction">
+        <span class="lbl">Инструкция</span>
+        Указываются значения <b>массы тела, гемоглобина, ферритина и сатурации трансферрина</b>.
+        На основании указанных данных рекомендуется объём в/в инъекции Феринжекта
+        и дата следующего визита <b>через 6 недель</b>.
+      </div>
+
+      <div class="grid">
+        <div class="field"><label>Дата визита</label><input type="date" id="hf0-date"></div>
+        <div class="field"><label>Масса тела, <span class="unit">кг</span></label><input type="text" inputmode="decimal" id="hf0-weight" placeholder="например, 74"></div>
+        <div class="field"><label>Гемоглобин, <span class="unit">г/л</span></label><input type="text" inputmode="decimal" id="hf0-hb" placeholder="например, 140"></div>
+        <div class="field"><label>Ферритин, <span class="unit">нг/мл</span></label><input type="text" inputmode="decimal" id="hf0-fer" placeholder="например, 99"></div>
+        <div class="field"><label>Сатурация трансферрина, <span class="unit">%</span></label><input type="text" inputmode="decimal" id="hf0-tsat" placeholder="например, 19"></div>
+      </div>
+
+      <div class="hint">
+        <b>Критерий дефицита железа при ХСН:</b> ферритин &lt; 100 нг/мл <b>или</b> ферритин 100–299 нг/мл
+        при сатурации трансферрина &lt; 20 %. В/в железо показано независимо от уровня гемоглобина.
+      </div>
+
+      <div id="hf0-result" class="result"></div>
+
+      <a class="nav-btn" href="#hf-week6">Перейти в блок «Неделя 6» →</a>
+    </div>
+
+    <!-- ---------- НЕДЕЛЯ 6 ---------- -->
+    <div class="card" id="hf-week6">
+      <div class="card-head">
+        <div>
+          <h2>Неделя 6</h2>
+          <div class="sub">Контроль эффективности и коррекция дозы</div>
+        </div>
+        <span class="step-badge"><span class="n">6</span> недель</span>
+      </div>
+
+      <div class="instruction">
+        <span class="lbl">Инструкция</span>
+        Указываются значения <b>массы тела, гемоглобина</b>.
+        На основании указанных данных рекомендуется объём в/в инъекции Феринжекта
+        и дата следующего визита <b>через 6 недель</b>.
+      </div>
+
+      <div class="grid">
+        <div class="field"><label>Дата визита</label><input type="date" id="hf6-date"></div>
+        <div class="field"><label>Масса тела, <span class="unit">кг</span></label><input type="text" inputmode="decimal" id="hf6-weight" placeholder="например, 69"></div>
+        <div class="field"><label>Гемоглобин, <span class="unit">г/л</span></label><input type="text" inputmode="decimal" id="hf6-hb" placeholder="например, 99"></div>
+      </div>
+
+      <div id="hf6-result" class="result"></div>
+
+      <a class="nav-btn" href="#hf-week12">Перейти в блок «Неделя 12, 24, 36» →</a>
+    </div>
+
+    <!-- ---------- НЕДЕЛЯ 12, 24, 36 ---------- -->
+    <div class="card" id="hf-week12">
+      <div class="card-head">
+        <div>
+          <h2>Неделя 12, 24, 36</h2>
+          <div class="sub">Долгосрочное наблюдение · контроль ферритина и СТ</div>
+        </div>
+        <span class="step-badge"><span class="n">12</span> недель</span>
+      </div>
+
+      <div class="instruction">
+        <span class="lbl">Инструкция</span>
+        Указываются значения <b>ферритина и сатурации трансферрина</b>.
+        На основании указанных данных рекомендуется объём в/в инъекции Феринжекта
+        и дата следующего визита <b>через 12 недель</b>.
+        На 24 и 36 неделе повторно ввести требуемые значения.
+      </div>
+
+      <div class="grid">
+        <div class="field"><label>Дата визита</label><input type="date" id="hf12-date"></div>
+        <div class="field"><label>Ферритин, <span class="unit">нг/мл</span></label><input type="text" inputmode="decimal" id="hf12-fer" placeholder="например, 299"></div>
+        <div class="field"><label>Сатурация трансферрина, <span class="unit">%</span></label><input type="text" inputmode="decimal" id="hf12-tsat" placeholder="например, 19"></div>
+      </div>
+
+      <div id="hf12-result" class="result"></div>
+    </div>
+
+  </section>
+
+  <!-- ============================================================
+       ПАНЕЛЬ 2. Без ХСН
+       ============================================================ -->
+  <section class="pane" id="pane-nohf">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Лечение дефицита железа и анемии без ХСН</h2>
+          <div class="sub">Первичная оценка · стартовая доза Феринжекта®</div>
+        </div>
+        <span class="step-badge"><span class="n">0</span> старт</span>
+      </div>
+
+      <div class="instruction">
+        <span class="lbl">Инструкция</span>
+        Указываются значения <b>массы тела, гемоглобина, ферритина и сатурации трансферрина</b>.
+        На основании указанных данных рекомендуется объём в/в инъекции Феринжекта
+        и дата следующего визита <b>через 4 недели</b>.<br><br>
+        <b>Для определения дальнейшей тактики — вновь ввести требуемые данные через 4 недели.</b>
+      </div>
+
+      <div class="grid">
+        <div class="field"><label>Дата визита</label><input type="date" id="nh-date"></div>
+        <div class="field"><label>Масса тела, <span class="unit">кг</span></label><input type="text" inputmode="decimal" id="nh-weight" placeholder="например, 83"></div>
+        <div class="field"><label>Гемоглобин, <span class="unit">г/л</span></label><input type="text" inputmode="decimal" id="nh-hb" placeholder="например, 119"></div>
+        <div class="field"><label>Ферритин, <span class="unit">нг/мл</span></label><input type="text" inputmode="decimal" id="nh-fer" placeholder="например, 309"></div>
+        <div class="field"><label>Сатурация трансферрина, <span class="unit">%</span></label><input type="text" inputmode="decimal" id="nh-tsat" placeholder="например, 19"></div>
+      </div>
+
+      <div class="hint">
+        <b>Критерий дефицита железа:</b> ферритин &lt; 100 нг/мл <b>или</b> ферритин 100–299 нг/мл
+        при сатурации трансферрина &lt; 20 %.
+      </div>
+
+      <div id="nh-result" class="result"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ПАНЕЛЬ 3. ЖДА / АХЗ
+       ============================================================ -->
+  <section class="pane" id="pane-dd">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Дифференциальная диагностика ЖДА и АХЗ</h2>
+          <div class="sub">Железодефицитная анемия (D50) · анемия хронических заболеваний (D63.0) · дефицит железа (E61.1)</div>
+        </div>
+      </div>
+
+      <div class="grid">
+        <div class="field"><label>Сывороточное железо, <span class="unit">мкмоль/л</span></label><input type="text" inputmode="decimal" id="dd-fe" placeholder="10,7–32,2"></div>
+        <div class="field"><label>ОЖСС, <span class="unit">мкмоль/л</span></label><input type="text" inputmode="decimal" id="dd-ibc" placeholder="46–90"></div>
+        <div class="field"><label>Ферритин, <span class="unit">нг/мл</span></label><input type="text" inputmode="decimal" id="dd-fer" placeholder="11,0–306,8"></div>
+      </div>
+
+      <div class="hint">
+        Сатурация трансферрина рассчитывается автоматически: <b>СТ = железо / ОЖСС × 100 %</b> (референс 17,8–43,3 %).
+      </div>
+
+      <div id="dd-result" class="result"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ПАНЕЛЬ 4. Сатурация трансферрина
+       ============================================================ -->
+  <section class="pane" id="pane-tsat">
+    <div class="card">
+      <div class="card-head">
+        <div>
+          <h2>Расчёт сатурации трансферрина</h2>
+          <div class="sub">Два способа: через ОЖСС или через концентрацию трансферрина</div>
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr;">
+        <div class="field">
+          <label>Сывороточное железо, <span class="unit">мкмоль/л</span></label>
+          <input type="text" inputmode="decimal" id="ts-fe" placeholder="например, 6,54">
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns:1fr 1fr;">
+        <div class="field">
+          <label>ОЖСС, <span class="unit">мкмоль/л</span></label>
+          <input type="text" inputmode="decimal" id="ts-ibc" placeholder="например, 80,47">
+        </div>
+        <div class="field">
+          <label>Трансферрин, <span class="unit">мкмоль/л</span></label>
+          <input type="text" inputmode="decimal" id="ts-tf" placeholder="например, 36">
+        </div>
+      </div>
+
+      <div class="hint">
+        <b>СТ = Железо / ОЖСС × 100 %</b> &nbsp;·&nbsp; <b>СТ = Железо / Трансферрин × 70,9</b>.<br>
+        Если заполнены оба поля — приоритет у расчёта через ОЖСС.
+      </div>
+
+      <div id="ts-result" class="result"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       ПАНЕЛЬ 5. Справка
+       ============================================================ -->
+  <section class="pane" id="pane-ref">
+
+    <!-- Изображение 1 -->
+    <div class="card">
+      <h2>Диагностические критерии анемий различной этиологии</h2>
+      <div class="figure">
+        <div class="img-frame">
+          <div class="img-title">ДИАГНОСТИЧЕСКИЕ КРИТЕРИИ АНЕМИЙ РАЗЛИЧНОЙ ЭТИОЛОГИИ</div>
+          <table class="diag-table">
+            <thead>
+              <tr>
+                <th style="width:15%"></th>
+                <th>ЖДА</th>
+                <th>Постгеморрагическая анемия</th>
+                <th>АХЗ</th>
+                <th>Гемолитическая анемия</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Гемоглобин</td>
+                <td class="val">&lt; 120 (130)</td>
+                <td class="val">&lt; 120 (130)</td>
+                <td class="val">&lt; 120 (130)</td>
+                <td class="val">&lt; 120 (130)</td>
+              </tr>
+              <tr>
+                <td>MCV</td>
+                <td class="val">&lt; 80</td>
+                <td class="val">&lt; 80 или N</td>
+                <td class="val">&lt; 80 или N</td>
+                <td class="val">N или &gt; 100</td>
+              </tr>
+              <tr>
+                <td>MCH</td>
+                <td class="val">&lt; 27</td>
+                <td class="val">&lt; 27 или N</td>
+                <td class="val">&lt; 27 или N</td>
+                <td class="val">N или &gt; 34</td>
+              </tr>
+              <tr>
+                <td>Ретикулоциты</td>
+                <td class="val">&lt; 100</td>
+                <td class="val">&gt; 100</td>
+                <td class="val">N</td>
+                <td class="val">&gt; 100</td>
+              </tr>
+              <tr>
+                <td>Ферритин</td>
+                <td class="val">&lt; 30 (&lt; 100)</td>
+                <td class="val">N</td>
+                <td class="val">N или &gt; 300</td>
+                <td class="val">↑↑</td>
+              </tr>
+              <tr>
+                <td>Трансферрин</td>
+                <td class="val">&gt; 360</td>
+                <td class="val">N</td>
+                <td class="val">N или &lt; 200</td>
+                <td class="val">↓↓</td>
+              </tr>
+              <tr>
+                <td>ОЖСС</td>
+                <td class="val">&gt; 78</td>
+                <td class="val">N</td>
+                <td class="val">N</td>
+                <td class="val">↓↓</td>
+              </tr>
+              <tr>
+                <td>НТЖ</td>
+                <td class="val">&lt; 20</td>
+                <td class="val">N</td>
+                <td class="val">N</td>
+                <td class="val">↑↑</td>
+              </tr>
+              <tr>
+                <td>Сыв. железо</td>
+                <td class="val">&lt; 10</td>
+                <td class="val">&lt; 10 или N</td>
+                <td class="val">N или &lt; 10</td>
+                <td class="val">↑↑</td>
+              </tr>
+              <tr>
+                <td>СРБ</td>
+                <td class="val-n">N</td>
+                <td class="val-n">N</td>
+                <td class="val">&gt; 5</td>
+                <td class="val-n">N</td>
+              </tr>
+              <tr>
+                <td>Билирубин н.</td>
+                <td class="val-n">N</td>
+                <td class="val-n">N</td>
+                <td class="val-n">N</td>
+                <td class="val">&gt; 17,6</td>
+              </tr>
+              <tr>
+                <td>ЛДГ</td>
+                <td class="val-n">N</td>
+                <td class="val-n">N</td>
+                <td class="val-n">N</td>
+                <td class="val">&gt; 248</td>
+              </tr>
+              <tr class="sub-row"><td colspan="5">ЛАТЕНТНЫЙ ДЕФИЦИТ ЖЕЛЕЗА</td></tr>
+              <tr>
+                <td>Гемоглобин</td>
+                <td class="val-n">N</td>
+                <td class="val-n">—</td>
+                <td class="val-n">—</td>
+                <td class="val-n">—</td>
+              </tr>
+              <tr>
+                <td>Ферритин</td>
+                <td class="val">&lt; 30</td>
+                <td class="val-n">—</td>
+                <td class="val-n">—</td>
+                <td class="val-n">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="figure-caption">
+          Рис. 1. Диагностические критерии анемий различной этиологии. N — норма; ↑↑ — выраженное повышение; ↓↓ — выраженное снижение.
+        </div>
+      </div>
+      <div class="hint" style="margin-top:14px">
+        Данная панель диагностических критериев была подготовлена Пономаревым Р.В. (к.м.н., руководитель сектора изучения неопухолевых заболеваний системы крови «НМИЦ гематологии» Минздрава России).
+      </div>
+    </div>
+
+    <!-- Изображение 2 -->
+    <div class="card">
+      <h2>Биохимия крови — референсные значения</h2>
+      <div class="figure">
+        <div class="img-frame">
+          <div class="img-title">БИОХИМИЯ КРОВИ</div>
+          <div class="bio-layout">
+            <div class="bio-cats">
+              <div class="cat">Метаболизм железа</div>
+              <div class="cat">Воспаление</div>
+              <div class="cat">Маркеры гемолиза</div>
+              <div class="cat">Синтез ЭПО</div>
+              <div class="cat">Витамины</div>
+            </div>
+            <table class="bio-table">
+              <thead>
+                <tr><th>Показатель</th><th>Норма</th><th>Единицы измерения</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Ферритин</td><td>30–300</td><td>нг/мл</td></tr>
+                <tr><td>Трансферрин</td><td>200–360</td><td>мг/дл</td></tr>
+                <tr><td>ОЖСС</td><td>46–78</td><td>мкмоль/л</td></tr>
+                <tr><td>НТЖ</td><td>20–42</td><td>%</td></tr>
+                <tr><td>Сыв. железо</td><td>10–30</td><td>мкмоль/л</td></tr>
+                <tr><td>СРБ</td><td>&lt; 5</td><td>нг/мл</td></tr>
+                <tr><td>Билирубин о.</td><td>5–21</td><td>мкмоль/л</td></tr>
+                <tr><td>Билирубин н.</td><td>5–17,6</td><td>мкмоль/л</td></tr>
+                <tr><td>ЛДГ</td><td>0–248</td><td>ед/л</td></tr>
+                <tr><td>Гаптоглобин</td><td>0,3–2,0</td><td>г/л</td></tr>
+                <tr><td>Эритропоэтин</td><td>2,59–18,5</td><td>МЕ/мл</td></tr>
+                <tr><td>Витамин В12</td><td>180–914</td><td>пкг/мл</td></tr>
+                <tr><td>Фолаты (В9)</td><td>5,9–24,8</td><td>нг/мл</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="figure-caption">
+          Рис. 2. Биохимия крови: метаболизм железа, маркеры воспаления, гемолиза, синтез ЭПО и витамины.
+        </div>
+      </div>
+    </div>
+
+    <!-- Сокращения -->
+    <div class="card">
+      <h2>Сокращения</h2>
+      <div class="abbr">
+        <div><b>ХСН</b> — хроническая сердечная недостаточность</div>
+        <div><b>ФВ</b> — фракция выброса левого желудочка</div>
+        <div><b>ЖДА</b> — железодефицитная анемия</div>
+        <div><b>АХЗ</b> — анемия хронических заболеваний</div>
+        <div><b>Hb</b> — гемоглобин</div>
+        <div><b>СТ</b> — сатурация (насыщение) трансферрина</div>
+        <div><b>НТЖ</b> — насыщение трансферрина железом</div>
+        <div><b>ОЖСС</b> — общая железосвязывающая способность сыворотки</div>
+        <div><b>MCV</b> — средний объём эритроцита</div>
+        <div><b>MCH</b> — среднее содержание гемоглобина в эритроците</div>
+        <div><b>ЛДГ</b> — лактатдегидрогеназа</div>
+        <div><b>СРБ</b> — С-реактивный белок</div>
+        <div><b>ЭПО</b> — эритропоэтин</div>
+        <div><b>СКФ</b> — скорость клубочковой фильтрации</div>
+        <div><b>в/в</b> — внутривенно</div>
+        <div><b>NaCl 0,9 %</b> — раствор натрия хлорида 0,9 %</div>
+      </div>
+    </div>
+
+    <!-- Референсные интервалы -->
+    <div class="card">
+      <h2>Референсные интервалы</h2>
+      <table>
+        <thead>
+          <tr><th>Показатель</th><th>Референс</th><th>Комментарий</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Сывороточное железо</td><td>10,7–32,2 мкмоль/л</td><td>—</td></tr>
+          <tr><td>ОЖСС</td><td>46–90 мкмоль/л</td><td>—</td></tr>
+          <tr><td>Ферритин</td><td>11,0–306,8 нг/мл</td><td>При ХСН порог дефицита — &lt; 100 нг/мл</td></tr>
+          <tr><td>Сатурация трансферрина</td><td>17,8–43,3 %</td><td>При ХСН порог дефицита — &lt; 20 %</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Схемы -->
+    <div class="card">
+      <h2>Схемы введения железа карбоксимальтозата (Феринжект®)</h2>
+
+      <h3>Неделя 0 — стартовая доза по уровню Hb и массе тела</h3>
+      <table>
+        <thead>
+          <tr><th>Гемоглобин</th><th>&lt; 35 кг</th><th>35–69 кг</th><th>≥ 70 кг</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>&lt; 100 г/л</b></td>
+            <td>500 мг (10 мл) + NaCl 0,9 % 100 мл, в/в капельно 6+ мин</td>
+            <td>1500 мг (30 мл) за 2 инъекции: 500 мг + NaCl 100 мл (6+ мин), через 1 нед — 1000 мг + NaCl 200 мл (15+ мин)</td>
+            <td>2000 мг (40 мл) за 2 инъекции: 1000 мг + NaCl 200 мл (15+ мин), через 1 нед — 1000 мг + NaCl 200 мл (15+ мин)</td>
+          </tr>
+          <tr>
+            <td><b>100–139 г/л</b></td>
+            <td>500 мг (10 мл)</td>
+            <td>1000 мг (20 мл) + NaCl 0,9 % 200 мл, в/в капельно 15+ мин</td>
+            <td>1500 мг (30 мл) за 2 инъекции: 500 мг + NaCl 100 мл (6+ мин), через 1 нед — 1000 мг + NaCl 200 мл (15+ мин)</td>
+          </tr>
+          <tr>
+            <td><b>≥ 140 г/л</b></td>
+            <td colspan="3">500 мг (10 мл) + NaCl 0,9 % 100 мл, в/в капельно 6+ мин</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Неделя 6 — коррекция дозы</h3>
+      <table>
+        <thead><tr><th>Hb / масса тела</th><th>&lt; 70 кг</th><th>≥ 70 кг</th></tr></thead>
+        <tbody>
+          <tr><td><b>&lt; 100 г/л</b></td><td>500 мг (10 мл) + NaCl 100 мл, 6+ мин</td><td>1000 мг (20 мл) + NaCl 200 мл, 15+ мин</td></tr>
+          <tr><td><b>100–139 г/л</b></td><td>Потребности нет</td><td>500 мг (10 мл) + NaCl 100 мл, 6+ мин</td></tr>
+          <tr><td><b>≥ 140 г/л</b></td><td colspan="2">Потребности нет</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Неделя 12, 24, 36 — поддерживающая терапия</h3>
+      <table>
+        <thead><tr><th>Ферритин / СТ</th><th>Рекомендация</th></tr></thead>
+        <tbody>
+          <tr><td>Ферритин &lt; 100 нг/мл <b>или</b> ферритин 100–299 нг/мл при СТ &lt; 20 %</td><td>Железа карбоксимальтозат (Феринжект®) 500 мг (10 мл) + NaCl 0,9 % 100 мл; в/в капельно 6+ мин</td></tr>
+          <tr><td>Ферритин ≥ 300 нг/мл <b>или</b> ферритин 100–299 нг/мл при СТ ≥ 20 %</td><td>Потребности в дополнительном введении железа нет</td></tr>
+        </tbody>
+      </table>
+
+      <div class="hint" style="margin-top:16px">
+        Контроль эффективности: при ХСН — <b>через 6 недель</b> после старта, далее <b>через 12 недель</b>;
+        при лечении без ХСН — <b>через 4 недели</b>. Оценка включает Hb, ферритин и СТ.
+      </div>
+    </div>
+
+    <!-- Источники -->
+    <div class="card">
+      <h2>Источники</h2>
+      <ul class="ref-list">
+        <li>Клинические рекомендации «Хроническая сердечная недостаточность» (Минздрав РФ) — диагностика и коррекция дефицита железа при ХСН.</li>
+        <li>ESC Guidelines for the diagnosis and treatment of acute and chronic heart failure — критерии дефицита железа (ферритин &lt; 100 нг/мл или ферритин 100–299 нг/мл при СТ &lt; 20 %).</li>
+        <li>Инструкция по медицинскому применению лекарственного препарата <b>Феринжект®</b> (железа карбоксимальтозат) — дозы, скорость и объём инфузии, правила разведения.</li>
+        <li>Клинические рекомендации по диагностике и лечению железодефицитной анемии — дифференциальная диагностика ЖДА и АХЗ, референсные интервалы.</li>
+        <li>Пономарев Р.В. (к.м.н., НМИЦ гематологии Минздрава России) — панель диагностических критериев анемий различной этиологии.</li>
+      </ul>
+      <div class="disclaim">
+        Приложение является вспомогательным инструментом поддержки клинических решений и не заменяет
+        индивидуальную оценку врача, данные инструментальных исследований и актуальные версии
+        клинических рекомендаций и инструкций к препаратам.
+      </div>
+    </div>
+
+    <!-- О приложении -->
+    <div class="card">
+      <h2>О приложении</h2>
+      <p style="font-size:14px;margin:6px 0 0">
+        Клинический калькулятор для диагностики дефицита железа и расчёта дозы железа карбоксимальтозата
+        у пациентов с ХСН и без ХСН, а также для дифференциальной диагностики железодефицитной анемии
+        и анемии хронических заболеваний. Протокол наблюдения при ХСН включает три этапа: Неделя 0,
+        Неделя 6 и Неделя 12/24/36.
+      </p>
+    </div>
+
+  </section>
+
+</main>
+
+<footer>
+  
+</footer>
+
+<script>
+/* ================= Утилиты ================= */
+const $ = id => document.getElementById(id);
+
+function numOf(id){
+  const el = $(id);
+  if(!el) return null;
+  const s = String(el.value || '').replace(/\s/g,'').replace(',', '.');
+  if(s === '') return null;
+  const n = Number(s);
+  return Number.isFinite(n) ? n : null;
+}
+
+function todayISO(){
+  const d = new Date(), p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
+}
+function dateFromInput(id){
+  const v = $(id) ? $(id).value : '';
+  if(!v) return new Date();
+  const [y,m,d] = v.split('-').map(Number);
+  return new Date(y, m-1, d);
+}
+const WD = ['Вс','Пн','Вт','Ср','Чт','Пт','Сб'];
+function addDays(d,n){ const x = new Date(d.getTime()); x.setDate(x.getDate()+n); return x; }
+function fmtDate(d){
+  const p = n => String(n).padStart(2,'0');
+  return `${p(d.getDate())}.${p(d.getMonth()+1)}.${d.getFullYear()} (${WD[d.getDay()]})`;
+}
+function n2(x){ return (Math.round(x*100)/100).toString().replace('.', ','); }
+
+/* ================= Тексты доз ================= */
+const D = {
+  w500: `<b>Железа карбоксимальтозат (Феринжект®) 500 мг (10 мл)</b><br>+ NaCl 0,9 % — 100 мл; в/в, капельно за 6+ мин.`,
+  w500s: `<b>Железа карбоксимальтозат (Феринжект®) 500 мг (10 мл)</b>`,
+  w1000: `<b>Железа карбоксимальтозат (Феринжект®) 1000 мг (20 мл)</b><br>+ NaCl 0,9 % — 200 мл; в/в, капельно за 15+ мин.`,
+  w1500: `<b>1500 мг (30 мл) за 2 в/в инъекции:</b><ul>
+    <li>Железа карбоксимальтозат (Феринжект®) 500 мг (10 мл) + NaCl 0,9 % — 100 мл; в/в, капельно за 6+ мин;</li>
+    <li>через 1 неделю — Железа карбоксимальтозат (Феринжект®) 1000 мг (20 мл) + NaCl 0,9 % — 200 мл; в/в, капельно за 15+ мин.</li></ul>`,
+  w2000: `<b>2000 мг (40 мл) за 2 в/в инъекции:</b><ul>
+    <li>Железа карбоксимальтозат (Феринжект®) 1000 мг (20 мл) + NaCl 0,9 % — 200 мл; в/в, капельно за 15+ мин;</li>
+    <li>через 1 неделю — Феринжект® 1000 мг (20 мл) + NaCl 0,9 % — 200 мл; в/в, капельно за 15+ мин.</li></ul>`,
+  none: `Потребности в дополнительном введении железа нет.`
+};
+
+/* Стартовая доза (Неделя 0) */
+function doseStart(hb, w){
+  if(hb < 100){
+    if(w < 35) return D.w500;
+    if(w < 70) return D.w1500;
+    return D.w2000;
+  }
+  if(hb < 140){
+    if(w < 35) return D.w500s;
+    if(w < 70) return D.w1000;
+    return D.w1500;
+  }
+  return D.w500;
+}
+
+/* Неделя 6 — коррекция */
+function doseWeek6(hb, w){
+  if(hb < 100 && w < 70)  return D.w500;
+  if(hb < 140 && w < 70)  return D.none;
+  if(hb < 100 && w >= 70) return D.w1000;
+  if(hb < 140 && w >= 70) return D.w500;
+  if(hb >= 140)           return D.none;
+  return '';
+}
+
+function verdict(kind, text){
+  const ico = { ok:'✔', bad:'!', warn:'!', info:'i' }[kind] || 'i';
+  return `<div class="verdict ${kind}"><span class="ico">${ico}</span><span>${text}</span></div>`;
+}
+
+/* ================= Логика дефицита железа ================= */
+function ironStatus(fer, tsat){
+  if(fer === null || tsat === null) return { code:'empty', text:'Заполните ферритин и сатурацию трансферрина.' };
+  if(tsat === 0)                    return { code:'need',  text:'Укажите сатурацию трансферрина!' };
+  if((fer <= 299 && tsat < 20) || fer < 100)
+    return { code:'deficit', text:'Рекомендуется в/в инъекция железа карбоксимальтозата' };
+  return { code:'none', text:'Дефицит железа отсутствует' };
+}
+
+/* ================= НЕДЕЛЯ 0 (ХСН) ================= */
+function renderHF0(){
+  const w    = numOf('hf0-weight');
+  const hb   = numOf('hf0-hb');
+  const fer  = numOf('hf0-fer');
+  const tsat = numOf('hf0-tsat');
+  const box  = $('hf0-result');
+
+  const st = ironStatus(fer, tsat);
+  let html = '';
+
+  if(st.code === 'empty'){ box.innerHTML = verdict('warn', st.text); return; }
+  if(st.code === 'need'){  box.innerHTML = verdict('warn', st.text); return; }
+
+  if(st.code === 'deficit'){
+    html += verdict('bad', 'Дефицит железа подтверждён — рекомендуется в/в инъекция железа карбоксимальтозата.');
+  } else {
+    html += verdict('ok', `Дефицит железа отсутствует (ферритин ${n2(fer)} нг/мл; СТ ${n2(tsat)} %).`);
+  }
+
+  if(st.code === 'deficit'){
+    if(w === null || hb === null){
+      html += verdict('warn', 'Для расчёта дозы укажите массу тела и уровень гемоглобина.');
+    } else {
+      html += `<div class="rec">
+        <div class="t">Стартовая доза (Неделя 0)</div>
+        <div class="body">${doseStart(hb, w)}</div>
+      </div>`;
+    }
+  }
+
+  /* Дата следующего визита — через 6 недель */
+  const base = dateFromInput('hf0-date');
+  const next = addDays(base, 42);
+  html += `<h3 style="margin-top:20px">Следующий визит</h3>
+    <div class="dates">
+      <div class="date-box hl">
+        <div class="lbl">Через 6 недель</div>
+        <div class="val">${fmtDate(next)}</div>
+      </div>
+    </div>`;
+
+  box.innerHTML = html;
+}
+
+/* ================= НЕДЕЛЯ 6 (ХСН) ================= */
+function renderHF6(){
+  const w   = numOf('hf6-weight');
+  const hb  = numOf('hf6-hb');
+  const box = $('hf6-result');
+  let html = '';
+
+  if(w === null || hb === null){
+    box.innerHTML = verdict('warn', 'Укажите массу тела и уровень гемоглобина.');
+    return;
+  }
+
+  const dose = doseWeek6(hb, w);
+
+  if(dose === D.none){
+    html += verdict('ok', `Hb ${n2(hb)} г/л, масса тела ${n2(w)} кг — потребности в дополнительном введении железа нет.`);
+  } else {
+    html += verdict('bad', `Hb ${n2(hb)} г/л, масса тела ${n2(w)} кг — требуется в/в введение железа карбоксимальтозата.`);
+    html += `<div class="rec">
+      <div class="t">Коррекция дозы (Неделя 6)</div>
+      <div class="body">${dose}</div>
+    </div>`;
+  }
+
+  /* Следующий визит — через 6 недель */
+  const base = dateFromInput('hf6-date');
+  const next = addDays(base, 42);
+  html += `<h3 style="margin-top:20px">Следующий визит</h3>
+    <div class="dates">
+      <div class="date-box hl">
+        <div class="lbl">Через 6 недель</div>
+        <div class="val">${fmtDate(next)}</div>
+      </div>
+    </div>`;
+
+  box.innerHTML = html;
+}
+
+/* ================= НЕДЕЛЯ 12 / 24 / 36 (ХСН) ================= */
+function renderHF12(){
+  const fer  = numOf('hf12-fer');
+  const tsat = numOf('hf12-tsat');
+  const box  = $('hf12-result');
+
+  if(fer === null || tsat === null){
+    box.innerHTML = verdict('warn', 'Укажите ферритин и сатурацию трансферрина.');
+    return;
+  }
+  if(tsat === 0){
+    box.innerHTML = verdict('warn', 'Укажите сатурацию трансферрина!');
+    return;
+  }
+
+  let html = '';
+  const deficit = (fer <= 299 && tsat < 20) || fer < 100;
+
+  if(deficit){
+    html += verdict('bad', `Дефицит железа сохраняется (ферритин ${n2(fer)} нг/мл; СТ ${n2(tsat)} %).`);
+    html += `<div class="rec">
+      <div class="t">Поддерживающая доза (Неделя 12 / 24 / 36)</div>
+      <div class="body">${D.w500}</div>
+    </div>`;
+  } else {
+    html += verdict('ok', `Дефицит железа отсутствует (ферритин ${n2(fer)} нг/мл; СТ ${n2(tsat)} %).`);
+    html += `<div class="rec">
+      <div class="t">Рекомендация</div>
+      <div class="body">${D.none}</div>
+    </div>`;
+  }
+
+  /* Следующий визит — через 12 недель */
+  const base = dateFromInput('hf12-date');
+  const next = addDays(base, 84);
+  html += `<h3 style="margin-top:20px">Следующий визит</h3>
+    <div class="dates">
+      <div class="date-box hl">
+        <div class="lbl">Через 12 недель</div>
+        <div class="val">${fmtDate(next)}</div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:14px">
+      На 24 и 36 неделе повторно ввести требуемые значения (ферритин и СТ).
+    </div>`;
+
+  box.innerHTML = html;
+}
+
+/* ================= БЕЗ ХСН ================= */
+function renderNH(){
+  const w    = numOf('nh-weight');
+  const hb   = numOf('nh-hb');
+  const fer  = numOf('nh-fer');
+  const tsat = numOf('nh-tsat');
+  const box  = $('nh-result');
+
+  const st = ironStatus(fer, tsat);
+  let html = '';
+
+  if(st.code === 'empty'){ box.innerHTML = verdict('warn', st.text); return; }
+  if(st.code === 'need'){  box.innerHTML = verdict('warn', st.text); return; }
+
+  if(st.code === 'deficit'){
+    html += verdict('bad', 'Дефицит железа подтверждён — рекомендуется в/в инъекция железа карбоксимальтозата.');
+  } else {
+    html += verdict('ok', `Дефицит железа отсутствует (ферритин ${n2(fer)} нг/мл; СТ ${n2(tsat)} %).`);
+  }
+
+  if(st.code === 'deficit'){
+    if(w === null || hb === null){
+      html += verdict('warn', 'Для расчёта дозы укажите массу тела и уровень гемоглобина.');
+    } else {
+      html += `<div class="rec">
+        <div class="t">Стартовая доза (Неделя 0)</div>
+        <div class="body">${doseStart(hb, w)}</div>
+      </div>`;
+    }
+  }
+
+  /* Следующий визит — через 4 недели */
+  const base = dateFromInput('nh-date');
+  const next = addDays(base, 28);
+  html += `<h3 style="margin-top:20px">Следующий визит</h3>
+    <div class="dates">
+      <div class="date-box hl">
+        <div class="lbl">Через 4 недели</div>
+        <div class="val">${fmtDate(next)}</div>
+      </div>
+    </div>
+    <div class="hint" style="margin-top:14px">
+      Для определения дальнейшей тактики — <b>вновь ввести требуемые данные через 4 недели</b>.
+    </div>`;
+
+  box.innerHTML = html;
+}
+
+/* ================= ЖДА / АХЗ ================= */
+function renderDD(){
+  const fe  = numOf('dd-fe');
+  const ibc = numOf('dd-ibc');
+  const fer = numOf('dd-fer');
+  const box = $('dd-result');
+
+  if(fe === null || ibc === null || fer === null){
+    box.innerHTML = verdict('warn', 'Заполните все три показателя: сывороточное железо, ОЖСС и ферритин.');
+    return;
+  }
+  if(ibc === 0){
+    box.innerHTML = verdict('warn', 'ОЖСС не может быть равно нулю.');
+    return;
+  }
+
+  const tsat = (fe / ibc) * 100;
+  let html = '';
+
+  if(fe < 10.7 && ibc > 90 && tsat < 17.8 && fer < 11){
+    html += verdict('bad', 'D50 Железодефицитная анемия (ЖДА)');
+  } else if(fe < 32.2 && ibc <= 90 && fer >= 11){
+    html += verdict('warn', 'D63.0 Анемия хронических заболеваний (АХЗ)');
+  } else if(fer < 100){
+    html += verdict('warn', 'Дефицит железа (E61.1)');
+  } else {
+    html += verdict('info', 'Оцените СКФ, витамин B12 и фолиевую кислоту');
+  }
+
+  html += `<div class="rec">
+    <div class="t">Расчётные показатели</div>
+    <div class="body">
+      Сатурация трансферрина: <b>${n2(tsat)} %</b> <span style="color:var(--muted)">(референс 17,8–43,3 %)</span>
+    </div>
+  </div>`;
+
+  box.innerHTML = html;
+}
+
+/* ================= СТ ================= */
+function renderTS(){
+  const fe  = numOf('ts-fe');
+  const ibc = numOf('ts-ibc');
+  const tf  = numOf('ts-tf');
+  const box = $('ts-result');
+
+  if(fe === null){
+    box.innerHTML = verdict('warn', 'Укажите сывороточное железо.');
+    return;
+  }
+
+  let tsat = null, method = '';
+
+  if(ibc !== null && ibc !== 0){
+    tsat = (fe / ibc) * 100;
+    method = 'через ОЖСС: Fe / ОЖСС × 100 %';
+  } else if(tf !== null && tf !== 0){
+    tsat = (fe / tf) * 70.9;
+    method = 'через трансферрин: Fe / Тф × 70,9';
+  }
+
+  if(tsat === null){
+    box.innerHTML = verdict('warn', 'Укажите ОЖСС или концентрацию трансферрина.');
+    return;
+  }
+
+  let kind = 'ok', text = '';
+  if(tsat < 20){
+    kind = 'bad';
+    text = 'Сатурация трансферрина < 20 % — соответствует критерию дефицита железа (в т.ч. при ХСН).';
+  } else if(tsat < 17.8){
+    kind = 'bad';
+    text = 'Сатурация трансферрина ниже референса.';
+  } else if(tsat > 43.3){
+    kind = 'warn';
+    text = 'Сатурация трансферрина выше референса.';
+  } else {
+    text = 'Сатурация трансферрина в пределах референсных значений (17,8–43,3 %).';
+  }
+
+  box.innerHTML = `
+    <div class="rec">
+      <div class="t">Результат</div>
+      <div class="body">
+        <b style="font-size:22px;color:var(--brand-dark)">${n2(tsat)} %</b><br>
+        <span style="color:var(--muted);font-size:13px">Метод расчёта — ${method}</span>
+      </div>
+    </div>
+    ${verdict(kind, text)}
+  `;
+}
+
+/* ================= Инициализация ================= */
+document.addEventListener('DOMContentLoaded', () => {
+
+  /* Табы */
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.pane').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      document.getElementById(t.dataset.target).classList.add('active');
+      window.scrollTo({ top:0, behavior:'smooth' });
+    });
+  });
+
+  /* Даты по умолчанию */
+  ['hf0-date','hf6-date','hf12-date','nh-date'].forEach(id => {
+    if($(id)) $(id).value = todayISO();
+  });
+
+  /* ХСН — Неделя 0 */
+  ['hf0-date','hf0-weight','hf0-hb','hf0-fer','hf0-tsat'].forEach(id => {
+    $(id).addEventListener('input', renderHF0);
+    $(id).addEventListener('change', renderHF0);
+  });
+
+  /* ХСН — Неделя 6 */
+  ['hf6-date','hf6-weight','hf6-hb'].forEach(id => {
+    $(id).addEventListener('input', renderHF6);
+    $(id).addEventListener('change', renderHF6);
+  });
+
+  /* ХСН — Неделя 12/24/36 */
+  ['hf12-date','hf12-fer','hf12-tsat'].forEach(id => {
+    $(id).addEventListener('input', renderHF12);
+    $(id).addEventListener('change', renderHF12);
+  });
+
+  /* Без ХСН */
+  ['nh-date','nh-weight','nh-hb','nh-fer','nh-tsat'].forEach(id => {
+    $(id).addEventListener('input', renderNH);
+    $(id).addEventListener('change', renderNH);
+  });
+
+  /* ЖДА / АХЗ */
+  ['dd-fe','dd-ibc','dd-fer'].forEach(id => {
+    $(id).addEventListener('input', renderDD);
+    $(id).addEventListener('change', renderDD);
+  });
+
+  /* СТ */
+  ['ts-fe','ts-ibc','ts-tf'].forEach(id => {
+    $(id).addEventListener('input', renderTS);
+    $(id).addEventListener('change', renderTS);
+  });
+
+  /* Первичный рендер */
+  renderHF0();
+  renderHF6();
+  renderHF12();
+  renderNH();
+  renderDD();
+  renderTS();
+});
+</script>
+
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="ХСН.html" title="Диагностика ХСН при анемии">СНсФВ (H2FPEF)</a>
+    <a href="EGFR.html" title="Ренальная функция и дозы железа">рСКФ / ХБП</a>
+    <a href="операция.html" title="Стратификация перед операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

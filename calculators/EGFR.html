@@ -1,0 +1,2559 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>рСКФ · Калькулятор ХБП</title>
+<style>
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;
+       background:#eef2f7;color:#0f172a;font-size:15px;line-height:1.45}
+  .hero{background:linear-gradient(120deg,#0b4f8a,#0e7490);color:#fff;padding:22px 28px;
+        position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(15,23,42,.12)}
+  .hero h1{margin:0;font-size:20px;font-weight:600}
+  .hero p{margin:6px 0 0;font-size:13px;opacity:.85}
+  .tabs{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+  .tab{padding:8px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.3);
+       background:rgba(255,255,255,.1);color:#fff;cursor:pointer;
+       font-size:13.5px;font-weight:600;transition:.15s;font-family:inherit;
+       text-decoration:none}
+  .tab:hover{background:rgba(255,255,255,.2)}
+
+  .layout{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:18px;max-width:1560px;margin:0 auto;align-items:start}
+  @media(max-width:1050px){.layout{grid-template-columns:1fr}}
+  .layout.single{grid-template-columns:1fr;max-width:1400px}
+  .card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:16px 18px;
+        box-shadow:0 1px 3px rgba(15,23,42,.06);margin-bottom:16px;position:relative}
+  .card h2{margin:0 0 12px;font-size:15px;font-weight:600;color:#0b4f8a;
+           text-transform:uppercase;letter-spacing:.04em}
+
+  .sidebar{position:sticky;top:96px;align-self:start}
+  @media(max-width:1050px){.sidebar{position:static}}
+
+  label{display:block;font-size:12.5px;color:#475569;margin:10px 0 4px;font-weight:500}
+  input[type=number],input[type=text],select{
+    width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;
+    background:#fff;color:#0f172a;outline:none;transition:.15s;font-family:inherit}
+  input:focus,select:focus{border-color:#0ea5a4;box-shadow:0 0 0 3px rgba(14,165,164,.15)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .chk{display:flex;gap:8px;align-items:center;margin-top:14px;font-size:13px;color:#334155}
+  .chk input{width:16px;height:16px;accent-color:#0e7490}
+  .hint{font-size:11.5px;color:#94a3b8;margin-top:4px}
+
+  .seg{position:relative;display:grid;grid-template-columns:1fr 1fr;
+       background:#f1f5f9;border:1px solid #e2e8f0;border-radius:12px;
+       padding:4px;margin-top:6px;isolation:isolate}
+  .seg input{position:absolute;opacity:0;width:1px;height:1px;margin:0;pointer-events:none}
+  .seg label{position:relative;z-index:2;margin:0;padding:9px 8px;text-align:center;
+       font-size:13.5px;font-weight:600;color:#64748b;cursor:pointer;border-radius:9px;
+       transition:color .22s ease;user-select:none;-webkit-tap-highlight-color:transparent}
+  .seg label:hover{color:#0e7490}
+  .seg .seg-slider{position:absolute;z-index:1;top:4px;bottom:4px;left:4px;
+       width:calc(50% - 4px);border-radius:9px;
+       background:linear-gradient(135deg,#0e7490,#0891b2);
+       box-shadow:0 2px 6px rgba(8,145,178,.35);
+       transition:transform .28s cubic-bezier(.4,0,.2,1)}
+  .seg input:nth-of-type(1):checked ~ .seg-slider{transform:translateX(0)}
+  .seg input:nth-of-type(2):checked ~ .seg-slider{transform:translateX(100%)}
+  .seg input:nth-of-type(1):checked ~ label[for="sex-f"],
+  .seg input:nth-of-type(2):checked ~ label[for="sex-m"]{color:#fff}
+  .seg input:focus-visible + label{box-shadow:0 0 0 3px rgba(14,165,164,.45)}
+
+  .gfr-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px}
+  .gfr{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;
+       background:#fbfdff;transition:background .2s, border-color .2s;position:relative}
+  .gfr .name{font-size:12px;color:#64748b;font-weight:600;letter-spacing:.02em;padding-right:82px}
+  .gfr .val{font-size:26px;font-weight:700;line-height:1.15;margin:4px 0 2px}
+  .gfr .val small{font-size:12px;font-weight:500;opacity:.75;color:inherit}
+  .gfr .stage{display:inline-block;font-size:12px;padding:2px 8px;border-radius:20px;
+              font-weight:700;margin-top:4px}
+  .gfr .deidx{font-size:12px;margin-top:6px;opacity:.85}
+  .gfr .gfr-copy-btn{position:absolute;top:8px;right:8px;margin:0;z-index:2}
+  .card-copy-btn{position:absolute;top:14px;right:16px;z-index:2}
+
+  .gfr.st-c1{background:linear-gradient(180deg,#f0fdf4,#fff);border-color:#86efac}
+  .gfr.st-c1 .val{color:#15803d}.gfr.st-c1 .stage{background:#dcfce7;color:#15803d}.gfr.st-c1 .deidx{color:#166534}
+  .gfr.st-c2{background:linear-gradient(180deg,#f7fee7,#fff);border-color:#bef264}
+  .gfr.st-c2 .val{color:#4d7c0f}.gfr.st-c2 .stage{background:#ecfccb;color:#3f6212}.gfr.st-c2 .deidx{color:#4d7c0f}
+  .gfr.st-c3a{background:linear-gradient(180deg,#fefce8,#fff);border-color:#fde047}
+  .gfr.st-c3a .val{color:#a16207}.gfr.st-c3a .stage{background:#fef9c3;color:#854d0e}.gfr.st-c3a .deidx{color:#a16207}
+  .gfr.st-c3b{background:linear-gradient(180deg,#fff7ed,#fff);border-color:#fdba74}
+  .gfr.st-c3b .val{color:#c2410c}.gfr.st-c3b .stage{background:#ffedd5;color:#9a3412}.gfr.st-c3b .deidx{color:#c2410c}
+  .gfr.st-c4{background:linear-gradient(180deg,#fef2f2,#fff);border-color:#fca5a5}
+  .gfr.st-c4 .val{color:#b91c1c}.gfr.st-c4 .stage{background:#fee2e2;color:#991b1b}.gfr.st-c4 .deidx{color:#b91c1c}
+  .gfr.st-c5{background:linear-gradient(180deg,#fdf2f8,#fff);border-color:#9f1239}
+  .gfr.st-c5 .val{color:#7f1d1d}.gfr.st-c5 .stage{background:#7f1d1d;color:#fff}.gfr.st-c5 .deidx{color:#7f1d1d}
+  .gfr.gfr-cg .val{color:#0b4f8a}.gfr.gfr-cg .stage{background:#e0f2fe;color:#075985}
+
+  .kv{display:grid;grid-template-columns:1fr auto;gap:6px 14px;font-size:13.5px}
+  .kv .k{color:#64748b}.kv .v{font-weight:600;text-align:right}
+
+  .alert{padding:10px 14px;border-radius:10px;font-size:13.5px;margin-top:12px;border:1px solid}
+  .alert.warn{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
+  .alert.info{background:#f0f9ff;border-color:#bae6fd;color:#075985}
+  .alert.ok{background:#f0fdf4;border-color:#bbf7d0;color:#166534}
+  .alert.danger{background:#fef2f2;border-color:#fecaca;color:#991b1b}
+
+  .pill{display:inline-block;padding:3px 10px;border-radius:20px;font-size:12.5px;font-weight:600}
+  .p-low{background:#dcfce7;color:#166534}.p-mod{background:#fef9c3;color:#854d0e}
+  .p-high{background:#ffedd5;color:#9a3412}.p-vhigh{background:#fee2e2;color:#991b1b}
+
+  .dx-box{background:#f0f9ff;border-left:4px solid #0e7490;padding:12px 16px;border-radius:8px;margin-top:4px}
+  .dx-line{font-size:14.5px;padding:8px 0;color:#0f172a;line-height:1.55;
+           display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+  .dx-line + .dx-line{border-top:1px dashed #bae6fd}
+  .dx-line > .dx-line-text{flex:1 1 auto;min-width:0}
+  .dx-line b{color:#0b4f8a}
+  .dx-copy-btn{padding:5px 12px;font-size:11.5px;font-weight:600;border-radius:20px;
+       border:1px solid #bae6fd;background:#fff;color:#0e7490;cursor:pointer;
+       transition:.15s;text-transform:none;letter-spacing:0;white-space:nowrap;font-family:inherit}
+  .dx-copy-btn:hover{background:#e0f2fe;border-color:#7dd3fc}
+  .dx-copy-btn.copied{background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+  .card-copy-btn.dx-copy-btn{background:#0e7490;color:#fff;border-color:#0e7490;box-shadow:0 2px 6px rgba(8,145,178,.25)}
+  .card-copy-btn.dx-copy-btn:hover{background:#0b4f8a;border-color:#0b4f8a}
+  .card-copy-btn.dx-copy-btn.copied{background:#166534;border-color:#166534;color:#fff}
+
+  .risk-table{width:100%;border-collapse:collapse;font-size:14px;border-radius:10px;overflow:hidden}
+  .risk-table tr:nth-child(odd){background:#f8fafc}
+  .risk-table tr:nth-child(even){background:#ffffff}
+  .risk-table td{padding:10px 12px;border-bottom:1px solid #eef2f7;vertical-align:middle}
+  .risk-table .rt-title{width:30%;color:#334155}
+  .risk-table .rt-value{width:20%;text-align:right;white-space:nowrap}
+  .rt-up{color:#b91c1c;font-weight:700}
+  .rt-down{color:#166534;font-weight:600}
+  .rt-neutral{color:#94a3b8;font-style:italic}
+  .risk-table .sep{border-left:1px solid #e2e8f0}
+
+  .crit-block{font-size:12.5px;color:#334155;line-height:1.55}
+  .crit-block b{color:#0b4f8a}
+  .crit-block ul{padding-left:18px;margin:6px 0 10px}
+  .crit-block li{margin:4px 0}
+  .crit-block .or-line{font-weight:700;color:#0b4f8a;margin:8px 0 6px;letter-spacing:.04em}
+  .crit-block .footnote{font-size:11px;color:#64748b;margin-top:10px;line-height:1.5}
+
+  .scale-legend{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+  .scale-legend .lg{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;
+       padding:3px 9px;border-radius:20px;font-weight:600;border:1px solid}
+  .lg-c1{background:#dcfce7;color:#15803d;border-color:#86efac}
+  .lg-c2{background:#ecfccb;color:#3f6212;border-color:#bef264}
+  .lg-c3a{background:#fef9c3;color:#854d0e;border-color:#fde047}
+  .lg-c3b{background:#ffedd5;color:#9a3412;border-color:#fdba74}
+  .lg-c4{background:#fee2e2;color:#991b1b;border-color:#fca5a5}
+  .lg-c5{background:#7f1d1d;color:#fff;border-color:#7f1d1d}
+
+  .drug{border:1px solid #e2e8f0;border-radius:11px;padding:12px 14px;margin-bottom:10px;background:#fbfdff}
+  .drug .dn{font-weight:600;font-size:14px;color:#0b4f8a;margin-bottom:4px}
+  .drug .dd{font-size:14px}
+  .drug .dd.neg{color:#b91c1c;font-weight:600}
+
+  .drug-row{border-left:4px solid #cbd5e1;border-radius:8px;padding:10px 14px;margin-bottom:8px;background:#fbfdff}
+  .drug-row.lvl-1{border-left-color:#dc2626;background:#fef2f2}
+  .drug-row.lvl-2{border-left-color:#ea580c;background:#fff7ed}
+  .drug-row.lvl-3{border-left-color:#ca8a04;background:#fefce8}
+  .drug-row.lvl-4{border-left-color:#0284c7;background:#f0f9ff}
+  .drug-row .head{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .drug-row .nm{font-weight:600;font-size:14.5px;color:#0f172a}
+  .drug-row .cl{font-size:12px;color:#94a3b8}
+  .drug-row .tag{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em}
+  .tag.t1{background:#dc2626;color:#fff}.tag.t2{background:#ea580c;color:#fff}
+  .tag.t3{background:#ca8a04;color:#fff}.tag.t4{background:#0284c7;color:#fff}
+  .drug-row .nt{font-size:13px;color:#475569;margin-top:6px}
+  .drug-row .cr{font-size:12px;color:#94a3b8;margin-top:4px}
+
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+  .toolbar input[type=text]{max-width:320px;flex:1 1 200px}
+  .btn{padding:8px 14px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;
+       color:#0f172a;font-size:13.5px;font-weight:600;cursor:pointer;font-family:inherit;
+       transition:.15s;white-space:nowrap}
+  .btn:hover{background:#f1f5f9;border-color:#94a3b8}
+  .btn.primary{background:#0e7490;color:#fff;border-color:#0e7490}
+  .btn.primary:hover{background:#0b4f8a;border-color:#0b4f8a}
+  .btn.danger{background:#fee2e2;color:#991b1b;border-color:#fecaca}
+  .btn.danger:hover{background:#fecaca}
+  .file-btn{display:inline-block}
+
+  .status{font-size:12.5px;color:#64748b;min-height:18px;margin-bottom:8px}
+  .status.ok{color:#166534}.status.err{color:#991b1b}
+
+  .table-wrap{border:1px solid #e2e8f0;border-radius:10px;overflow:auto;max-height:70vh}
+  table.drug-table{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;min-width:1100px}
+  table.drug-table thead th{position:sticky;top:0;background:#f1f5f9;color:#475569;
+       font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;
+       text-align:left;padding:8px 6px;border-bottom:1px solid #e2e8f0;z-index:1}
+  table.drug-table tbody td{padding:4px 4px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
+  table.drug-table tbody tr:hover{background:#f8fafc}
+  table.drug-table input,table.drug-table select{width:100%;padding:6px 8px;font-size:13px;border-radius:7px;border:1px solid #e2e8f0;background:#fff}
+  table.drug-table input[type=number]{max-width:100px}
+  table.drug-table .num{color:#94a3b8;font-size:12px;font-weight:600;text-align:right}
+  table.drug-table .del-btn{background:transparent;border:none;color:#94a3b8;cursor:pointer;
+       font-size:18px;line-height:1;padding:4px 8px;border-radius:6px;font-family:inherit}
+  table.drug-table .del-btn:hover{background:#fee2e2;color:#991b1b}
+
+  .section-divider{max-width:1560px;margin:8px auto 0;padding:0 18px}
+  .section-divider h2{margin:20px 0 12px;font-size:18px;color:#0b4f8a;font-weight:700;letter-spacing:.02em}
+
+  .meta-block{max-width:1560px;margin:0 auto 24px;padding:0 18px}
+  .meta-block .card{background:#fbfdff}
+  .meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:820px){.meta-grid{grid-template-columns:1fr}}
+  .meta-block h3{margin:0 0 8px;font-size:13px;color:#0b4f8a;text-transform:uppercase;letter-spacing:.04em;font-weight:700}
+  .meta-block ul{margin:0;padding-left:18px;font-size:13px;color:#334155}
+  .meta-block li{margin:2px 0}
+  .meta-block .abbr{font-size:13px;color:#334155}
+  .meta-block .abbr b{color:#0b4f8a}
+
+  /* ============ Вкладки ============ */
+  .hero .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+  .hero .tab{padding:7px 12px;border-radius:16px;border:1px solid rgba(255,255,255,.3);
+    background:rgba(255,255,255,.08);color:#fff;cursor:pointer;font-size:12.5px;
+    font-weight:600;font-family:inherit;transition:.15s;white-space:nowrap}
+  .hero .tab:hover{background:rgba(255,255,255,.2)}
+  .hero .tab.active{background:#fff;color:#0b4f8a;border-color:#fff}
+
+  .tab-panel[hidden]{display:none!important}
+
+  .clin-layout{display:grid;grid-template-columns:360px 1fr;gap:18px;padding:18px;
+    max-width:1560px;margin:0 auto;align-items:start}
+  @media(max-width:1050px){.clin-layout{grid-template-columns:1fr}}
+
+  .clin-fields{position:sticky;top:120px;align-self:start}
+  @media(max-width:1050px){.clin-fields{position:static}}
+
+  .field-group{display:grid;grid-template-columns:1fr;gap:4px;margin-bottom:10px}
+  .field-group label{display:block;font-size:12.5px;color:#475569;font-weight:500;margin:0}
+  .field-group input,.field-group select{width:100%;padding:7px 9px;border:1px solid #cbd5e1;
+    border-radius:8px;font-size:13.5px;background:#fff;color:#0f172a;font-family:inherit;
+    outline:none;transition:.15s}
+  .field-group input:focus,.field-group select:focus{border-color:#0ea5a4;
+    box-shadow:0 0 0 3px rgba(14,165,164,.15)}
+  .field-group.missing label::after{content:" ·";color:#dc2626;font-weight:700}
+
+  .chk-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+  .chk-group label{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;
+    border:1px solid #cbd5e1;border-radius:14px;font-size:12px;background:#fff;
+    cursor:pointer;color:#334155}
+  .chk-group label:has(input:checked){background:#e0f2fe;border-color:#0e7490;color:#0b4f8a}
+  .chk-group input{margin:0;accent-color:#0e7490}
+
+  .rec-list{display:flex;flex-direction:column;gap:10px}
+  .rec-card{border:1px solid #e2e8f0;border-radius:12px;padding:12px 14px;
+    background:#fff;position:relative;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+  .rec-card.cls-1{border-left:5px solid #16a34a;background:linear-gradient(90deg,#f0fdf4,#fff 60%)}
+  .rec-card.cls-2a{border-left:5px solid #eab308;background:linear-gradient(90deg,#fefce8,#fff 60%)}
+  .rec-card.cls-2b{border-left:5px solid #ea580c;background:linear-gradient(90deg,#fff7ed,#fff 60%)}
+  .rec-card.cls-3{border-left:5px solid #dc2626;background:linear-gradient(90deg,#fef2f2,#fff 60%)}
+
+  .rec-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+  .rec-badges{display:flex;gap:6px;flex-wrap:wrap}
+  .rec-badge{display:inline-block;padding:2px 9px;border-radius:14px;font-size:11px;
+    font-weight:700;letter-spacing:.03em;text-transform:uppercase}
+  .rec-badge.cls-1{background:#16a34a;color:#fff}
+  .rec-badge.cls-2a{background:#eab308;color:#fff}
+  .rec-badge.cls-2b{background:#ea580c;color:#fff}
+  .rec-badge.cls-3{background:#dc2626;color:#fff}
+  .rec-badge.lvl{background:#e2e8f0;color:#334155}
+
+  .rec-action{font-size:14.5px;color:#0f172a;line-height:1.5;margin:0 0 6px;font-weight:600}
+  .rec-meta{font-size:13px;color:#475569;line-height:1.5}
+  .rec-meta b{color:#0b4f8a;font-weight:600}
+  .rec-meta .lbl{color:#64748b;font-weight:500}
+
+  .rec-src{margin-top:8px;border-top:1px dashed #e2e8f0;padding-top:6px;font-size:12px;color:#64748b}
+  .rec-src summary{cursor:pointer;color:#0e7490;font-weight:600;list-style:none;
+    display:inline-flex;align-items:center;gap:4px}
+  .rec-src summary::-webkit-details-marker{display:none}
+  .rec-src summary::before{content:"▸";transition:.15s}
+  .rec-src[open] summary::before{content:"▾"}
+  .rec-src .src-body{margin-top:4px;line-height:1.5}
+
+  .rec-warn{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;
+    padding:8px 12px;border-radius:8px;font-size:12.5px;margin-top:8px}
+  .rec-warn b{color:#7f1d1d}
+
+  .rec-copy{margin-top:8px;padding:4px 12px;font-size:11.5px;font-weight:600;
+    border-radius:20px;border:1px solid #bae6fd;background:#fff;color:#0e7490;
+    cursor:pointer;font-family:inherit}
+  .rec-copy:hover{background:#e0f2fe}
+  .rec-copy.copied{background:#f0fdf4;color:#166534;border-color:#bbf7d0}
+
+  .empty-state{padding:24px;border:1px dashed #cbd5e1;border-radius:12px;
+    background:#f8fafc;color:#64748b;font-size:13.5px;text-align:center}
+  .empty-state b{color:#0b4f8a}
+
+  .tab-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
+  .tab-toolbar .tb-chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;
+    color:#334155;cursor:pointer;padding:4px 10px;border:1px solid #cbd5e1;
+    border-radius:8px;background:#fff}
+  .tab-toolbar .tb-chk input{accent-color:#0e7490}
+
+  .tab-title{max-width:1560px;margin:8px auto 0;padding:0 18px}
+  .tab-title h2{margin:20px 0 12px;font-size:18px;color:#0b4f8a;font-weight:700}
+  .tab-title p{margin:0 0 6px;font-size:12.5px;color:#64748b}
+
+  .base-summary{background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;
+    padding:10px 14px;font-size:12.5px;color:#1e3a8a;margin-bottom:12px;line-height:1.6}
+  .base-summary b{color:#0b4f8a}
+  .base-summary .bs-title{font-weight:700;color:#0b4f8a;margin-bottom:4px;font-size:11.5px;
+    text-transform:uppercase;letter-spacing:.04em}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>Калькулятор рСКФ и ведение пациента с ХБП</h1>
+  <p>CKD-EPI 2009/2011 · EKFC 2021 · CKD-EPI 2021 · Cockcroft–Gault · стадии ХБП · альбуминурия · риски · дозы ПОАК · препараты</p>
+  <nav class="tabs">
+    <button class="tab active" data-tab="calc">Расчёт рСКФ</button>
+    <button class="tab" data-tab="ckd">ХБП: общие рекомендации</button>
+    <button class="tab" data-tab="dm">СД 2 типа + ХБП</button>
+    <button class="tab" data-tab="hf">ХСН + ХБП</button>
+    <button class="tab" data-tab="ihd">ИБС / ОКС + ХБП</button>
+    <button class="tab" data-tab="af">ФП + ХБП</button>
+    <button class="tab" data-tab="vte">ВТЭО + ХБП</button>
+    <button class="tab" data-tab="dial">Диализ + ССЗ</button>
+    <button class="tab" data-tab="tx">Трансплантация + ССЗ</button>
+    <button class="tab" data-tab="contrast">Контраст / ОПП</button>
+    <button class="tab" data-tab="drugs">База препаратов</button>
+  </nav>
+</div>
+
+<!-- =================== РАСЧЁТ СКФ =================== -->
+<div class="tab-panel" data-tab="calc">
+  <div class="section-divider" id="section-calc">
+    <h2>Расчет СКФ и ведение пациента</h2>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="card">
+        <h2>Данные пациента</h2>
+
+        <label>Пол</label>
+        <div class="seg">
+          <input type="radio" name="sex" id="sex-f" value="2" checked>
+          <label for="sex-f">♀ Женщина</label>
+          <input type="radio" name="sex" id="sex-m" value="1">
+          <label for="sex-m">♂ Мужчина</label>
+          <span class="seg-slider"></span>
+        </div>
+
+        <label>Возраст, годы</label>
+        <input type="number" id="age" value="" min="0" max="120" step="1" placeholder="—">
+
+        <label>Креатинин, мкмоль/л</label>
+        <input type="number" id="cr" value="" min="1" max="2000" step="0.1" placeholder="—">
+
+        <label>Альбумин / креатинин мочи</label>
+        <div class="row2">
+          <input type="number" id="alb" value="" min="0" step="0.1" placeholder="—">
+          <select id="albUnit">
+            <option value="mgg">мг/г</option>
+            <option value="mmol">мг/ммоль</option>
+          </select>
+        </div>
+        <div class="hint">Разовая порция мочи.</div>
+
+        <div class="row2">
+          <div><label>Рост, см</label>
+            <input type="number" id="height" value="" min="50" max="250" step="0.5" placeholder="—"></div>
+          <div><label>Масса тела, кг</label>
+            <input type="number" id="weight" value="" min="10" max="300" step="0.5" placeholder="—"></div>
+        </div>
+
+        <label>Показатель для доз ПОАК</label>
+        <select id="doacMetric">
+          <option value="ekfc">EKFC, деиндексированная (мл/мин)</option>
+          <option value="epi2021">CKD-EPI 2021, деиндексированная (мл/мин)</option>
+          <option value="epi2011">CKD-EPI 2009/2011, деиндексированная (мл/мин)</option>
+          <option value="cg">КК Cockcroft–Gault (мл/мин)</option>
+        </select>
+
+        <div class="chk">
+          <input type="checkbox" id="bleed">
+          <label for="bleed" style="margin:0">Повышенный риск кровотечения</label>
+        </div>
+
+        <div class="hint" style="margin-top:14px">Расчёт обновляется автоматически.</div>
+
+        <div class="scale-legend">
+          <span class="lg lg-c1">С1 ≥90</span>
+          <span class="lg lg-c2">С2 60–89</span>
+          <span class="lg lg-c3a">С3а 45–59</span>
+          <span class="lg lg-c3b">С3б 30–44</span>
+          <span class="lg lg-c4">С4 15–29</span>
+          <span class="lg lg-c5">С5 &lt;15</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Критерии Хронической Болезни Почек</h2>
+        <div class="crit-block">
+          <p style="margin:0 0 6px"><b>1. Признаки повреждения почек (≥1) в течение 3-х и более месяцев</b></p>
+          <ul>
+            <li>Альбуминурия соотношение А/К* в разовой порции мочи ≥30 мг/г [≥3 мг/ммоль];</li>
+            <li>Патологический осадок мочи (зернистые и/или эритроцитарные цилиндры);</li>
+            <li>Электролитные или другие нарушения, связанные с патологией канальцев;</li>
+            <li>Нарушения структуры почек по результатам лучевых методов исследования (УЗИ, КТ, МРТ, РНГ, ангиография);</li>
+            <li>Патологические изменения по результатам нефробиопсии;</li>
+            <li>Трансплантация почки.</li>
+          </ul>
+          <p class="or-line">И/ИЛИ</p>
+          <p style="margin:0"><b>2.</b> рСКФ &lt;60 мл/мин/1,73 м² в течение 3-х и более месяцев.</p>
+          <p class="footnote">
+            * Отношение концентрации альбумина (мг) и креатинина (г) в разовой порции мочи.<br>
+            ** УЗИ – ультразвуковое исследование; КТ – компьютерная томография;
+            МРТ – магнито-резонансная томография; РНГ – ренография радиоизотопная.
+          </p>
+        </div>
+      </div>
+    </aside>
+
+    <main id="results"></main>
+  </div>
+</div>
+
+<!-- =================== ХБП =================== -->
+<div class="tab-panel" data-tab="ckd" hidden>
+  <div class="tab-title"><h2>ХБП: общие рекомендации</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, разделы 3, 4, 5.1–5.5.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-ckd"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="ckd" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="ckd">Копировать все</button>
+    </div><div id="recs-ckd" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== СД 2 =================== -->
+<div class="tab-panel" data-tab="dm" hidden>
+  <div class="tab-title"><h2>СД 2 типа + ХБП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, разделы 5.5–5.6.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-dm"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="dm" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="dm">Копировать все</button>
+    </div><div id="recs-dm" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ХСН =================== -->
+<div class="tab-panel" data-tab="hf" hidden>
+  <div class="tab-title"><h2>ХСН + ХБП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 6.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-hf"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="hf" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="hf">Копировать все</button>
+    </div><div id="recs-hf" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ИБС / ОКС =================== -->
+<div class="tab-panel" data-tab="ihd" hidden>
+  <div class="tab-title"><h2>ИБС / ОКС + ХБП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 7.1–7.2.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-ihd"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="ihd" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="ihd">Копировать все</button>
+    </div><div id="recs-ihd" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ФП =================== -->
+<div class="tab-panel" data-tab="af" hidden>
+  <div class="tab-title"><h2>ФП + ХБП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 9.1.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-af"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="af" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="af">Копировать все</button>
+    </div><div id="recs-af" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ВТЭО =================== -->
+<div class="tab-panel" data-tab="vte" hidden>
+  <div class="tab-title"><h2>ВТЭО + ХБП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 8.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-vte"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="vte" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="vte">Копировать все</button>
+    </div><div id="recs-vte" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ДИАЛИЗ =================== -->
+<div class="tab-panel" data-tab="dial" hidden>
+  <div class="tab-title"><h2>Диализ + ССЗ</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 12.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-dial"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="dial" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="dial">Копировать все</button>
+    </div><div id="recs-dial" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== ТРАНСПЛАНТАЦИЯ =================== -->
+<div class="tab-panel" data-tab="tx" hidden>
+  <div class="tab-title"><h2>Трансплантация почки + ССЗ</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 13.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-tx"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="tx" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="tx">Копировать все</button>
+    </div><div id="recs-tx" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== КОНТРАСТ / ОПП =================== -->
+<div class="tab-panel" data-tab="contrast" hidden>
+  <div class="tab-title"><h2>Контраст / ОПП</h2>
+    <p>Источник: 2026 ESC Guidelines CVD + CKD, раздел 11.</p></div>
+  <div class="clin-layout">
+    <aside class="clin-fields card"><h2>Недостающие данные</h2>
+      <div id="fields-contrast"></div></aside>
+    <main><div class="tab-toolbar">
+      <label class="tb-chk"><input type="checkbox" class="only-app-chk" data-tab="contrast" checked>показывать только применимые</label>
+      <button class="btn copy-all" data-tab="contrast">Копировать все</button>
+    </div><div id="recs-contrast" class="rec-list"></div></main>
+  </div>
+</div>
+
+<!-- =================== БАЗА ПРЕПАРАТОВ =================== -->
+<div class="tab-panel" data-tab="drugs" hidden>
+  <div class="section-divider" id="section-drugs">
+    <h2>База препаратов</h2>
+  </div>
+
+  <div class="layout single">
+    <div class="card">
+      <h2>Пользовательская база препаратов</h2>
+      <p class="hint" style="font-size:12.5px;color:#64748b;margin:0 0 6px">
+        Изменения автоматически сохраняются в вашем браузере. Встроенная база используется как стартовая —
+        вы можете её редактировать, дополнять и удалять строки. Чтобы вернуть исходный вид, нажмите
+        «Сбросить к встроенной».
+      </p>
+      <p class="hint" style="font-size:12.5px;color:#64748b;margin:0 0 6px">
+        <b>Показатель:</b> СКФ — EKFC 2021 (мл/мин/1,73м²); КК — Cockcroft–Gault (мл/мин); Кр — креатинин (мкмоль/л).<br>
+        <b>Тип ограничения:</b> ПРОТИВОПОКАЗАН — применение запрещено; НЕЭФФЕКТИВЕН — препарат не работает;
+        КОРРЕКЦИЯ_макс — уменьшить дозу и ограничить максимум; КОРРЕКЦИЯ — скорректировать дозу.
+      </p>
+
+      <div class="toolbar">
+        <input type="text" id="drugSearch" placeholder="Поиск по названию или классу...">
+        <button class="btn primary" id="btnAddDrug">+ Добавить строку</button>
+        <button class="btn" id="btnDupDrug">Дублировать последнюю</button>
+        <button class="btn danger" id="btnResetDrugs">Сбросить к встроенной</button>
+        <button class="btn" id="btnExportJson">Экспорт JSON</button>
+        <button class="btn" id="btnExportCsv">Экспорт CSV</button>
+        <label class="btn file-btn">Импорт JSON
+          <input type="file" id="importJson" accept=".json,application/json" hidden>
+        </label>
+        <label class="btn file-btn">Импорт CSV
+          <input type="file" id="importCsv" accept=".csv,text/csv" hidden>
+        </label>
+      </div>
+
+      <div class="status" id="drugStatus"></div>
+
+      <div class="table-wrap">
+        <table class="drug-table">
+          <thead>
+            <tr>
+              <th style="width:36px">#</th>
+              <th style="min-width:200px">Название</th>
+              <th style="min-width:180px">Класс</th>
+              <th style="width:110px">Показатель</th>
+              <th style="width:90px">Оператор</th>
+              <th style="width:100px">Граница</th>
+              <th style="width:170px">Тип</th>
+              <th style="min-width:260px">Примечание</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="drugTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== ИСТОЧНИКИ =================== -->
+<div class="meta-block">
+  <div class="card">
+    <h2>Источники</h2>
+    <div class="meta-grid">
+      <div>
+        <h3>Источники</h3>
+        <ul>
+          <li>2026 ESC Guidelines for the management of cardiovascular disease and chronic kidney disease, in collaboration with the European Renal Association (ERA). Eur Heart J. 2026.</li>
+          <li>KDIGO 2024 Clinical Practice Guideline for the Evaluation and Management of Chronic Kidney Disease. Kidney Int. 2024.</li>
+          <li>Levey AS, et al. A new equation to estimate glomerular filtration rate. Ann Intern Med. 2009;150(9):604–612 (CKD-EPI 2009).</li>
+          <li>Levey AS, et al. Chronic Kidney Disease Epidemiology Collaboration (CKD-EPI) 2009 в модификации 2011 г.</li>
+          <li>Inker LA, et al. New Creatinine- and Cystatin C–Based Equations to Estimate GFR without Race. N Engl J Med. 2021;385:1737–1749 (CKD-EPI 2021).</li>
+          <li>Pottel H, et al. Development and validation of a new equation for the estimation of glomerular filtration rate (EKFC). Lancet. 2021;398:1803–1812 (EKFC 2021).</li>
+          <li>Cockcroft DW, Gault MH. Prediction of creatinine clearance from serum creatinine. Nephron. 1976;16(1):31–41.</li>
+          <li>Granger CB, et al. Дозы ПОАК при фибрилляции предсердий в зависимости от клиренса креатинина (по материалам инструкций и рекомендаций ESC 2020/2024).</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Список сокращений</h3>
+        <p class="abbr">
+          <b>АВК</b> — антагонисты витамина К ·
+          <b>АД</b> — артериальное давление ·
+          <b>АКШ</b> — аортокоронарное шунтирование ·
+          <b>АМКР</b> — антагонисты минералокортикоидных рецепторов ·
+          <b>АРНИ</b> — ингибитор ангиотензиновых рецепторов и неприлизина ·
+          <b>арГПП-1</b> — агонисты рецепторов глюкагоноподобного пептида-1 ·
+          <b>АССЗ</b> — атеросклеротические сердечно-сосудистые заболевания ·
+          <b>БКК</b> — блокаторы кальциевых каналов ·
+          <b>БРА</b> — блокаторы рецепторов ангиотензина II ·
+          <b>ВСС</b> — внезапная сердечная смерть ·
+          <b>ВТЭО</b> — венозные тромбоэмболические осложнения ·
+          <b>ГД</b> — гемодиализ ·
+          <b>ДАТТ</b> — двойная антитромбоцитарная терапия ·
+          <b>ДОАК</b> — прямые оральные антикоагулянты ·
+          <b>ЗПТ</b> — заместительная почечная терапия ·
+          <b>иАПФ</b> — ингибиторы ангиотензинпревращающего фермента ·
+          <b>ИБС</b> — ишемическая болезнь сердца ·
+          <b>иДПП-4</b> — ингибиторы дипептидилпептидазы-4 ·
+          <b>ИКД</b> — имплантируемый кардиовертер-дефибриллятор ·
+          <b>ИМТ</b> — индекс массы тела ·
+          <b>иНГЛТ-2</b> — ингибиторы натрий-глюкозного котранспортёра 2 типа ·
+          <b>КБС</b> — коронарная болезнь сердца ·
+          <b>КИ-ОПП</b> — контраст-индуцированное острое повреждение почек ·
+          <b>КК</b> — клиренс креатинина ·
+          <b>КТ</b> — компьютерная томография ·
+          <b>МРТ</b> — магнитно-резонансная томография ·
+          <b>НМГ</b> — низкомолекулярные гепарины ·
+          <b>НПВС</b> — нестероидные противовоспалительные средства ·
+          <b>ОКС</b> — острый коронарный синдром ·
+          <b>ОПП</b> — острое повреждение почек ·
+          <b>ПАД</b> — периферическая артериальная болезнь ·
+          <b>ПД</b> — перитонеальный диализ ·
+          <b>ПОАК</b> — прямые оральные антикоагулянты ·
+          <b>рСКФ</b> — расчётная скорость клубочковой фильтрации ·
+          <b>САД</b> — систолическое артериальное давление ·
+          <b>СД</b> — сахарный диабет ·
+          <b>СД 2 типа</b> — сахарный диабет 2 типа ·
+          <b>СКФ</b> — скорость клубочковой фильтрации ·
+          <b>СРТ</b> — сердечная ресинхронизирующая терапия ·
+          <b>ССЗ</b> — сердечно-сосудистые заболевания ·
+          <b>ТГ</b> — триглицериды ·
+          <b>ТГВ</b> — тромбоз глубоких вен ·
+          <b>ТИА</b> — транзиторная ишемическая атака ·
+          <b>ТП</b> — трансплантация почки ·
+          <b>ТПН</b> — терминальная почечная недостаточность ·
+          <b>ТЭЛА</b> — тромбоэмболия лёгочной артерии ·
+          <b>УЗИ</b> — ультразвуковое исследование ·
+          <b>ФВ ЛЖ</b> — фракция выброса левого желудочка ·
+          <b>ФП</b> — фибрилляция предсердий ·
+          <b>ХБП</b> — хроническая болезнь почек ·
+          <b>ХКС</b> — хронический коронарный синдром ·
+          <b>ХС-ЛПНП</b> — холестерин липопротеинов низкой плотности ·
+          <b>ХСН</b> — хроническая сердечная недостаточность ·
+          <b>ХСНнФВ</b> — ХСН с низкой фракцией выброса ·
+          <b>ХСНсФВ</b> — ХСН с сохранённой фракцией выброса ·
+          <b>ХСНунФВ</b> — ХСН с умеренно сниженной фракцией выброса ·
+          <b>ЧКВ</b> — чрескожное коронарное вмешательство ·
+          <b>ЧСС</b> — частота сердечных сокращений ·
+          <b>ЭСА</b> — эритропоэз-стимулирующие агенты ·
+          <b>KFRE</b> — уравнение риска почечной недостаточности ·
+          <b>KDIGO</b> — Kidney Disease: Improving Global Outcomes ·
+          <b>EKFC</b> — European Kidney Function Consortium ·
+          <b>TSAT</b> — насыщение трансферрина.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============================================================
+   УТИЛИТЫ
+   ============================================================ */
+const NOW = new Date();
+const DATE_STR = NOW.toLocaleDateString('ru-RU');
+const $ = id => document.getElementById(id);
+const nf = (x,d=1) => (x==null||!isFinite(x)) ? '—'
+      : x.toLocaleString('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d});
+const num = id => {
+  const el=$(id); if(!el) return null;
+  const raw = String(el.value).trim();
+  if(raw === '') return null;
+  const v=parseFloat(raw.replace(',','.'));
+  return isNaN(v)?null:v;
+};
+const getSex = () => {
+  const el = document.querySelector('input[name="sex"]:checked');
+  return el ? parseInt(el.value,10) : 2;
+};
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pluralRaz = n => {
+  const abs = Math.abs(Math.round(n*10)/10);
+  const i = Math.floor(abs);
+  const last = i % 10, last2 = i % 100;
+  if (last2 >= 11 && last2 <= 19) return 'раз';
+  if (last === 1) return 'раз';
+  if (last >= 2 && last <= 4) return 'раза';
+  return 'раз';
+};
+
+/* ============================================================
+   СПРАВОЧНЫЕ ТАБЛИЦЫ
+   ============================================================ */
+const GFR_ROWS = [
+  {idx:105,label:'≥105'},{idx:100,label:'90–104'},{idx:90,label:'60–89'},
+  {idx:60,label:'45–59'},{idx:45,label:'30–44'},{idx:30,label:'15–29'},{idx:15,label:'<15'}
+];
+const ALB_COLS = [
+  {idx:10,  mgg:'<10',    mmol:'<1'},
+  {idx:30,  mgg:'10–29',  mmol:'1–2,9'},
+  {idx:300, mgg:'30–299', mmol:'3–29,9'},
+  {idx:1000,mgg:'300–999',mmol:'30–99,9'},
+  {idx:1001,mgg:'≥1000',  mmol:'≥100'}
+];
+const RISK_TABLES = [
+ {title:'Общая смертность',data:[[1.6,2.2,2.9,4.3,5.8],['ref',1.3,1.8,2.6,3.1],[1,1.3,1.7,2.2,2.8],[1.3,1.6,2,2.4,3.1],[1.8,2,2.5,3.2,3.9],[2.8,2.8,3.3,4.1,5.6],[4.6,5,5.3,6,7]]},
+ {title:'Инфаркт миокарда',data:[[1.1,1.4,2,2.7,3.8],['ref',1.3,1.6,2.2,3.2],[1.1,1.3,1.6,2.2,3.1],[1.4,1.7,2,2.8,3.7],[1.9,2,2.4,3.2,4.3],[2.7,3.1,3.1,4.2,5.1],[4.6,5.6,4.8,6,6]]},
+ {title:'Смерть от СС причин',data:[[1.4,2,3,4.1,5.4],['ref',1.3,1.9,2.7,3.6],[1,1.4,1.7,2.4,3.2],[1.4,1.7,2.2,2.8,3.8],[2,2.3,2.8,3.7,4.6],[3.2,3.1,3.5,5,6.5],[6.1,6.4,6.4,7.3,8.2]]},
+ {title:'Инсульт',data:[[1.2,1.6,2.2,3.1,4.3],['ref',1.3,1.6,2.4,3.1],[1.1,1.3,1.7,2.2,3],[1.4,1.6,1.9,2.3,2.9],[1.6,1.7,2,2.4,3],[1.8,2.1,2.1,2.7,3],[3.2,2.8,2.9,3.2,3.8]]},
+ {title:'ТПН и пересадка почки',data:[[0.5,1.2,2.9,7.7,25],['ref',1.8,4.3,12,43],[2.3,4.9,10,27,85],[13,19,37,89,236],[50,58,115,240,463],[283,301,443,796,1253],[770,1040,1618,2297,2547]]},
+ {title:'Сердечная недостаточность',data:[[1.2,1.7,1.7,2.4,3.5],['ref',1.3,1.5,1.9,2.3],[1.1,1.4,1.4,1.7,2.2],[1.6,1.8,1.5,1.8,2.4],[2.2,2.5,1.7,2,2.4],[3.6,3.5,2,2.6,3],[5.1,5.7,3.1,3.6,4.2]]},
+ {title:'Острое повреждение почек',data:[[1,1.6,2.4,3.7,5.5],['ref',1.4,2.1,3.2,5],[1.6,2.2,3.1,4.3,6.7],[3.5,4,5.1,6.9,9],[5.6,5.9,6.8,8.6,11],[8.3,8,8.5,9.9,10],[8.5,11,7.9,5.5,5.7]]},
+ {title:'Фибрилляция предсердий',data:[[1.1,1.3,1.7,2.4,3.5],['ref',1.2,1.5,1.9,2.3],[1,1.2,1.4,1.7,2.2],[1.2,1.3,1.5,1.8,2.4],[1.4,1.5,1.7,2,2.4],[1.9,1.8,2,2.6,3],[2.6,2.8,3.1,3.6,4.2]]},
+ {title:'Госпитализация',data:[[1.4,1.7,2.1,2.1,2.3],['ref',1.1,1.3,1.5,1.7],[1,1.1,1.3,1.5,1.8],[1.3,1.3,1.5,1.7,2.1],[1.5,1.5,1.6,1.9,2.3],[1.8,1.8,1.9,2.4,2.8],[2.7,2.8,3,3.2,3.8]]},
+ {title:'Заболевания периферических артерий',data:[[0.9,1.4,1.9,2.8,5],['ref',1.3,1.9,2.8,4.3],[1,1.3,1.8,2.5,3.8],[1.5,1.7,2.1,2.9,4.2],[2,1.9,2.5,3.6,5],[3.3,3.3,3.8,5.7,8.1],[9.1,9,9.6,13,14]]}
+];
+
+/* ============================================================
+   БАЗА ПРЕПАРАТОВ
+   ============================================================ */
+const DEFAULT_DRUGS = [
+  ['Розувастатин','Статины','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Розувастатин','Статины','КК',60,'<=','КОРРЕКЦИЯ','Начальная доза 5 мг/сут, макс 20–30 мг/сут'],
+  ['Гидрохлоротиазид','Тиазидные диуретики','СКФ',30,'<','НЕЭФФЕКТИВЕН','Неэффективен, использовать петлевые диуретики'],
+  ['Гидрохлоротиазид','Тиазидные диуретики','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Хлорталидон','Тиазидные диуретики','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Индапамид','Тиазидоподобные диуретики','СКФ',30,'<','НЕЭФФЕКТИВЕН','Неэффективен при СКФ <30, использовать петлевые диуретики'],
+  ['Индапамид','Тиазидоподобные диуретики','СКФ',10,'<','НЕЭФФЕКТИВЕН','Неэффективен при СКФ <10, использовать петлевые диуретики'],
+  ['Лизиноприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Эналаприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Периндоприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Рамиприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Фозиноприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','ПРЕДПОЧТИТЕЛЕН. Коррекция дозы, осторожное применение'],
+  ['Зофеноприл','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Телмисартан','ИАПФ','Кр',265,'>','КОРРЕКЦИЯ','ПРЕДПОЧТИТЕЛЕН. Коррекция дозы, осторожное применение'],
+  ['Лозартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Валсартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Кандесартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Ирбесартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Эпросартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Олмесартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Азилсартан','БРА','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Юперио','БРА+Сакубитрил','СКФ',30,'<','КОРРЕКЦИЯ','Коррекция дозы, осторожное применение'],
+  ['Эплеренон','АМКР','КК',50,'<','КОРРЕКЦИЯ','Коррекция дозы (>25 мг не исследовалась)'],
+  ['Эплеренон','АМКР','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан. Путем диализа не выводится'],
+  ['Спиронолактон','АМКР','СКФ',10,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Спиронолактон','АМКР','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан при ХСН'],
+  ['Спиронолактон','АМКР','Кр',220,'>','ПРОТИВОПОКАЗАН','Противопоказан при ХСН'],
+  ['Финеренон','АМКР','СКФ',60,'<','КОРРЕКЦИЯ','Начальная доза 10 мг'],
+  ['Финеренон','АМКР','СКФ',25,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Соталол','ААП III гр.','КК',10,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Соталол','ААП III гр.','КК',30,'<','КОРРЕКЦИЯ_макс','не более 40–80 мг/сут'],
+  ['Соталол','ААП III гр.','КК',60,'<','КОРРЕКЦИЯ','не более 80–160 мг/сут'],
+  ['Пропафенон','ААП IС гр.','КК',60,'<','КОРРЕКЦИЯ','Контроль QRS'],
+  ['Флекаинид','ААП IС гр.','СКФ',35,'<','КОРРЕКЦИЯ','Начальная доза не более 100 мг/сут. Контроль QRS'],
+  ['Аллапинин','ААП IС гр.','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Этацунорм (Этацизин)','ААП IС гр.','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Аллопуринол','Ингибитор ксантиноксидазы','СКФ',60,'<','КОРРЕКЦИЯ','Начальная доза 50 мг/сут, макс 300 мг/сут'],
+  ['Аллопуринол','Ингибитор ксантиноксидазы','СКФ',30,'<','КОРРЕКЦИЯ_макс','Начальная доза 50 мг/сут, макс 100 мг/сут'],
+  ['Напроксен','НПВС','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Напроксен','НПВС','КК',60,'<=','КОРРЕКЦИЯ','С осторожностью. Контроль КК'],
+  ['Целекоксиб','НПВС','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Метформин','Бигуанид','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Метформин','Бигуанид','КК',45,'<','КОРРЕКЦИЯ_макс','Макс 1000 мг/сут'],
+  ['Метформин','Бигуанид','КК',60,'<','КОРРЕКЦИЯ','Макс 2000 мг/сут'],
+  ['Дапаглифлозин','иНГЛТ-2','СКФ',45,'<','КОРРЕКЦИЯ','Не для улучшения контроля гликемии'],
+  ['Дапаглифлозин','иНГЛТ-2','СКФ',25,'<','КОРРЕКЦИЯ_макс','Противопоказан для начала терапии. Не для улучшения контроля гликемии'],
+  ['Дапаглифлозин','иНГЛТ-2','СКФ',15,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Эмпаглифлозин','иНГЛТ-2','СКФ',15,'<','КОРРЕКЦИЯ','Макс 10 мг/сут. Противопоказан для начала терапии на диализе'],
+  ['Канаглифлозин','иНГЛТ-2','СКФ',60,'<','КОРРЕКЦИЯ','Макс 100 мг/сут'],
+  ['Канаглифлозин','иНГЛТ-2','СКФ',30,'<','КОРРЕКЦИЯ_макс','Макс 100 мг/сут до начала ЗПТ'],
+  ['Лусеоглифлозин','иНГЛТ-2','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Ипраглифлозин','иНГЛТ-2','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Дапаглифлозин+Метформин','Комбо (иНГЛТ-2 + Бигуанид)','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Дапаглифлозин+Метформин','Комбо (иНГЛТ-2 + Бигуанид)','СКФ',45,'<','КОРРЕКЦИЯ','Макс 10 мг + 1000 мг/сут'],
+  ['Метформин+Эмпаглифлозин','Комбо (Бигуанид + иНГЛТ-2)','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Метформин+Эмпаглифлозин','Комбо (Бигуанид + иНГЛТ-2)','СКФ',45,'<','КОРРЕКЦИЯ_макс','по Метформину: макс 1000 мг/сут'],
+  ['Метформин+Эмпаглифлозин','Комбо (Бигуанид + иНГЛТ-2)','СКФ',65,'<','КОРРЕКЦИЯ','по Метформину: макс 2000 мг/сут'],
+  ['Семаглутид','арГПП-1','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Семаглутид','арГПП-1','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Семаглутид','арГПП-1','КК',15,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Семаглутид','арГПП-1','СКФ',15,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Ситаглиптин','иДПП-4','СКФ',45,'<','КОРРЕКЦИЯ','Макс 50 мг/сут'],
+  ['Ситаглиптин','иДПП-4','СКФ',30,'<','КОРРЕКЦИЯ_макс','Макс 25 мг/сут'],
+  ['Вилдаглиптин','иДПП-4','СКФ',50,'<','КОРРЕКЦИЯ','Макс 50 мг/сут'],
+  ['Алоглиптин','иДПП-4','КК',50,'<','КОРРЕКЦИЯ','Макс 12,5 мг/сут'],
+  ['Алоглиптин','иДПП-4','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Гозоглиптин','иДПП-4','СКФ',60,'<','КОРРЕКЦИЯ','Макс 20 мг/сут'],
+  ['Гозоглиптин','иДПП-4','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Алоглиптин+Пиоглитазон','Комбо (иДПП-4 + Глитазон)','КК',50,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Ситаглиптин+Метформин','Комбо (иДПП-4 + Бигуанид)','СКФ',45,'<','КОРРЕКЦИЯ','Макс 25 мг + 500 мг 2 р/сут'],
+  ['Ситаглиптин+Метформин','Комбо (иДПП-4 + Бигуанид)','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Вилдаглиптин+Метформин','Комбо (иДПП-4 + Бигуанид)','СКФ',60,'<','КОРРЕКЦИЯ','Макс 50 мг + 1000 мг/сут'],
+  ['Вилдаглиптин+Метформин','Комбо (иДПП-4 + Бигуанид)','СКФ',45,'<','КОРРЕКЦИЯ_макс','Макс 50 мг + 500 мг/сут'],
+  ['Вилдаглиптин+Метформин','Комбо (иДПП-4 + Бигуанид)','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Гликлазид','СМ','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Глимепирид','СМ','СКФ',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Глибенкламид','СМ','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан'],
+  ['Ципрофлоксацин','Фторхинолон','СКФ',60,'<','КОРРЕКЦИЯ','Макс 1000 мг/сут'],
+  ['Ципрофлоксацин','Фторхинолон','СКФ',30,'<','КОРРЕКЦИЯ_макс','Макс 500 мг/сут'],
+  ['Офлоксацин','Фторхинолон','КК',50,'<','КОРРЕКЦИЯ','Разовая 100–200 мг каждые 24 ч'],
+  ['Офлоксацин','Фторхинолон','КК',20,'<','КОРРЕКЦИЯ_макс','Разовая 100 мг каждые 24 ч или 200 мг каждые 48 ч'],
+  ['Левофлоксацин','Фторхинолон','КК',50,'<=','КОРРЕКЦИЯ','Первая доза – 500 мг, затем – по 250 мг/24 ч'],
+  ['Левофлоксацин','Фторхинолон','КК',20,'<','КОРРЕКЦИЯ_макс','Первая доза – 500 мг, затем – по 125 мг/24 ч'],
+  ['Кларитромицин','Макролид','КК',30,'<','КОРРЕКЦИЯ','250 мг/сут, макс 250 мг 2 раза/сут'],
+  ['Амоксициллин','Бета-лактамный','КК',10,'<','КОРРЕКЦИЯ_макс','Макс 500 мг/сут'],
+  ['Амоксициллин','Бета-лактамный','КК',30,'<','КОРРЕКЦИЯ','Макс 500 мг 2 раза/сут'],
+  ['Амоксициллин + клавулановая кислота','Бета-лактамный','КК',30,'<','ПРОТИВОПОКАЗАН','Противопоказан']
+];
+
+const LS_KEY = 'ckd_drugs_v1';
+const FIELD_POS = { name:0, cls:1, indicator:2, threshold:3, operator:4, type:5, note:6 };
+const INDICATORS = ['СКФ','КК','Кр'];
+const OPERATORS  = ['<','<=','>','>=','='];
+const TYPES      = ['ПРОТИВОПОКАЗАН','НЕЭФФЕКТИВЕН','КОРРЕКЦИЯ_макс','КОРРЕКЦИЯ'];
+const TYPE_PRIORITY = {'ПРОТИВОПОКАЗАН':1,'НЕЭФФЕКТИВЕН':2,'КОРРЕКЦИЯ_макс':3,'КОРРЕКЦИЯ':4};
+const TYPE_LABEL = {'ПРОТИВОПОКАЗАН':'Противопоказан','НЕЭФФЕКТИВЕН':'Неэффективен',
+  'КОРРЕКЦИЯ_макс':'Максимальная коррекция','КОРРЕКЦИЯ':'Коррекция дозы'};
+
+let DRUGS = loadDrugs();
+function deepCopy(arr){ return arr.map(d=>d.slice()); }
+function loadDrugs(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed) && parsed.length && Array.isArray(parsed[0])) return parsed;
+    }
+  }catch(e){}
+  return deepCopy(DEFAULT_DRUGS);
+}
+function saveDrugs(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(DRUGS)); return true; }
+  catch(e){ return false; }
+}
+function resetDrugs(){
+  if(!confirm('Сбросить пользовательскую базу препаратов к встроенной?\nВсе внесённые изменения будут потеряны.')) return;
+  try{ localStorage.removeItem(LS_KEY); }catch(e){}
+  DRUGS = deepCopy(DEFAULT_DRUGS);
+  renderDrugEditor();
+  flashStatus('База сброшена к встроенной.', 'ok');
+}
+function flashStatus(msg, cls){
+  const el = document.getElementById('drugStatus');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'status ' + (cls || '');
+  clearTimeout(flashStatus._t);
+  flashStatus._t = setTimeout(()=>{ el.textContent=''; el.className='status'; }, 2500);
+}
+
+function renderDrugEditor(){
+  const tbody = document.getElementById('drugTbody');
+  if (!tbody) return;
+  const q = (document.getElementById('drugSearch').value || '').trim().toLowerCase();
+  const rows = DRUGS.map((d,i)=>({d,i})).filter(({d})=>{
+    if(!q) return true;
+    return (String(d[0])+' '+String(d[1])).toLowerCase().includes(q);
+  });
+  if(rows.length === 0){
+    tbody.innerHTML = `<tr><td colspan="9" style="padding:24px;text-align:center;color:#94a3b8">
+      ${q?'Ничего не найдено по запросу «'+esc(q)+'»':'База пуста. Нажмите «+ Добавить строку».'}
+    </td></tr>`;
+    return;
+  }
+  let html = '';
+  rows.forEach(({d,i}, n)=>{
+    html += `<tr data-index="${i}">
+      <td class="num">${n+1}</td>
+      <td><input type="text" data-field="name" value="${esc(d[0])}"></td>
+      <td><input type="text" data-field="cls" value="${esc(d[1])}"></td>
+      <td><select data-field="indicator">${INDICATORS.map(x=>`<option value="${x}"${x===d[2]?' selected':''}>${x}</option>`).join('')}</select></td>
+      <td><select data-field="operator">${OPERATORS.map(x=>`<option value="${x}"${x===d[4]?' selected':''}>${x==='<'?'&lt;':x==='<='?'&le;':x==='>'?'&gt;':x==='>='?'&ge;':'='}</option>`).join('')}</select></td>
+      <td><input type="number" data-field="threshold" value="${esc(d[3])}" step="0.1"></td>
+      <td><select data-field="type">${TYPES.map(x=>`<option value="${x}"${x===d[5]?' selected':''}>${x}</option>`).join('')}</select></td>
+      <td><input type="text" data-field="note" value="${esc(d[6])}"></td>
+      <td><button class="del-btn" data-del="${i}" title="Удалить">×</button></td>
+    </tr>`;
+  });
+  tbody.innerHTML = html;
+}
+
+document.getElementById('drugTbody').addEventListener('change', e=>{
+  const tr = e.target.closest('tr'); if(!tr) return;
+  const idx = parseInt(tr.dataset.index, 10);
+  const field = e.target.dataset.field;
+  if(field==null || isNaN(idx)) return;
+  let val = e.target.value;
+  if(field==='threshold') val = parseFloat(String(val).replace(',','.')) || 0;
+  DRUGS[idx][FIELD_POS[field]] = val;
+  saveDrugs();
+  flashStatus('Сохранено.', 'ok');
+});
+document.getElementById('drugTbody').addEventListener('click', e=>{
+  const btn = e.target.closest('.del-btn'); if(!btn) return;
+  const idx = parseInt(btn.dataset.del, 10); if(isNaN(idx)) return;
+  const nm = DRUGS[idx] && DRUGS[idx][0] ? DRUGS[idx][0] : '(без названия)';
+  if(!confirm('Удалить запись «'+nm+'»?')) return;
+  DRUGS.splice(idx, 1);
+  saveDrugs();
+  renderDrugEditor();
+  flashStatus('Запись удалена.', 'ok');
+});
+document.getElementById('drugSearch').addEventListener('input', renderDrugEditor);
+document.getElementById('btnAddDrug').addEventListener('click', ()=>{
+  DRUGS.push(['Новый препарат','Класс','СКФ',60,'<','КОРРЕКЦИЯ','']);
+  saveDrugs();
+  renderDrugEditor();
+  const tbody = document.getElementById('drugTbody');
+  const lastTr = tbody.lastElementChild;
+  if(lastTr){
+    lastTr.scrollIntoView({block:'center'});
+    const inp = lastTr.querySelector('input[data-field="name"]');
+    if(inp){ inp.focus(); inp.select(); }
+  }
+  flashStatus('Строка добавлена.', 'ok');
+});
+document.getElementById('btnDupDrug').addEventListener('click', ()=>{
+  if(!DRUGS.length){ alert('База пуста — нечего дублировать.'); return; }
+  const last = DRUGS[DRUGS.length-1].slice();
+  last[0] = last[0] + ' (копия)';
+  DRUGS.push(last);
+  saveDrugs();
+  renderDrugEditor();
+  flashStatus('Последняя строка продублирована.', 'ok');
+});
+document.getElementById('btnResetDrugs').addEventListener('click', resetDrugs);
+function download(filename, content, mime){
+  const blob = new Blob([content], {type: mime || 'application/octet-stream'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+document.getElementById('btnExportJson').addEventListener('click', ()=>{
+  const data = { version: 1, exportedAt: new Date().toISOString(), drugs: DRUGS };
+  download('drugs_base.json', JSON.stringify(data, null, 2), 'application/json');
+  flashStatus('JSON сохранён.', 'ok');
+});
+document.getElementById('btnExportCsv').addEventListener('click', ()=>{
+  const header = 'Название;Класс;Показатель;Граница;Оператор;Тип;Примечание';
+  const rows = DRUGS.map(d => d.map(v=>{
+    const s = String(v==null?'':v);
+    return /[;"\n\r]/.test(s) ? '"'+s.replace(/"/g,'""')+'"' : s;
+  }).join(';'));
+  const csv = '\ufeff' + header + '\n' + rows.join('\n');
+  download('drugs_base.csv', csv, 'text/csv;charset=utf-8');
+  flashStatus('CSV сохранён.', 'ok');
+});
+function parseCsvLine(line){
+  const out = []; let cur = ''; let inQ = false;
+  for(let i=0;i<line.length;i++){
+    const ch = line[i];
+    if(inQ){
+      if(ch === '"' && line[i+1] === '"'){ cur += '"'; i++; }
+      else if(ch === '"'){ inQ = false; }
+      else cur += ch;
+    } else {
+      if(ch === '"') inQ = true;
+      else if(ch === ';'){ out.push(cur); cur = ''; }
+      else cur += ch;
+    }
+  }
+  out.push(cur); return out;
+}
+function parseCsv(text){
+  const clean = text.replace(/^\ufeff/,'');
+  const lines = clean.split(/\r?\n/).filter(l=>l.trim().length>0);
+  if(!lines.length) return [];
+  let start = 0;
+  if(/^"?Название/i.test(lines[0])) start = 1;
+  const out = [];
+  for(let i=start;i<lines.length;i++){
+    const c = parseCsvLine(lines[i]);
+    if(c.length < 7) continue;
+    out.push([
+      c[0].trim(), c[1].trim(),
+      INDICATORS.includes(c[2].trim()) ? c[2].trim() : 'СКФ',
+      parseFloat(String(c[3]).replace(',','.')) || 0,
+      OPERATORS.includes(c[4].trim()) ? c[4].trim() : '<',
+      TYPES.includes(c[5].trim()) ? c[5].trim() : 'КОРРЕКЦИЯ',
+      c[6].trim()
+    ]);
+  }
+  return out;
+}
+document.getElementById('importJson').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const parsed = JSON.parse(reader.result);
+      const arr = Array.isArray(parsed) ? parsed : (parsed && Array.isArray(parsed.drugs) ? parsed.drugs : null);
+      if(!arr) throw new Error('Не найден массив drugs');
+      const validated = arr.filter(d => Array.isArray(d) && d.length >= 7).map(d=>[
+        String(d[0]), String(d[1]),
+        INDICATORS.includes(d[2]) ? d[2] : 'СКФ',
+        parseFloat(d[3]) || 0,
+        OPERATORS.includes(d[4]) ? d[4] : '<',
+        TYPES.includes(d[5]) ? d[5] : 'КОРРЕКЦИЯ',
+        String(d[6])
+      ]);
+      if(!validated.length) throw new Error('Нет валидных записей');
+      if(!confirm('Импортировать '+validated.length+' записей? Текущая база будет заменена.')) return;
+      DRUGS = validated;
+      saveDrugs();
+      renderDrugEditor();
+      flashStatus('Импортировано записей: '+validated.length, 'ok');
+    }catch(err){
+      flashStatus('Ошибка импорта JSON: '+err.message, 'err');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+});
+document.getElementById('importCsv').addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try{
+      const arr = parseCsv(reader.result);
+      if(!arr.length) throw new Error('Нет валидных записей');
+      if(!confirm('Импортировать '+arr.length+' записей? Текущая база будет заменена.')) return;
+      DRUGS = arr;
+      saveDrugs();
+      renderDrugEditor();
+      flashStatus('Импортировано записей: '+arr.length, 'ok');
+    }catch(err){
+      flashStatus('Ошибка импорта CSV: '+err.message, 'err');
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file, 'utf-8');
+});
+
+/* ============================================================
+   ФОРМУЛЫ рСКФ
+   ============================================================ */
+function ckdEpi2011(age,sex,cr){
+  if(age==null||cr==null||age<18) return null;
+  const s=cr*0.0113;
+  if(sex===1){const k=0.9;
+    return s<=k?141*Math.pow(s/k,-0.411)*Math.pow(0.993,age)
+              :141*Math.pow(s/k,-1.209)*Math.pow(0.993,age);}
+  const k=0.7;
+  return s<=k?144*Math.pow(s/k,-0.329)*Math.pow(0.993,age)
+            :144*Math.pow(s/k,-1.209)*Math.pow(0.993,age);
+}
+function ckdEpi2021(age,sex,cr){
+  if(age==null||cr==null||age<18) return null;
+  const s=cr*0.0113;
+  if(sex===1){const k=0.9;
+    return s<=k?142*Math.pow(s/k,-0.302)*Math.pow(0.9938,age)
+              :142*Math.pow(s/k,-1.200)*Math.pow(0.9938,age);}
+  const k=0.7,f=Math.pow(0.9938,age)*1.012;
+  return s<=k?142*Math.pow(s/k,-0.241)*f
+            :142*Math.pow(s/k,-1.200)*f;
+}
+function ekfcQ(age,sex){
+  if(age!=null&&age<=25){
+    const a=age;
+    if(sex===1) return Math.exp(3.2+0.259*a-0.543*Math.log(a)-0.00763*a*a+0.000079*Math.pow(a,3));
+    return Math.exp(3.08+0.177*a-0.223*Math.log(a)-0.00596*a*a+0.0000686*Math.pow(a,3));
+  }
+  return sex===1?80:62;
+}
+function ekfc(age,sex,cr){
+  if(age==null||cr==null||age<2) return null;
+  const q=ekfcQ(age,sex), r=cr/q;
+  let e = r<1 ? 107.3*Math.pow(r,-0.322) : 107.3*Math.pow(r,-1.132);
+  if(age>40) e*=Math.pow(0.99,age-40);
+  return e;
+}
+function cockcroft(age,sex,cr,w){
+  if(age==null||cr==null||w==null) return null;
+  return (140-age)*w*(sex===1?1.23:1.04)/cr;
+}
+function ckdStage(g){
+  if(g==null) return null;
+  if(g>=90) return {s:'С1',d:'высокая или оптимальная',icd:'N18.1',cls:'st-c1'};
+  if(g>=60) return {s:'С2',d:'незначительно сниженная',icd:'N18.2',cls:'st-c2'};
+  if(g>=45) return {s:'С3а',d:'умеренно сниженная',icd:'N18.3',cls:'st-c3a'};
+  if(g>=30) return {s:'С3б',d:'значительно сниженная',icd:'N18.3',cls:'st-c3b'};
+  if(g>=15) return {s:'С4',d:'резко сниженная',icd:'N18.4',cls:'st-c4'};
+  return {s:'С5',d:'терминальная почечная недостаточность',icd:'N18.5',cls:'st-c5'};
+}
+function albStage(v,u){
+  if(v==null) return null;
+  if(u==='mgg'){
+    if(v<30) return {c:'A1',d:'нормальная'};
+    if(v<=300) return {c:'A2',d:'умеренно повышенная'};
+    if(v<2200) return {c:'A3',d:'резко повышенная'};
+    return {c:'A4',d:'нефротическая'};
+  }
+  if(v<3) return {c:'A1',d:'нормальная'};
+  if(v<=30) return {c:'A2',d:'умеренно повышенная'};
+  if(v<220) return {c:'A3',d:'резко повышенная'};
+  return {c:'A4',d:'нефротическая'};
+}
+function gfrIndex(g){
+  if(g==null) return null;
+  if(g<15) return 15; if(g<30) return 30; if(g<45) return 45;
+  if(g<60) return 60; if(g<90) return 90; if(g<105) return 100;
+  return 105;
+}
+function albIndex(v,u){
+  if(v==null||v===0) return 10;
+  if(u==='mgg'){
+    if(v<10) return 10; if(v<30) return 30; if(v<300) return 300;
+    if(v<1000) return 1000; return 1001;
+  }
+  if(v<1) return 10; if(v<3) return 30; if(v<30) return 300;
+  if(v<100) return 1000; return 1001;
+}
+const colPos = ai => ALB_COLS.findIndex(c=>c.idx===ai);
+const rowPos = gi => GFR_ROWS.findIndex(r=>r.idx===gi);
+
+function riskCategory(gi,ai){
+  const c=colPos(ai);
+  if(gi>=90) return ['низкий','умеренный','высокий','высокий','высокий'][c];
+  if(gi>=60) return ['умеренный','высокий','очень высокий','очень высокий','очень высокий'][c];
+  if(gi>=45) return ['высокий','очень высокий','очень высокий','очень высокий','очень высокий'][c];
+  return 'очень высокий';
+}
+function monitoring(gi,ai){
+  const c=colPos(ai);
+  if(gi>=90) return ['ежегодно','ежегодно','каждые 6 мес.','каждые 6 мес.','каждые 6 мес.'][c];
+  if(gi>=45) return ['каждые 6 мес.','каждые 6 мес.','каждые 3 мес.','каждые 3 мес.','каждые 3 мес.'][c];
+  if(gi>=30) return ['каждые 3 мес.','каждые 3 мес.','каждые 6 нед.','каждые 6 нед.','каждые 6 нед.'][c];
+  return 'каждые 2–4 нед.';
+}
+function observation(gi,ai){
+  const c=colPos(ai);
+  if(gi>=90) return ['ежегодный скрининг','наблюдение терапевта','консультация / наблюдение нефролога','наблюдение нефролога','наблюдение нефролога'][c];
+  if(gi>=45) return ['наблюдение терапевта','наблюдение терапевта','наблюдение нефролога','наблюдение нефролога','наблюдение нефролога'][c];
+  return 'наблюдение нефролога. Постановка на учёт в центре ЗПТ.';
+}
+const TX_SCREEN='Регулярный скрининг ХБП.';
+const TX_BASE='Назначить кардионефропротективную терапию. Например: комбинация иАПФ/БРА + БКК, иНГЛТ-2, аторвастатин; у пациентов с ХБП и СД 2 типа: иНГЛТ-2, аналоги GLP-1, финеренон.';
+const TX_AMKR='Назначить кардионефропротективную терапию. Например: комбинация иАПФ/БРА + БКК, иНГЛТ-2, АМКР, аторвастатин; у пациентов с ХБП и СД 2 типа: иНГЛТ-2, аналоги GLP-1, финеренон.';
+function therapy(gi,ai){
+  if(gi>=90&&ai<=30) return TX_SCREEN;
+  if(gi<=60&&ai>=300) return TX_AMKR;
+  return TX_BASE;
+}
+function doacDoses(crcl,w,age,cr,bleed){
+  if(crcl==null) return {dab:'—',riv:'—',api:'—'};
+  let dab = crcl<30 ? 'Дабигатран НЕ рекомендован'
+          : (bleed ? 'Дабигатран 110 мг 2 раза в день' : 'Дабигатран 150 мг 2 раза в день');
+  let riv = crcl<=15 ? 'Ривароксабан НЕ рекомендован'
+          : (crcl<=49 ? 'Ривароксабан 15 мг 1 раз в день' : 'Ривароксабан 20 мг 1 раз в день');
+  let api;
+  if(crcl<=15) api='Апиксабан НЕ рекомендован';
+  else if(crcl<=29) api='Апиксабан 2,5 мг 2 раза в день';
+  else if(w!=null&&w<=60&&age!=null&&age>=80) api='Апиксабан 2,5 мг 2 раза в день';
+  else if(cr!=null&&cr>=133&&age!=null&&age>=80) api='Апиксабан 2,5 мг 2 раза в день';
+  else if(cr!=null&&cr>=133&&w!=null&&w<=60) api='Апиксабан 2,5 мг 2 раза в день';
+  else api='Апиксабан 5 мг 2 раза в день';
+  return {dab,riv,api};
+}
+function pillClass(r){
+  if(r==='низкий') return 'p-low';
+  if(r==='умеренный') return 'p-mod';
+  if(r==='высокий') return 'p-high';
+  return 'p-vhigh';
+}
+
+/* ============================================================
+   ФИЛЬТРАЦИЯ ПРЕПАРАТОВ
+   ============================================================ */
+function checkOp(val, op, thr){
+  if(val==null) return false;
+  switch(op){
+    case '<':  return val < thr;
+    case '<=': return val <= thr;
+    case '>':  return val > thr;
+    case '>=': return val >= thr;
+    case '=':  return val === thr;
+  }
+  return false;
+}
+function getIndicatorValue(ind, pGfr, pCg, pCr){
+  if(ind==='СКФ') return pGfr;
+  if(ind==='КК') return pCg;
+  if(ind==='Кр') return pCr;
+  return null;
+}
+function filterDrugs(pGfr, pCg, pCr){
+  const byName = new Map();
+  for(const d of DRUGS){
+    if(!Array.isArray(d) || d.length < 7) continue;
+    const [name, cls, ind, thr, op, type, note] = d;
+    const val = getIndicatorValue(ind, pGfr, pCg, pCr);
+    if(!checkOp(val, op, Number(thr))) continue;
+    const prio = TYPE_PRIORITY[type] || 99;
+    const key = String(name).trim().toLowerCase();
+    const current = byName.get(key);
+    if(!current || prio < current.prio){
+      byName.set(key, { name, cls, type, note, prio, rule: `${ind} ${op} ${thr}`, value: val });
+    }
+  }
+  return Array.from(byName.values()).sort((a,b)=>{
+    if(a.prio !== b.prio) return a.prio - b.prio;
+    return String(a.name).localeCompare(String(b.name),'ru');
+  });
+}
+
+/* ============================================================
+   КОПИРОВАНИЕ
+   ============================================================ */
+function copyToClipboard(text, btn){
+  const done = () => {
+    if (!btn) return;
+    const orig = btn.dataset.orig || btn.textContent;
+    btn.dataset.orig = orig;
+    btn.textContent = '✓ Скопировано';
+    btn.classList.add('copied');
+    clearTimeout(btn._t);
+    btn._t = setTimeout(()=>{
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 1600);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text, done));
+  } else {
+    fallbackCopy(text, done);
+  }
+}
+function fallbackCopy(text, onSuccess){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.setAttribute('readonly','');
+    ta.style.position = 'absolute'; ta.style.left = '-9999px';
+    document.body.appendChild(ta); ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(ok && onSuccess) onSuccess();
+  }catch(e){}
+}
+
+/* ============================================================
+   ГЛАВНЫЙ РАСЧЁТ
+   ============================================================ */
+function render(){
+  const sex   = getSex();
+  const age   = num('age');
+  const cr    = num('cr');
+  const h     = num('height');
+  const w     = num('weight');
+  const albV  = num('alb');
+  const albU  = $('albUnit').value;
+  const doacM = $('doacMetric').value;
+  const bleed = $('bleed').checked;
+
+  const bsa   = (h!=null&&w!=null) ? Math.sqrt(h*w/3600) : null;
+  const bmi   = (h!=null&&w!=null) ? w/Math.pow(h/100,2) : null;
+  const obese = bmi!=null && (bmi>=35 || bmi<18.5);
+
+  const e2011 = ckdEpi2011(age,sex,cr);
+  const e2021 = ckdEpi2021(age,sex,cr);
+  const eEkfc = ekfc(age,sex,cr);
+  const cg    = cockcroft(age,sex,cr,w);
+
+  const de = (g) => (g!=null && bsa!=null) ? g*bsa/1.73 : null;
+  const d2011 = de(e2011), d2021 = de(e2021), dEkfc = de(eEkfc);
+
+  let doacVal;
+  if(doacM==='ekfc') doacVal=dEkfc;
+  else if(doacM==='epi2021') doacVal=d2021;
+  else if(doacM==='epi2011') doacVal=d2011;
+  else doacVal=cg;
+
+  const primaryG = eEkfc!=null?eEkfc:e2011;
+  const st = ckdStage(primaryG);
+  const st2011 = ckdStage(e2011);
+  const stEkfc = ckdStage(eEkfc);
+
+  const as = (albV == null)
+    ? { c: 'А?', d: 'не указана' }
+    : albStage(albV, albU);
+
+  const gi = gfrIndex(primaryG);
+  const ai = albIndex(albV, albU);
+  const rk = (gi!=null&&ai!=null) ? riskCategory(gi,ai) : null;
+
+  const doses = doacDoses(doacVal,w,age,cr,bleed);
+  const drugs = filterDrugs(primaryG, cg, cr);
+
+  let out='';
+
+  out+=`<div class="card"><h2>Расчётная СКФ</h2><div class="gfr-grid">`;
+  const card=(name, formulaName, g, deidx, extraCls)=>{
+    const s=ckdStage(g);
+    const stCls = s ? s.cls : '';
+    let copyBtn = '';
+    if (g != null && s) {
+      const copyText = `рСКФ (по формуле ${formulaName}) = ${nf(g,1)} мл/мин/1,73м² от ${DATE_STR} - ${s.s}`;
+      copyBtn = `<button type="button" class="dx-copy-btn gfr-copy-btn" data-copy="${esc(copyText)}">Копировать</button>`;
+    }
+    return `<div class="gfr ${stCls} ${extraCls||''}">
+      <div class="name">${name}</div>
+      <div class="val">${nf(g,1)} <small>мл/мин/1,73м²</small></div>
+      <div class="stage">${s?s.s+' · '+s.d:'—'}</div>
+      <div class="deidx">Деиндексированная: <b>${nf(deidx,1)}</b> мл/мин</div>
+      ${copyBtn}
+    </div>`;
+  };
+  out+=card('EKFC 2021', 'EKFC, 2021', eEkfc, dEkfc);
+  out+=card('CKD-EPI 2009/2011', 'CKD-EPI, 2011', e2011, d2011);
+  out+=card('CKD-EPI 2021', 'CKD-EPI, 2021', e2021, d2021);
+  out+=`<div class="gfr gfr-cg">
+    <div class="name">КК Cockcroft–Gault</div>
+    <div class="val">${nf(cg,1)} <small>мл/мин</small></div>
+    <div class="stage">оценка клиренса креатинина</div>
+    <div class="deidx">Не индексируется на 1,73 м²</div>
+  </div>`;
+  out+=`</div>`;
+
+  if(age!=null&&age<18){
+    out+=`<div class="alert warn">Пациент младше 18 лет — формулы CKD-EPI/EKFC для взрослых не применяются.</div>`;
+  }
+  if((h==null||w==null) && (h!=null || w!=null || age!=null || cr!=null)){
+    out+=`<div class="alert warn">Укажите рост и массу тела — иначе нельзя рассчитать деиндексированную рСКФ, ИМТ и дозы ПОАК.</div>`;
+  } else if(h!=null && w!=null){
+    out+=`<div class="alert info">
+      <b>Антропометрия:</b> ИМТ ${nf(bmi,1)} кг/м² · площадь тела ${nf(bsa,2)} м².
+      ${obese?'<br><b>ИМТ вне диапазона 18,5–35 → оптимально использовать деиндексированную рСКФ.</b>':''}
+    </div>`;
+  }
+  out+=`</div>`;
+
+  if(st2011 && stEkfc){
+    const line2011 = `ХБП ${st2011.s}${as.c} (рСКФ по формуле CKD-EPI, 2011 = ${nf(e2011,1)} мл/мин/1,73м² от ${DATE_STR})`;
+    const lineEkfc = `ХБП ${stEkfc.s}${as.c} (рСКФ по формуле EKFC, 2021 = ${nf(eEkfc,1)} мл/мин/1,73м² от ${DATE_STR})`;
+
+    out+=`<div class="card">
+      <h2 style="margin-bottom:12px">Формулировка диагноза</h2>
+      <div class="dx-box">
+        <div class="dx-line">
+          <span class="dx-line-text">ХБП <b>${st2011.s}${as.c}</b> (рСКФ по формуле CKD-EPI, 2011 = <b>${nf(e2011,1)}</b> мл/мин/1,73м² от ${DATE_STR})</span>
+          <button type="button" class="dx-copy-btn" data-dx="${esc(line2011)}">Копировать</button>
+        </div>
+        <div class="dx-line">
+          <span class="dx-line-text">ХБП <b>${stEkfc.s}${as.c}</b> (рСКФ по формуле EKFC, 2021 = <b>${nf(eEkfc,1)}</b> мл/мин/1,73м² от ${DATE_STR})</span>
+          <button type="button" class="dx-copy-btn" data-dx="${esc(lineEkfc)}">Копировать</button>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:8px">
+        Формулировка приведена по двум уравнениям. Категория альбуминурии — <b>${as.c}</b>${as.d?` (${as.d})`:''}.
+        При наличии критериев повреждения почек и/или рСКФ &lt; 60 мл/мин/1,73 м² в течение ≥ 3 месяцев диагноз ХБП правомочен.
+      </div>
+    </div>`;
+  }
+
+  const monitoringVal = gi!=null&&ai!=null ? monitoring(gi,ai) : '—';
+  const observationVal = gi!=null&&ai!=null ? observation(gi,ai) : '—';
+  const observationCap = (observationVal && observationVal !== '—')
+    ? observationVal.charAt(0).toUpperCase() + observationVal.slice(1)
+    : observationVal;
+  const copyStageText = `Частота контроля рСКФ и альбуминурии: ${monitoringVal}\n${observationCap}`;
+
+  out+=`<div class="card">
+    <h2>Стадия ХБП, альбуминурия и риск</h2>
+    <button type="button" class="dx-copy-btn card-copy-btn" data-copy="${esc(copyStageText)}">Копировать</button>`;
+  out+=`<div class="kv">
+    <div class="k">Стадия ХБП (по EKFC)</div><div class="v">${st?st.s+' — '+st.d+' ('+st.icd+')':'—'}</div>
+    <div class="k">Категория альбуминурии</div><div class="v">${as?as.c+' — '+as.d:'—'}</div>
+    <div class="k">Категория риска (KDIGO)</div><div class="v">${rk?`<span class="pill ${pillClass(rk)}">${rk}</span>`:'—'}</div>
+    <div class="k">Частота контроля рСКФ и альбуминурии</div><div class="v">${monitoringVal}</div>
+    <div class="k">Наблюдение</div><div class="v">${observationVal}</div>
+  </div>`;
+  out+=`<div class="alert ok" style="margin-top:14px"><b>Тактика:</b><br>${gi!=null&&ai!=null?therapy(gi,ai):'—'}</div>`;
+  out+=`</div>`;
+
+  out+=`<div class="card"><h2>Дозы пероральных антикоагулянтов при ФП</h2>
+    <div class="hint" style="margin-bottom:10px">
+      Расчёт по показателю: <b>${
+        doacM==='ekfc'?'EKFC, деиндексированная':
+        doacM==='epi2021'?'CKD-EPI 2021, деиндексированная':
+        doacM==='epi2011'?'CKD-EPI 2009/2011, деиндексированная':'Cockcroft–Gault'
+      }</b> = <b>${nf(doacVal,1)}</b> мл/мин
+    </div>
+    <div class="drug"><div class="dn">Дабигатран</div>
+      <div class="dd ${doses.dab.includes('НЕ рекомендован')?'neg':''}">${doses.dab}</div></div>
+    <div class="drug"><div class="dn">Ривароксабан</div>
+      <div class="dd ${doses.riv.includes('НЕ рекомендован')?'neg':''}">${doses.riv}</div></div>
+    <div class="drug"><div class="dn">Апиксабан</div>
+      <div class="dd ${doses.api.includes('НЕ рекомендован')?'neg':''}">${doses.api}</div></div>
+  </div>`;
+
+  if(gi!=null&&ai!=null){
+    const rowI = rowPos(gi);
+    const colI = colPos(ai);
+    const refRowI = rowPos(100);
+    const refColI = colPos(10);
+
+    const riskInfo = (t) => {
+      const patVal = t.data[rowI][colI];
+      const refVal = t.data[refRowI][refColI];
+      const patNum = (patVal==='ref') ? 1 : Number(patVal);
+      const refNum = (refVal==='ref') ? 1 : Number(refVal);
+      const ratio = patNum / refNum;
+      if (Math.abs(ratio-1) < 0.05) return {txt:'на уровне референса', cls:'rt-neutral'};
+      if (ratio > 1) return {txt:`в ${nf(ratio,1)} ${pluralRaz(ratio)}`, cls:'rt-up'};
+      const inv = 1/ratio;
+      return {txt:`снижен в ${nf(inv,1)} ${pluralRaz(inv)}`, cls:'rt-down'};
+    };
+
+    const albNote = (albV == null)
+      ? ' (А/К не указан — в расчёте использована категория A1)'
+      : '';
+
+    out+=`<div class="card"><h2>Риски данного пациента, в разы…</h2>
+      <div class="hint" style="margin-bottom:12px">
+        Ячейка пациента: СКФ <b>${GFR_ROWS[rowI].label}</b> мл/мин/1,73 м² ·
+        альбуминурия <b>${ALB_COLS[colI].mgg} мг/г</b>
+        (${ALB_COLS[colI].mmol} мг/ммоль)${albNote}.
+        Референсная группа — СКФ 90–104 мл/мин/1,73 м² с альбуминурией &lt;10 мг/г.
+      </div>
+      <table class="risk-table"><tbody>`;
+
+    const half = Math.ceil(RISK_TABLES.length / 2);
+    for(let i=0; i<half; i++){
+      const t1 = RISK_TABLES[i];
+      const t2 = RISK_TABLES[i + half];
+      const r1 = riskInfo(t1);
+      const r2 = t2 ? riskInfo(t2) : null;
+      out += `<tr>
+        <td class="rt-title">${t1.title}</td>
+        <td class="rt-value ${r1.cls}">${r1.txt}</td>
+        <td class="rt-title sep">${t2 ? t2.title : ''}</td>
+        <td class="rt-value ${r2?r2.cls:''}">${r2?r2.txt:''}</td>
+      </tr>`;
+    }
+
+    out+=`</tbody></table>
+      <div class="alert info" style="margin-top:12px">
+        <b>Обратите внимание:</b> риски суммарно кратны относительно группы сравнения.
+        При СКФ &lt;60 и/или альбуминурии ≥30 мг/г требуется активное наблюдение и коррекция терапии.
+      </div>
+    </div>`;
+  } else {
+    out+=`<div class="card"><h2>Риски данного пациента, в разы…</h2>
+      <div class="alert warn">Недостаточно данных для расчёта кратности рисков. Проверьте возраст, креатинин и пол.</div>
+    </div>`;
+  }
+
+  out+=`<div class="card"><h2>Препараты, требующие внимания</h2>`;
+  if(drugs.length===0){
+    if(primaryG==null && cg==null && cr==null){
+      out+=`<div class="alert info">Заполните данные пациента для оценки препаратов.</div>`;
+    } else {
+      out+=`<div class="alert ok">По введённым показателям (СКФ ${nf(primaryG,1)}, КК ${nf(cg,1)}, креатинин ${nf(cr,1)}) ограничений по базе препаратов не выявлено.</div>`;
+    }
+  } else {
+    const nContra = drugs.filter(d=>d.prio===1).length;
+    const nIneff  = drugs.filter(d=>d.prio===2).length;
+    const nMax    = drugs.filter(d=>d.prio===3).length;
+    const nCorr   = drugs.filter(d=>d.prio===4).length;
+
+    out+=`<div class="alert ${nContra>0?'danger':'info'}" style="margin-bottom:12px">
+      <b>${drugs.length} препарата(ов) требуют внимания.</b>
+      ${nContra>0?`Противопоказаны: <b>${nContra}</b>. `:''}
+      ${nIneff>0?`Неэффективны: <b>${nIneff}</b>. `:''}
+      ${nMax>0?`Максимальная коррекция: <b>${nMax}</b>. `:''}
+      ${nCorr>0?`Коррекция дозы: <b>${nCorr}</b>.`:''}
+    </div>`;
+
+    drugs.forEach(d=>{
+      const lvlClass = 'lvl-'+d.prio;
+      const tagClass = 't'+d.prio;
+      out+=`<div class="drug-row ${lvlClass}">
+        <div class="head">
+          <div>
+            <span class="nm">${esc(d.name)}</span>
+            <span class="cl"> — ${esc(d.cls)}</span>
+          </div>
+          <span class="tag ${tagClass}">${TYPE_LABEL[d.type]||d.type}</span>
+        </div>
+        <div class="nt">${esc(d.note)}</div>
+        <div class="cr">Условие: ${esc(d.rule)} (текущее значение: ${nf(d.value,1)})</div>
+      </div>`;
+    });
+  }
+  out+=`</div>`;
+
+  $('results').innerHTML = out;
+
+  document.querySelectorAll('.dx-copy-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const text = btn.getAttribute('data-copy') || btn.getAttribute('data-dx') || '';
+      copyToClipboard(text, btn);
+    });
+  });
+}
+
+/* ============================================================
+   БАЗОВЫЙ КОНТЕКСТ (ИЗ РАСЧЁТА)
+   ============================================================ */
+function buildBaseCtx() {
+  const sex = getSex();
+  const age = num('age');
+  const cr  = num('cr');
+  const h   = num('height');
+  const w   = num('weight');
+  const albV = num('alb');
+  const albU = $('albUnit').value;
+  const bsa = (h!=null && w!=null) ? Math.sqrt(h*w/3600) : null;
+  const bmi = (h!=null && w!=null) ? w/Math.pow(h/100,2) : null;
+  const egfr = ekfc(age,sex,cr);
+  const cg = cockcroft(age,sex,cr,w);
+  const acrMg = albV != null ? (albU === 'mgg' ? albV : albV*10) : null;
+  const acrMmol = albV != null ? (albU === 'mgg' ? albV/10 : albV) : null;
+  return { sex, age, cr, h, w, bsa, bmi, albV, albU, acrMg, acrMmol,
+           egfr, cg, hasEgfr: egfr!=null, hasAcr: acrMmol!=null };
+}
+function buildCtx(tabId) {
+  const base = buildBaseCtx();
+  const st = TAB_STATE[tabId] || {};
+  const ctx = Object.assign({}, base, {
+    onDialysis: st.status === 'dialysis' || st.modality === 'hd' || st.modality === 'pd',
+    onTransplant: st.status === 'transplant' || st.txStatus === 'recipient',
+    isCandidate: st.txStatus === 'candidate',
+    sbp: st.sbp ? Number(st.sbp) : null,
+    dbp: st.dbp ? Number(st.dbp) : null,
+    ldl: st.ldl ? Number(st.ldl) : null,
+    tg: st.tg ? Number(st.tg) : null,
+    smoking: st.smoking || '',
+    sympASCVD: st.sympASCVD || '',
+    status: st.status || '',
+    dmType: st.dmType || '',
+    hba1c: st.hba1c ? Number(st.hba1c) : null,
+    k: st.k ? Number(st.k) : (st.k2 ? Number(st.k2) : null),
+    meds: Array.isArray(st.meds) ? st.meds : [],
+    lvef: st.lvef ? Number(st.lvef) : null,
+    congestion: st.congestion || '',
+    hfmeds: Array.isArray(st.hfmeds) ? st.hfmeds : [],
+    ntprobnp: st.ntprobnp ? Number(st.ntprobnp) : null,
+    ihdEvent: st.ihdEvent || '',
+    ihdPlan: st.ihdPlan || '',
+    lvDysfunction: st.lvDysfunction || '',
+    hfSigns: st.hfSigns || '',
+    afConfirmed: st.afConfirmed || '',
+    afPlanAC: st.afPlanAC || '',
+    afType: st.afType || '',
+    vteCurrent: st.vteCurrent || '',
+    vteLoc: st.vteLoc || '',
+    vteRecurrent: st.vteRecurrent || '',
+    nephrotic: st.nephrotic || '',
+    modality: st.modality || '',
+    ferritin: st.ferritin ? Number(st.ferritin) : null,
+    tsat: st.tsat ? Number(st.tsat) : null,
+    hb: st.hb ? Number(st.hb) : null,
+    txStatus: st.txStatus || '',
+    angina: st.angina || '',
+    obstructiveCAD: st.obstructiveCAD || '',
+    calciumScore: st.calciumScore || '',
+    dmPostTx: st.dmPostTx || '',
+    planContrast: st.planContrast || '',
+    planMri: st.planMri || '',
+    dehydration: st.dehydration || '',
+    nephrotoxic: st.nephrotoxic || ''
+  });
+  return ctx;
+}
+
+// Хелперы для предикатов (CKD — подтверждена ли ХБП по данным расчёта)
+function hasCKD(c) {
+  return (c.egfr != null && c.egfr < 60) || (c.acrMmol != null && c.acrMmol >= 3);
+}
+function hasCKDWithAlb(c) {
+  return c.acrMmol != null && c.acrMmol >= 3;
+}
+function isDM2(c) {
+  return c.dmType === 't2';
+}
+
+/* ============================================================
+   КОНФИГУРАЦИЯ ПОЛЕЙ ПО ВКЛАДКАМ
+   ============================================================ */
+const TAB_FIELDS = {
+  ckd: [
+    { id:'chron3mo', label:'Хроничность ≥ 3 мес', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет'],['unknown','Неизвестно']] },
+    { id:'ckdCause', label:'Причина ХБП', type:'text' },
+    { id:'smoking', label:'Курение', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'sbp', label:'САД (подтверждённое), мм рт.ст.', type:'number' },
+    { id:'dbp', label:'ДАД, мм рт.ст.', type:'number' },
+    { id:'ldl', label:'ХС-ЛПНП, ммоль/л', type:'number' },
+    { id:'tg', label:'ТГ, ммоль/л', type:'number' },
+    { id:'sympASCVD', label:'Симптомное АССЗ', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'status', label:'Статус ЗПТ', type:'select',
+      options:[['','—'],['none','Не на ЗПТ'],['dialysis','Диализ'],['transplant','Трансплантация']] }
+  ],
+  dm: [
+    { id:'dmType', label:'Тип диабета', type:'select',
+      options:[['','—'],['none','Нет'],['t2','СД 2 типа'],['t1','СД 1 типа'],['unknown','Неизвестно']] },
+    { id:'hba1c', label:'HbA1c, %', type:'number' },
+    { id:'k', label:'Калий, ммоль/л', type:'number' },
+    { id:'meds', label:'Текущая сахароснижающая терапия', type:'checks',
+      options:[['metformin','Метформин'],['sglt2','иНГЛТ-2'],['glp1','арГПП-1'],
+               ['dpp4','иДПП-4'],['sulf','Сульфонилурея'],['insulin','Инсулин'],['none','Нет']] }
+  ],
+  hf: [
+    { id:'lvef', label:'ФВ ЛЖ, %', type:'number' },
+    { id:'congestion', label:'Признаки застоя', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'k2', label:'Калий, ммоль/л', type:'number' },
+    { id:'ntprobnp', label:'NT-proBNP, пг/мл (опционально)', type:'number' },
+    { id:'hfmeds', label:'Текущая терапия ХСН', type:'checks',
+      options:[['acei','иАПФ/БРА'],['arni','АРНИ'],['bb','Бета-блокатор'],
+               ['mra','АМКР'],['sglt2','иНГЛТ-2'],['diur','Диуретик'],['none','Нет']] }
+  ],
+  ihd: [
+    { id:'ihdEvent', label:'Тип события', type:'select',
+      options:[['','—'],['ccs','ХКС'],['nste','ОКС бпST'],['ste','ОКС пST']] },
+    { id:'ihdPlan', label:'Планируемое вмешательство', type:'select',
+      options:[['','—'],['pci','ЧКВ'],['cabg','АКШ'],['med','Только медикаментозно']] },
+    { id:'lvDysfunction', label:'Дисфункция ЛЖ (ФВ < 50%)', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'hfSigns', label:'Признаки ХСН', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] }
+  ],
+  af: [
+    { id:'afConfirmed', label:'ФП подтверждена', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'afPlanAC', label:'Планируется антикоагуляция', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет'],['undecided','Решение не принято']] },
+    { id:'afType', label:'Тип ФП', type:'select',
+      options:[['','—'],['parox','Пароксизмальная'],['persist','Персистирующая'],['permanent','Постоянная']] }
+  ],
+  vte: [
+    { id:'vteCurrent', label:'Текущий эпизод ВТЭО', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'vteLoc', label:'Локализация', type:'select',
+      options:[['','—'],['dvt','ТГВ'],['pe','ТЭЛА'],['other','Другое']] },
+    { id:'vteRecurrent', label:'Рецидивирующее ВТЭО', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'nephrotic', label:'Нефротический синдром', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] }
+  ],
+  dial: [
+    { id:'modality', label:'Модальность', type:'select',
+      options:[['','—'],['hd','ГД'],['pd','ПД'],['none','Ещё не начат']] },
+    { id:'ferritin', label:'Ферритин, мкг/л', type:'number' },
+    { id:'tsat', label:'TSAT, %', type:'number' },
+    { id:'hb', label:'Гемоглобин, г/л', type:'number' }
+  ],
+  tx: [
+    { id:'txStatus', label:'Статус', type:'select',
+      options:[['','—'],['candidate','Кандидат на ТП'],['recipient','Реципиент ТП'],['none','Не рассматривается']] },
+    { id:'angina', label:'Стенокардия / эквиваленты', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'obstructiveCAD', label:'Обструктивное КБС', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'calciumScore', label:'Данные КТ-кальциевого скора', type:'select',
+      options:[['','—'],['yes','Есть'],['no','Нет']] },
+    { id:'dmPostTx', label:'Диабет до/после ТП', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] }
+  ],
+  contrast: [
+    { id:'planContrast', label:'Планируется процедура с йодсодержащим контрастом', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'planMri', label:'Планируется МРТ с гадолинием', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] },
+    { id:'dehydration', label:'Дегидратация / перегрузка объёмом', type:'select',
+      options:[['','—'],['dehydrated','Дегидратация'],['overloaded','Перегрузка'],['none','Нет']] },
+    { id:'nephrotoxic', label:'Сопутствующая нефротоксичная терапия', type:'select',
+      options:[['','—'],['yes','Да'],['no','Нет']] }
+  ]
+};
+
+/* ============================================================
+   СОСТОЯНИЕ ВКЛАДОК
+   ============================================================ */
+const TAB_STATE = {};
+Object.keys(TAB_FIELDS).forEach(t => {
+  TAB_STATE[t] = {};
+  TAB_FIELDS[t].forEach(f => {
+    if (f.type === 'checks') {
+      TAB_STATE[t][f.id] = f.options.filter(o => o[0] === 'none').map(o => o[0]);
+    } else {
+      TAB_STATE[t][f.id] = '';
+    }
+  });
+});
+
+/* ============================================================
+   РЕКОМЕНДАЦИИ (предикаты строго по данным)
+   ============================================================ */
+const ALL_RECS = [
+  // ========== ХБП: общие ==========
+  // Скрининг — только если ХБП ещё НЕ классифицирована (нет eGFR < 60 и нет uACR ≥ 3)
+  { t:'ckd', c:'I', l:'C',
+    a:'Скрининг ХБП по рСКФ и uACR',
+    co:'рСКФ ≥ 60 и (uACR < 3 мг/ммоль или не измерялась) — ХБП ещё не классифицирована',
+    ch:'Оценить рСКФ и uACR, подтвердить хроничность ≥ 3 мес',
+    s:'Recommendation Table 3; раздел 3.3',
+    p:c => c.egfr != null && c.egfr >= 60 && (c.acrMmol == null || c.acrMmol < 3) },
+
+  // Повторная оценка — только если ХБП подтверждена (есть что контролировать)
+  { t:'ckd', c:'I', l:'C',
+    a:'Повторная оценка рСКФ и альбуминурии не реже 1 раза в год',
+    co:'ХБП (рСКФ < 60 и/или uACR ≥ 3 мг/ммоль)',
+    ch:'При прогрессировании — чаще',
+    s:'Recommendation Table 3; раздел 3.3',
+    p:c => hasCKD(c) },
+
+  // KFRE — при ХБП G3–G5 (рСКФ < 60)
+  { t:'ckd', c:'I', l:'A',
+    a:'Оценка риска ХБП по KDIGO (CGA) и KFRE при ХБП G3–G5',
+    co:'рСКФ < 60 мл/мин/1,73 м²',
+    ch:'Калькулятор KFRE (kidneyfailurerisk.co.uk)',
+    s:'Recommendation Table 5; раздел 3.5',
+    p:c => c.egfr != null && c.egfr < 60 },
+
+  { t:'ckd', c:'I', l:'B1',
+    a:'Отказ от курения',
+    co:'Активное курение + ХБП',
+    ch:'Направить в программу отказа от курения',
+    s:'Recommendation Table 8; раздел 5.1.1',
+    p:c => hasCKD(c) && c.smoking === 'yes' },
+
+  // Натрий — только при подтверждённой ХБП
+  { t:'ckd', c:'I', l:'B1',
+    a:'Натрий < 2 г/сут (< 5 г соли), овощи в рационе',
+    co:'ХБП (рСКФ < 60 и/или uACR ≥ 3 мг/ммоль)',
+    ch:'Оценить фактическое потребление',
+    s:'Recommendation Table 8; раздел 5.1.2',
+    p:c => hasCKD(c) },
+
+  { t:'ckd', c:'I', l:'B2',
+    a:'Снижение веса при ИМТ ≥ 25 до 18,5–25 кг/м²',
+    co:'ХБП + ИМТ ≥ 25 кг/м²',
+    ch:'Индивидуальный план, при необходимости — препараты для снижения веса',
+    s:'Recommendation Table 8; раздел 5.1.2',
+    p:c => hasCKD(c) && c.bmi != null && c.bmi >= 25 },
+
+  { t:'ckd', c:'I', l:'B2',
+    a:'Физическая активность ≥ 150 мин/нед умеренной интенсивности',
+    co:'ХБП, нет противопоказаний',
+    ch:'Учесть ограничения по ССЗ',
+    s:'Recommendation Table 8; раздел 5.1.2',
+    p:c => hasCKD(c) },
+
+  // АД: интенсификация — только если есть и ХБП, и повышенное АД
+  { t:'ckd', c:'I', l:'A',
+    a:'Интенсификация АД при подтверждённом САД ≥ 130 или ДАД ≥ 80 мм рт.ст.',
+    co:'ХБП, рСКФ ≥ 30 мл/мин/1,73 м², подтверждённое повышенное АД',
+    ch:'Оценить домашнее/амбулаторное АД, приверженность',
+    s:'Recommendation Table 9; раздел 5.2',
+    p:c => hasCKD(c) && c.egfr != null && c.egfr >= 30 && c.sbp != null && c.sbp >= 130 },
+
+  // Целевое САД — при ХБП с рСКФ ≥ 30
+  { t:'ckd', c:'I', l:'A',
+    a:'Целевое САД 120–129 мм рт.ст., если переносится',
+    co:'ХБП, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Контроль симптомов гипотонии, калия, рСКФ',
+    s:'Recommendation Table 9; раздел 5.2.1',
+    p:c => hasCKD(c) && c.egfr != null && c.egfr >= 30 },
+
+  // Индивидуальные цели АД — при ХБП с рСКФ < 30
+  { t:'ckd', c:'I', l:'C',
+    a:'Индивидуализированные цели АД',
+    co:'ХБП, рСКФ < 30 мл/мин/1,73 м²',
+    ch:'Учесть хрупкость, коморбидность, переносимость',
+    s:'Recommendation Table 9; раздел 5.2.1',
+    p:c => hasCKD(c) && c.egfr != null && c.egfr < 30 },
+
+  // Статин — при рСКФ < 60 не на диализе
+  { t:'ckd', c:'I', l:'A',
+    a:'Статин-содержащий режим независимо от исходного ХС-ЛПНП',
+    co:'ХБП, рСКФ < 60 мл/мин/1,73 м², не на ЗПТ',
+    ch:'Проверить переносимость, при необходимости — эзетимиб',
+    s:'Recommendation Table 10; раздел 5.3.2',
+    p:c => c.egfr != null && c.egfr < 60 && c.status !== 'dialysis' },
+
+  { t:'ckd', c:'IIa', l:'B1',
+    a:'Статин-содержащий режим',
+    co:'Трансплантация почки в анамнезе', ch:'Учесть лекарственные взаимодействия',
+    s:'Recommendation Table 10; раздел 5.3.2',
+    p:c => c.status === 'transplant' },
+
+  { t:'ckd', c:'IIb', l:'C',
+    a:'Продолжение или начало статин-содержащего режима',
+    co:'Диализ', ch:'Индивидуальное решение с учётом прогноза и коморбидности',
+    s:'Recommendation Table 10; раздел 5.3.2',
+    p:c => c.status === 'dialysis' },
+
+  // Антиагрегант III — только если явно указано «нет симптомного АССЗ»
+  { t:'ckd', c:'III', l:'B1',
+    a:'Рутинное назначение антиагрегантов НЕ рекомендуется',
+    co:'рСКФ < 60, отсутствие симптомного АССЗ (указано пользователем)',
+    ch:'Риск кровотечения может превышать пользу',
+    s:'Recommendation Table 11; раздел 5.4',
+    p:c => c.sympASCVD === 'no' && c.egfr != null && c.egfr < 60 },
+
+  // иАПФ/БРА — при ХБП с альбуминурией или при рСКФ < 60
+  { t:'ckd', c:'I', l:'A',
+    a:'иАПФ или БРА в максимально переносимой дозе',
+    co:'ХБП с альбуминурией (uACR ≥ 3 мг/ммоль) или рСКФ < 60 мл/мин/1,73 м²',
+    ch:'Контроль калия и рСКФ через 1–4 нед после инициации',
+    s:'Recommendation Table 12; раздел 5.5.1',
+    p:c => hasCKD(c) },
+
+  // Комбинированная РААС — при подтверждённой ХБП
+  { t:'ckd', c:'III', l:'A',
+    a:'Комбинированная блокада РААС (иАПФ + БРА) НЕ рекомендуется',
+    co:'ХБП', ch:'Риск гиперкалиемии и ОПП',
+    s:'Recommendation Table 12; раздел 5.5.1',
+    p:c => hasCKD(c) },
+
+  // иНГЛТ-2 при СД 2 + ХБП
+  { t:'ckd', c:'I', l:'A',
+    a:'иНГЛТ-2',
+    co:'ХБП + СД 2 типа, рСКФ ≥ 20 мл/мин/1,73 м²',
+    ch:'Учесть острый «дип» рСКФ',
+    s:'Recommendation Table 12; раздел 5.5.2',
+    p:c => isDM2(c) && c.egfr != null && c.egfr >= 20 && hasCKD(c) },
+
+  // иНГЛТ-2 при ХБП без диабета с uACR ≥ 20
+  { t:'ckd', c:'I', l:'A',
+    a:'иНГЛТ-2',
+    co:'ХБП без диабета, рСКФ ≥ 20, uACR ≥ 20 мг/ммоль',
+    ch:'При рСКФ < 30 — индивидуально',
+    s:'Recommendation Table 12; раздел 5.5.2',
+    p:c => !isDM2(c) && c.egfr != null && c.egfr >= 20 && c.acrMmol != null && c.acrMmol >= 20 },
+
+  // иНГЛТ-2 при ХБП без диабета с uACR < 20 — только IIa
+  { t:'ckd', c:'IIa', l:'B1',
+    a:'иНГЛТ-2 с целью замедления прогрессирования',
+    co:'ХБП без диабета, рСКФ 20–44, uACR < 20 мг/ммоль',
+    ch:'Взвесить ожидаемую пользу и стоимость',
+    s:'Recommendation Table 12; раздел 5.5.2',
+    p:c => !isDM2(c) && c.egfr != null && c.egfr >= 20 && c.egfr <= 44 &&
+            c.acrMmol != null && c.acrMmol < 20 },
+
+  // ========== СД 2 + ХБП ==========
+  { t:'dm', c:'I', l:'A',
+    a:'иНГЛТ-2',
+    co:'СД 2 типа + ХБП, рСКФ ≥ 20 мл/мин/1,73 м²',
+    ch:'Не ожидать значимого снижения гликемии при рСКФ < 30',
+    s:'Recommendation Table 12; раздел 5.5.2',
+    p:c => isDM2(c) && hasCKD(c) && c.egfr != null && c.egfr >= 20 },
+
+  { t:'dm', c:'I', l:'A',
+    a:'Финеренон (нестероидный АМКР)',
+    co:'СД 2 типа + ХБП, рСКФ ≥ 25, uACR ≥ 3 мг/ммоль',
+    ch:'Калий ≤ 5,0 ммоль/л перед началом; контроль калия и рСКФ',
+    s:'Recommendation Table 12; раздел 5.5.3.1',
+    p:c => isDM2(c) && c.egfr != null && c.egfr >= 25 && hasCKDWithAlb(c) },
+
+  { t:'dm', c:'I', l:'A',
+    a:'Семаглутид п/к 1,0 мг/нед (после титрации)',
+    co:'СД 2 типа + ХБП, рСКФ 25–49 + uACR ≥ 10 мг/ммоль ИЛИ рСКФ 50–74 + uACR ≥ 30 мг/ммоль',
+    ch:'Независимо от гликемического контроля; ЖКТ-симптомы',
+    s:'Recommendation Table 12; раздел 5.5.4',
+    p:c => isDM2(c) && c.egfr != null &&
+        ((c.egfr >= 25 && c.egfr <= 49 && c.acrMmol != null && c.acrMmol >= 10) ||
+         (c.egfr >= 50 && c.egfr <= 74 && c.acrMmol != null && c.acrMmol >= 30)) },
+
+  { t:'dm', c:'I', l:'A',
+    a:'иНГЛТ-2 и арГПП-1 как первая линия для снижения гликемии',
+    co:'СД 2 типа + ХБП', ch:'С учётом кардиоренальной пользы',
+    s:'Recommendation Table 13; раздел 5.6.2',
+    p:c => isDM2(c) && hasCKD(c) },
+
+  { t:'dm', c:'I', l:'B1',
+    a:'Персонализированный целевой HbA1c в диапазоне < 48…< 64 ммоль/моль',
+    co:'СД + ХБП', ch:'Цель < 53 ммоль/моль где возможно',
+    s:'Recommendation Table 13; раздел 5.6.1',
+    p:c => c.dmType && c.dmType !== 'none' && hasCKD(c) },
+
+  { t:'dm', c:'IIa', l:'B1',
+    a:'Метформин',
+    co:'СД 2 типа + ХБП, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'При рСКФ < 45 — снижение дозы, при < 30 — отмена',
+    s:'Recommendation Table 13; раздел 5.6.2',
+    p:c => isDM2(c) && hasCKD(c) && c.egfr != null && c.egfr >= 30 },
+
+  { t:'dm', c:'IIb', l:'C',
+    a:'Сульфонилурея',
+    co:'СД 2 типа + ХБП', ch:'Риск гипогликемий, прибавки веса',
+    s:'Recommendation Table 13; раздел 5.6.2',
+    p:c => isDM2(c) && hasCKD(c) },
+
+  { t:'dm', c:'IIb', l:'B1',
+    a:'иДПП-4 (при непереносимости арГПП-1)',
+    co:'СД 2 типа + ХБП', ch:'Осторожно при ХСН',
+    s:'Recommendation Table 13; раздел 5.6.2',
+    p:c => isDM2(c) && hasCKD(c) },
+
+  // ========== ХСН ==========
+  { t:'hf', c:'I', l:'A',
+    a:'Петлевые диуретики',
+    co:'ХСН с признаками застоя', ch:'Мониторинг веса, диуреза, калия, рСКФ',
+    s:'Recommendation Table 15; раздел 6.2.1.1',
+    p:c => c.congestion === 'yes' },
+
+  { t:'hf', c:'I', l:'A',
+    a:'иНГЛТ-2',
+    co:'ХСН (ФВ ЛЖ указана), рСКФ ≥ 20 мл/мин/1,73 м²',
+    ch:'Ожидаемый «дип» рСКФ не является причиной отмены',
+    s:'Recommendation Table 15; раздел 6.2.1.2',
+    p:c => c.lvef != null && c.egfr != null && c.egfr >= 20 },
+
+  { t:'hf', c:'I', l:'A',
+    a:'иАПФ / АРНИ / БРА (при непереносимости иАПФ или АРНИ)',
+    co:'ХСНнФВ, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Калий и рСКФ через 1–4 нед',
+    s:'Recommendation Table 15; раздел 6.2.2.1',
+    p:c => c.lvef != null && c.lvef < 40 && c.egfr != null && c.egfr >= 30 },
+
+  { t:'hf', c:'IIa', l:'B1',
+    a:'АРНИ как альтернатива иАПФ/БРА',
+    co:'ХСНнФВ, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Возможное замедление снижения рСКФ',
+    s:'Recommendation Table 15; раздел 6.2.2.1',
+    p:c => c.lvef != null && c.lvef < 40 && c.egfr != null && c.egfr >= 30 },
+
+  { t:'hf', c:'I', l:'A',
+    a:'Бета-блокатор',
+    co:'ХСНнФВ, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Контроль ЧСС и АД',
+    s:'Recommendation Table 15; раздел 6.2.2.3',
+    p:c => c.lvef != null && c.lvef < 40 && c.egfr != null && c.egfr >= 30 },
+
+  { t:'hf', c:'I', l:'A',
+    a:'Стероидный АМКР (спиронолактон/эплеренон)',
+    co:'ХСНнФВ, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Калий и рСКФ через 1–4 нед',
+    s:'Recommendation Table 15; раздел 6.2.1.3.1',
+    p:c => c.lvef != null && c.lvef < 40 && c.egfr != null && c.egfr >= 30 },
+
+  { t:'hf', c:'IIa', l:'B1',
+    a:'АМКР (стероидный или нестероидный)',
+    co:'ХСН, ФВ ЛЖ ≥ 40%, рСКФ ≥ 25 мл/мин/1,73 м²',
+    ch:'Калий и рСКФ, взаимодействия с иАПФ/БРА',
+    s:'Recommendation Table 15; раздел 6.2.1.3.2',
+    p:c => c.lvef != null && c.lvef >= 40 && c.egfr != null && c.egfr >= 25 },
+
+  { t:'hf', c:'IIa', l:'B1',
+    a:'Семаглутид или тирзепатид',
+    co:'ХСН, ФВ ЛЖ ≥ 45%, ожирение (ИМТ ≥ 30), рСКФ ≥ 15 мл/мин/1,73 м²',
+    ch:'ЖКТ-симптомы, снижение веса',
+    s:'Recommendation Table 15; раздел 6.2.2.2.1',
+    p:c => c.lvef != null && c.lvef >= 45 && c.bmi != null && c.bmi >= 30 && c.egfr != null && c.egfr >= 15 },
+
+  { t:'hf', c:'IIa', l:'C',
+    a:'Продолжение иНГЛТ-2',
+    co:'ХСН, рСКФ снизилась < 20 мл/мин/1,73 м², препарат хорошо переносится',
+    ch:'Падение рСКФ < 50% от исходной, гиперкалиемия < 5,5 ммоль/л',
+    s:'Recommendation Table 18; раздел 6.4.1',
+    p:c => c.lvef != null && c.egfr != null && c.egfr < 20 },
+
+  { t:'hf', c:'IIa', l:'C',
+    a:'Продолжение АРНИ',
+    co:'ХСН, рСКФ снизилась < 30 мл/мин/1,73 м², препарат хорошо переносится',
+    ch:'Падение рСКФ < 50% от исходной, гиперкалиемия < 5,5 ммоль/л',
+    s:'Recommendation Table 18; раздел 6.4.1',
+    p:c => c.lvef != null && c.egfr != null && c.egfr < 30 },
+
+  { t:'hf', c:'IIb', l:'C',
+    a:'Дигоксин или дигитоксин',
+    co:'ХСНнФВ, рСКФ > 20 мл/мин/1,73 м²',
+    ch:'Дигоксин — почечная элиминация, контроль уровня',
+    s:'Recommendation Table 15; раздел 6.2.2.1.4',
+    p:c => c.lvef != null && c.lvef < 40 && c.egfr != null && c.egfr > 20 },
+
+  // ========== ИБС / ОКС ==========
+  { t:'ihd', c:'I', l:'C',
+    a:'Не откладывать немедленную или раннюю инвазивную стратегию',
+    co:'ОКС с высоким/очень высоким риском',
+    ch:'Риск ОПП не должен задерживать реперфузию',
+    s:'Recommendation Table 21; раздел 7.2.2',
+    p:c => (c.ihdEvent === 'ste' || c.ihdEvent === 'nste') && c.egfr != null },
+
+  { t:'ihd', c:'I', l:'C',
+    a:'Антиагрегант (аспирин или клопидогрел)',
+    co:'ХКС, без показаний к антикоагуляции',
+    ch:'Риск кровотечения', s:'Recommendation Table 20; раздел 7.1.2.1',
+    p:c => c.ihdEvent === 'ccs' && c.egfr != null },
+
+  { t:'ihd', c:'IIa', l:'B1',
+    a:'Клопидогрел предпочтительнее аспирина',
+    co:'ХКС, рСКФ > 30 мл/мин/1,73 м²',
+    ch:'Меньше ишемических событий без роста кровотечений',
+    s:'Recommendation Table 20; раздел 7.1.2.1',
+    p:c => c.ihdEvent === 'ccs' && c.egfr != null && c.egfr > 30 },
+
+  { t:'ihd', c:'I', l:'A',
+    a:'Статин ± эзетимиб',
+    co:'ХКС, ХБП, не на диализе',
+    ch:'При необходимости — PCSK9-ингибитор',
+    s:'Recommendation Table 20; раздел 7.1.2.2',
+    p:c => c.ihdEvent === 'ccs' && c.status !== 'dialysis' },
+
+  { t:'ihd', c:'I', l:'B1',
+    a:'Первоначально консервативная стратегия',
+    co:'ХКС', ch:'ЧКВ резервировать при ухудшении',
+    s:'Recommendation Table 20; раздел 7.1.2.4',
+    p:c => c.ihdEvent === 'ccs' },
+
+  { t:'ihd', c:'I', l:'C',
+    a:'Индивидуализированное решение о реваскуляризации (ЧКВ vs АКШ)',
+    co:'ХКС, ХБП, при наличии показаний',
+    ch:'Мультидисциплинарная команда',
+    s:'Recommendation Table 20; раздел 7.1.2.4',
+    p:c => c.ihdEvent === 'ccs' && c.ihdPlan && c.ihdPlan !== 'med' },
+
+  { t:'ihd', c:'IIa', l:'C',
+    a:'Раннее назначение иАПФ',
+    co:'ОКС, рСКФ > 20 мл/мин/1,73 м²',
+    ch:'Калий и рСКФ',
+    s:'Recommendation Table 21; раздел 7.2.2.4',
+    p:c => (c.ihdEvent === 'ste' || c.ihdEvent === 'nste') && c.egfr != null && c.egfr > 20 },
+
+  { t:'ihd', c:'IIa', l:'B1',
+    a:'Бета-блокатор и стероидный АМКР (в стационаре)',
+    co:'ОКС + дисфункция ЛЖ или ХСН',
+    ch:'Калий и рСКФ; при рСКФ < 30 — индивидуализировать',
+    s:'Recommendation Table 21; раздел 7.2.2.4',
+    p:c => (c.ihdEvent === 'ste' || c.ihdEvent === 'nste') && (c.lvDysfunction === 'yes' || c.hfSigns === 'yes') },
+
+  { t:'ihd', c:'IIa', l:'B1',
+    a:'Сокращение ДАТТ до 3 мес или деэскалация через 1–3 мес',
+    co:'ОКС, без показаний к антикоагуляции',
+    ch:'Риск кровотечения vs ишемии',
+    s:'Recommendation Table 21; раздел 7.2.2.4',
+    p:c => (c.ihdEvent === 'ste' || c.ihdEvent === 'nste') },
+
+  { t:'ihd', c:'IIb', l:'C',
+    a:'иНГЛТ-2 (в стационаре)',
+    co:'ОКС + дисфункция ЛЖ или ХСН, рСКФ > 20 мл/мин/1,73 м²',
+    ch:'Ожидаемый «дип» рСКФ',
+    s:'Recommendation Table 21; раздел 7.2.2.4',
+    p:c => (c.ihdEvent === 'ste' || c.ihdEvent === 'nste') &&
+        (c.lvDysfunction === 'yes' || c.hfSigns === 'yes') && c.egfr != null && c.egfr > 20 },
+
+  // ========== ФП ==========
+  { t:'af', c:'I', l:'A',
+    a:'ДОАК предпочтительнее АВК',
+    co:'ФП, рСКФ ≥ 30 мл/мин/1,73 м², планируется антикоагуляция',
+    ch:'Дозы по инструкции (апиксабан/ривароксабан/дабигатран)',
+    s:'Recommendation Table 26; раздел 9.1.2',
+    p:c => c.afConfirmed === 'yes' && c.afPlanAC === 'yes' && c.egfr != null && c.egfr >= 30 },
+
+  { t:'af', c:'IIa', l:'B1',
+    a:'Фактор Xa (апиксабан, ривароксабан) предпочтительнее АВК',
+    co:'ФП, рСКФ 15–29 мл/мин/1,73 м², планируется антикоагуляция',
+    ch:'Индивидуальный риск кровотечения',
+    s:'Recommendation Table 26; раздел 9.1.2',
+    p:c => c.afConfirmed === 'yes' && c.afPlanAC === 'yes' && c.egfr != null && c.egfr >= 15 && c.egfr < 30 },
+
+  { t:'af', c:'IIa', l:'C',
+    a:'Индивидуализированное решение об антикоагуляции',
+    co:'ФП, рСКФ < 15 мл/мин/1,73 м² или диализ',
+    ch:'Взвесить риск инсульта и кровотечения',
+    s:'Recommendation Table 26; раздел 9.1.2',
+    p:c => c.afConfirmed === 'yes' && ((c.egfr != null && c.egfr < 15) || c.onDialysis) },
+
+  { t:'af', c:'III', l:'B',
+    a:'Существующие шкалы риска инсульта и кровотечения НЕ использовать',
+    co:'ФП + рСКФ < 30 мл/мин/1,73 м²',
+    ch:'Плохая дискриминация; пациент — высокий риск',
+    s:'Recommendation Table 25; раздел 9.1.1',
+    p:c => c.afConfirmed === 'yes' && c.egfr != null && c.egfr < 30 },
+
+  { t:'af', c:'IIb', l:'C',
+    a:'Оппортунистический скрининг ФП (пульс/ЭКГ)',
+    co:'ХБП + ФП не подтверждена', ch:'—',
+    s:'Recommendation Table 25; раздел 9.1.1',
+    p:c => hasCKD(c) && c.afConfirmed !== 'yes' },
+
+  { t:'af', c:'IIa', l:'C',
+    a:'Катетерная аблация при нестабильности на диализе',
+    co:'ФП + гемодинамическая нестабильность во время диализа',
+    ch:'Оценить в специализированном центре',
+    s:'Recommendation Table 27; раздел 9.1.4',
+    p:c => c.afConfirmed === 'yes' && c.onDialysis },
+
+  { t:'af', c:'IIb', l:'C',
+    a:'Катетерная аблация как стратегия контроля ритма',
+    co:'ФП (пароксизмальная) + ХБП', ch:'Риск рецидива выше, чем без ХБП',
+    s:'Recommendation Table 27; раздел 9.1.4',
+    p:c => c.afConfirmed === 'yes' && c.afType === 'parox' && hasCKD(c) },
+
+  // ========== ВТЭО ==========
+  { t:'vte', c:'I', l:'B2',
+    a:'ДОАК предпочтительнее НМГ + АВК',
+    co:'ВТЭО, рСКФ ≥ 30 мл/мин/1,73 м²',
+    ch:'Дозы по инструкции', s:'Recommendation Table 24; раздел 8.2',
+    p:c => c.vteCurrent === 'yes' && c.egfr != null && c.egfr >= 30 },
+
+  { t:'vte', c:'IIb', l:'C',
+    a:'Фактор Xa может рассматриваться',
+    co:'ВТЭО, рСКФ 15–29 мл/мин/1,73 м²',
+    ch:'Ограниченные данные', s:'Recommendation Table 24; раздел 8.2',
+    p:c => c.vteCurrent === 'yes' && c.egfr != null && c.egfr >= 15 && c.egfr < 30 },
+
+  { t:'vte', c:'IIb', l:'C',
+    a:'АВК или низкодозный апиксабан 2,5 мг 2 раза в сутки',
+    co:'ВТЭО, рСКФ < 15 мл/мин/1,73 м² без диализа или диализ',
+    ch:'Индивидуализированное решение', s:'Recommendation Table 24; раздел 8.2',
+    p:c => c.vteCurrent === 'yes' && ((c.egfr != null && c.egfr < 15) || c.onDialysis) },
+
+  // ========== Диализ ==========
+  { t:'dial', c:'I', l:'B1',
+    a:'Проактивное регулярное в/в железо (например, сахарат железа)',
+    co:'Гемодиализ, ферритин ≤ 700 мкг/л, TSAT < 40%',
+    ch:'Контроль ферритина и TSAT',
+    s:'Recommendation Table 31; раздел 12.2',
+    p:c => c.modality === 'hd' && (c.ferritin == null || c.ferritin <= 700) && (c.tsat == null || c.tsat < 40) },
+
+  { t:'dial', c:'III', l:'A',
+    a:'Рутинные АМКР НЕ рекомендуются',
+    co:'Диализ', ch:'Риск гиперкалиемии без доказанной пользы',
+    s:'Recommendation Table 31; раздел 12.2',
+    p:c => c.modality === 'hd' || c.modality === 'pd' },
+
+  { t:'dial', c:'III', l:'C',
+    a:'Рутинная имплантация ИКД для первичной профилактики ВСС НЕ рекомендуется',
+    co:'Диализ, ФВ ЛЖ ≥ 35%', ch:'По результатам ICD2',
+    s:'Recommendation Table 28; раздел 9.2.3',
+    p:c => (c.modality === 'hd' || c.modality === 'pd') && c.lvef != null && c.lvef >= 35 },
+
+  { t:'dial', c:'III', l:'A',
+    a:'Полная коррекция анемии с помощью ЭСА НЕ рекомендуется',
+    co:'Диализ с анемией', ch:'Повышает риск инсульта',
+    s:'Recommendation Table 23; раздел 7.4.1',
+    p:c => c.modality === 'hd' || c.modality === 'pd' },
+
+  // ========== Трансплантация ==========
+  { t:'tx', c:'I', l:'C',
+    a:'Интервью, осмотр, ЭКГ, трансторакальная ЭхоКГ',
+    co:'Кандидат на трансплантацию почки',
+    ch:'Оценить структуру, функцию, клапаны',
+    s:'Recommendation Table 32; раздел 13.1.1',
+    p:c => c.txStatus === 'candidate' },
+
+  { t:'tx', c:'I', l:'B2',
+    a:'Индивидуализированное решение о реваскуляризации при обструктивном КБС',
+    co:'Кандидат на ТП + обструктивное КБС, бессимптомное течение',
+    ch:'Мультидисциплинарная команда',
+    s:'Recommendation Table 32; раздел 13.1.1',
+    p:c => c.txStatus === 'candidate' && c.obstructiveCAD === 'yes' },
+
+  { t:'tx', c:'I', l:'C',
+    a:'САД 120–129 мм рт.ст.',
+    co:'Реципиент трансплантата почки', ch:'Контроль АД, калия, рСКФ',
+    s:'Recommendation Table 33; раздел 13.2.2',
+    p:c => c.txStatus === 'recipient' },
+
+  { t:'tx', c:'IIa', l:'B2',
+    a:'БКК для контроля АД',
+    co:'Реципиент трансплантата почки',
+    ch:'Возможное снижение риска потери трансплантата',
+    s:'Recommendation Table 33; раздел 13.2.2',
+    p:c => c.txStatus === 'recipient' },
+
+  { t:'tx', c:'IIb', l:'C',
+    a:'иНГЛТ-2',
+    co:'Реципиент + СД до/после ТП', ch:'Данные ограничены, индивидуально',
+    s:'Recommendation Table 33; раздел 13.2.2',
+    p:c => c.txStatus === 'recipient' && c.dmPostTx === 'yes' },
+
+  { t:'tx', c:'IIb', l:'C',
+    a:'арГПП-1',
+    co:'Реципиент + СД до/после ТП', ch:'Данные ограничены, индивидуально',
+    s:'Recommendation Table 33; раздел 13.2.2',
+    p:c => c.txStatus === 'recipient' && c.dmPostTx === 'yes' },
+
+  // ========== Контраст / ОПП ==========
+  { t:'contrast', c:'I', l:'C',
+    a:'Не откладывать процедуры с контрастом, если они показаны',
+    co:'ХБП, планируется процедура с контрастом',
+    ch:'Риск КИ-ОПП почти всегда меньше пользы процедуры',
+    s:'Recommendation Table 30; раздел 11',
+    p:c => c.planContrast === 'yes' },
+
+  { t:'contrast', c:'I', l:'A',
+    a:'Изо- или низкоосмолярный йодсодержащий контраст + контраст-сберегающие протоколы',
+    co:'рСКФ < 30 мл/мин/1,73 м², не на диализе',
+    ch:'Минимизировать объём контраста',
+    s:'Recommendation Table 30; раздел 11',
+    p:c => c.planContrast === 'yes' && c.egfr != null && c.egfr < 30 && !c.onDialysis },
+
+  { t:'contrast', c:'I', l:'B2',
+    a:'Гадолиний группы 2 или 3 для МРТ',
+    co:'рСКФ < 30 мл/мин/1,73 м², планируется МРТ',
+    ch:'Риск нефрогенного системного фиброза минимален',
+    s:'Recommendation Table 30; раздел 11',
+    p:c => c.planMri === 'yes' && c.egfr != null && c.egfr < 30 },
+
+  { t:'contrast', c:'IIb', l:'C',
+    a:'Перипроцедурная в/в гидратация',
+    co:'рСКФ < 30 мл/мин/1,73 м², не на диализе',
+    ch:'Избегать дегидратации; при перегрузке — индивидуально',
+    s:'Recommendation Table 30; раздел 11',
+    p:c => c.planContrast === 'yes' && c.egfr != null && c.egfr < 30 && !c.onDialysis },
+
+  { t:'contrast', c:'III', l:'B2',
+    a:'Профилактический гемодиализ для предотвращения КИ-ОПП НЕ рекомендуется',
+    co:'ХБП + процедура с контрастом', ch:'Может причинить вред',
+    s:'Recommendation Table 30; раздел 11',
+    p:c => c.planContrast === 'yes' }
+];
+
+/* ============================================================
+   РЕНДЕР ПОЛЕЙ С АВТО-ПОДСТАНОВКОЙ ДАННЫХ ИЗ РАСЧЁТА
+   ============================================================ */
+function renderFields(tabId) {
+  const box = $('fields-' + tabId);
+  if (!box) return;
+  const fields = TAB_FIELDS[tabId] || [];
+  const state = TAB_STATE[tabId] || {};
+  const base = buildBaseCtx();
+
+  let html = '';
+
+  // Блок «данные из расчёта» — автоподстановка
+  const parts = [];
+  if (base.egfr != null) {
+    const st = ckdStage(base.egfr);
+    parts.push(`рСКФ (EKFC) <b>${nf(base.egfr,1)}</b>${st?' · '+st.s:''}`);
+  }
+  if (base.acrMmol != null) {
+    const as = albStage(base.albV, base.albU);
+    parts.push(`uACR <b>${nf(base.acrMmol,1)}</b> мг/ммоль${as?' · '+as.c:''}`);
+  }
+  if (base.bmi != null) parts.push(`ИМТ <b>${nf(base.bmi,1)}</b>`);
+  if (base.age != null) parts.push(`<b>${base.age}</b> лет`);
+  parts.push(base.sex === 1 ? 'муж.' : 'жен.');
+
+  if (base.egfr != null || base.acrMmol != null) {
+    html += `<div class="base-summary">
+      <div class="bs-title">Используются данные из «Расчёта рСКФ»</div>
+      ${parts.join(' · ')}
+    </div>`;
+  } else {
+    html += `<div class="alert warn" style="margin-bottom:12px">
+      <b>Заполните «Расчёт рСКФ»:</b> пол, возраст, креатинин, альбуминурию, рост, вес.<br>
+      Без этих данных рекомендации не строятся.
+    </div>`;
+  }
+
+  // Поля вкладки
+  if (fields.length) {
+    html += `<div class="hint" style="margin:0 0 6px;font-weight:600;color:#0b4f8a;font-size:11.5px;text-transform:uppercase;letter-spacing:.04em">
+      Дополнительные данные для этой вкладки
+    </div>`;
+    fields.forEach(f => {
+      const val = state[f.id];
+      const isMissing = (f.type !== 'checks' && (val === '' || val == null));
+      html += `<div class="field-group${isMissing ? ' missing' : ''}"><label>${esc(f.label)}</label>`;
+      if (f.type === 'select') {
+        html += `<select data-tab="${tabId}" data-field="${f.id}">` +
+          f.options.map(o => `<option value="${o[0]}"${o[0]===val?' selected':''}>${esc(o[1])}</option>`).join('') +
+          `</select>`;
+      } else if (f.type === 'checks') {
+        const arr = Array.isArray(val) ? val : [];
+        html += `<div class="chk-group">` +
+          f.options.map(o => `<label><input type="checkbox" data-tab="${tabId}" data-field="${f.id}" value="${o[0]}"${arr.includes(o[0])?' checked':''}>${esc(o[1])}</label>`).join('') +
+          `</div>`;
+      } else {
+        html += `<input type="${f.type}" data-tab="${tabId}" data-field="${f.id}" value="${esc(val)}">`;
+      }
+      html += `</div>`;
+    });
+  }
+
+  // Индикатор незаполненных
+  const missing = [];
+  fields.forEach(f => {
+    const val = state[f.id];
+    if (f.type !== 'checks' && (val === '' || val == null)) missing.push(f.label);
+  });
+  html += `<div class="missing-indicator alert info" style="margin-top:12px;font-size:12px">
+    ${missing.length ? `<b>Не заполнено:</b> ${missing.join(', ')}` : '<b>Все поля заполнены</b>'}
+  </div>`;
+
+  box.innerHTML = html;
+
+  box.querySelectorAll('select, input[type=number], input[type=text]').forEach(el => {
+    const handler = () => {
+      const t = el.dataset.tab, f = el.dataset.field;
+      TAB_STATE[t][f] = el.value;
+      updateMissingIndicator(t);
+      renderRecs(t);
+    };
+    el.addEventListener('input', handler);
+    el.addEventListener('change', handler);
+  });
+  box.querySelectorAll('input[type=checkbox][data-field]').forEach(el => {
+    el.addEventListener('change', () => {
+      const t = el.dataset.tab, f = el.dataset.field;
+      const arr = TAB_STATE[t][f];
+      if (el.value === 'none') {
+        if (el.checked) {
+          TAB_STATE[t][f] = ['none'];
+          box.querySelectorAll(`input[data-tab="${t}"][data-field="${f}"]`).forEach(o => {
+            if (o !== el) o.checked = false;
+          });
+        } else {
+          TAB_STATE[t][f] = [];
+        }
+      } else {
+        const i = arr.indexOf('none');
+        if (i >= 0) arr.splice(i, 1);
+        const noneEl = box.querySelector(`input[data-tab="${t}"][data-field="${f}"][value="none"]`);
+        if (noneEl) noneEl.checked = false;
+        if (el.checked) {
+          if (!arr.includes(el.value)) arr.push(el.value);
+        } else {
+          const j = arr.indexOf(el.value);
+          if (j >= 0) arr.splice(j, 1);
+        }
+      }
+      updateMissingIndicator(t);
+      renderRecs(t);
+    });
+  });
+}
+
+function updateMissingIndicator(tabId) {
+  const box = $('fields-' + tabId);
+  if (!box) return;
+  const ind = box.querySelector('.missing-indicator');
+  if (!ind) return;
+  const fields = TAB_FIELDS[tabId] || [];
+  const state = TAB_STATE[tabId] || {};
+  const missing = [];
+  fields.forEach(f => {
+    const val = state[f.id];
+    if (f.type !== 'checks' && (val === '' || val == null)) missing.push(f.label);
+  });
+  ind.innerHTML = missing.length
+    ? `<b>Не заполнено:</b> ${missing.join(', ')}`
+    : '<b>Все поля заполнены</b>';
+}
+
+/* ============================================================
+   РЕНДЕР КАРТОЧКИ РЕКОМЕНДАЦИИ
+   ============================================================ */
+function renderRecCard(r) {
+  const cls = r.c === 'I' ? '1' : r.c === 'IIa' ? '2a' : r.c === 'IIb' ? '2b' : '3';
+  const clsLabel = 'Класс ' + r.c;
+  const lvlLabel = 'Уровень ' + r.l;
+  const warn = r.c === 'III' ? `<div class="rec-warn"><b>Не рекомендуется:</b> не предлагать как терапию.</div>` : '';
+  const srcBody = `<details class="rec-src"><summary>Источник</summary><div class="src-body">${esc(r.s)}</div></details>`;
+  const copyText = `${r.a}\nУсловие: ${r.co}\n${clsLabel}, ${lvlLabel}\nИсточник: ${r.s}`;
+  return `<div class="rec-card cls-${cls}">
+    <div class="rec-head">
+      <div class="rec-badges">
+        <span class="rec-badge cls-${cls}">${clsLabel}</span>
+        <span class="rec-badge lvl">${lvlLabel}</span>
+      </div>
+    </div>
+    <p class="rec-action">${esc(r.a)}</p>
+    <div class="rec-meta">
+      <div><span class="lbl">Условие:</span> ${esc(r.co)}</div>
+      <div><span class="lbl">Что проверить:</span> ${esc(r.ch)}</div>
+    </div>
+    ${warn}
+    ${srcBody}
+    <button class="rec-copy" data-copy="${esc(copyText)}">Копировать</button>
+  </div>`;
+}
+
+/* ============================================================
+   РЕНДЕР РЕКОМЕНДАЦИЙ
+   ============================================================ */
+function renderRecs(tabId) {
+  if (!['ckd','dm','hf','ihd','af','vte','dial','tx','contrast'].includes(tabId)) return;
+  const box = $('recs-' + tabId);
+  if (!box) return;
+  const ctx = buildCtx(tabId);
+
+  // Если базовые данные не заполнены — показываем подсказку и НЕ строим рекомендации
+  if (ctx.egfr == null && ctx.acrMmol == null) {
+    box.innerHTML = `<div class="empty-state">
+      <b>Заполните «Расчёт рСКФ»</b><br>
+      Без рСКФ и/или uACR рекомендации не строятся.<br>
+      Введите пол, возраст, креатинин, альбуминурию, рост и вес на вкладке «Расчёт рСКФ».
+    </div>`;
+    return;
+  }
+
+  const onlyApp = document.querySelector(`.only-app-chk[data-tab="${tabId}"]`)?.checked ?? true;
+  const recs = ALL_RECS.filter(r => r.t === tabId).map(r => ({...r, applicable: !!r.p(ctx)}));
+  const shown = onlyApp ? recs.filter(r => r.applicable) : recs;
+
+  if (shown.length === 0) {
+    const anyApplicable = recs.some(r => r.applicable);
+    box.innerHTML = `<div class="empty-state">
+      ${recs.length === 0 ? 'В приложенном документе нет рекомендаций для этой вкладки.'
+        : !anyApplicable ? 'При текущих значениях пациента применимых рекомендаций нет.<br>Заполните дополнительные поля слева, чтобы увидеть больше.'
+        : 'Нет применимых рекомендаций по выбранным критериям.'}
+    </div>`;
+    return;
+  }
+
+  const order = { 'III':0, 'I':1, 'IIa':2, 'IIb':3 };
+  shown.sort((a,b) => (order[a.c] ?? 9) - (order[b.c] ?? 9));
+
+  box.innerHTML = shown.map(renderRecCard).join('') +
+    `<div class="alert info" style="margin-top:12px;font-size:11.5px">
+      Не заменяет клиническое суждение. Проверьте противопоказания, дозы и актуальную инструкцию.
+    </div>`;
+
+  box.querySelectorAll('.rec-copy').forEach(btn => {
+    btn.addEventListener('click', () => {
+      copyToClipboard(btn.getAttribute('data-copy') || '', btn);
+    });
+  });
+}
+
+/* ============================================================
+   ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК
+   ============================================================ */
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-panel').forEach(p => {
+    p.hidden = (p.dataset.tab !== tabId);
+  });
+  document.querySelectorAll('.hero .tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === tabId);
+  });
+  if (tabId === 'calc') {
+    render();
+  } else if (tabId === 'drugs') {
+    renderDrugEditor();
+  } else {
+    const fieldBox = $('fields-' + tabId);
+    if (fieldBox && fieldBox.children.length === 0) {
+      renderFields(tabId);
+    } else {
+      // перерисовываем summary — данные из calc могли измениться
+      renderFields(tabId);
+    }
+    renderRecs(tabId);
+  }
+  try { history.replaceState(null, '', '#' + tabId); } catch(e) {}
+}
+
+/* ============================================================
+   СОБЫТИЯ
+   ============================================================ */
+// При изменении расчёта — обновить активную клиническую вкладку
+['age','cr','alb','height','weight','albUnit','doacMetric','bleed'].forEach(id=>{
+  const el=$(id);
+  if(!el) return;
+  const onChange = () => {
+    render();
+    const activeTab = document.querySelector('.tab-panel:not([hidden])')?.dataset.tab;
+    if (activeTab && activeTab !== 'calc' && activeTab !== 'drugs') {
+      renderFields(activeTab);
+      renderRecs(activeTab);
+    }
+  };
+  el.addEventListener('input', onChange);
+  el.addEventListener('change', onChange);
+});
+document.querySelectorAll('input[name="sex"]').forEach(el=>{
+  el.addEventListener('change', () => {
+    render();
+    const activeTab = document.querySelector('.tab-panel:not([hidden])')?.dataset.tab;
+    if (activeTab && activeTab !== 'calc' && activeTab !== 'drugs') {
+      renderFields(activeTab);
+      renderRecs(activeTab);
+    }
+  });
+});
+
+document.querySelectorAll('.hero .tab').forEach(t => {
+  t.addEventListener('click', () => switchTab(t.dataset.tab));
+});
+document.querySelectorAll('.only-app-chk').forEach(cb => {
+  cb.addEventListener('change', () => {
+    renderRecs(cb.dataset.tab);
+  });
+});
+document.querySelectorAll('.copy-all').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tabId = btn.dataset.tab;
+    const panel = document.querySelector(`.tab-panel[data-tab="${tabId}"]`);
+    if (!panel) return;
+    const cards = panel.querySelectorAll('.rec-copy');
+    const texts = Array.from(cards).map(b => b.getAttribute('data-copy')).filter(Boolean);
+    if (!texts.length) { alert('Нет рекомендаций для копирования.'); return; }
+    copyToClipboard(texts.join('\n\n---\n\n'), btn);
+  });
+});
+
+/* Инициализация */
+render();
+render();
+renderDrugEditor();
+const initialTab = (location.hash || '#calc').replace('#','');
+switchTab(document.querySelector(`.tab-panel[data-tab="${initialTab}"]`) ? initialTab : 'calc');
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="поак.html" title="Сроки отмены/возобновления антикоагулянтов">Операция + ПОАК</a>
+    <a href="af.html" title="Риск инсульта и кровотечения при ФП">ФП · ОАК</a>
+    <a href="mehran2.html" title="Риск контраст-индуцированной нефропатии">Мехран-2</a>
+    <a href="операция.html" title="Кардиальный и почечный риск при операциях">Операционный риск</a>
+    <a href="ХСН.html" title="Диагностика ХСН с сохранённой ФВ">СНсФВ (H2FPEF)</a>
+    <a href="bsa.html" title="Антропометрия, площадь поверхности тела">ИМТ и ППТ</a>
+    
+  </div>
+</div>
+</body>
+</html>

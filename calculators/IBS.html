@@ -1,0 +1,1139 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ПТВ ИБС — калькулятор и алгоритм КАГ</title>
+<style>
+:root{
+  --bg:#eef3fa; --card:#ffffff; --ink:#0f2743; --muted:#5c7590; --line:#dbe5f0;
+  --blue:#1b6cf0; --blue-dk:#0b3f8f; --blue-lt:#e7f0ff;
+  --green:#12a150; --green-lt:#e3f7ec;
+  --lime:#9ecb3c; --lime-lt:#f0f8d9;
+  --amber:#e8a400; --amber-lt:#fff5dd;
+  --orange:#f0761a; --orange-lt:#ffefe2;
+  --red:#e03131; --red-lt:#ffe8e8;
+  --shadow:0 2px 4px rgba(15,39,67,.05),0 8px 24px rgba(15,39,67,.07);
+  --radius:14px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif;
+  font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 60px}
+.header{
+  background:linear-gradient(135deg,#0b3f8f 0%,#1b6cf0 55%,#3b8cf7 100%);
+  border-radius:var(--radius);padding:22px 26px;color:#fff;
+  box-shadow:var(--shadow);margin-bottom:18px;
+}
+.header h1{margin:0 0 6px;font-size:21px;font-weight:700;letter-spacing:-.2px}
+.header p{margin:0;font-size:13.5px;opacity:.85}
+.header .src{margin-top:10px;font-size:11.5px;opacity:.7}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tab{
+  appearance:none;border:1px solid var(--line);background:var(--card);
+  color:var(--muted);font:inherit;font-weight:600;font-size:13.5px;
+  padding:10px 20px;border-radius:10px;cursor:pointer;transition:.18s;
+  box-shadow:0 1px 2px rgba(15,39,67,.04);
+}
+.tab:hover{color:var(--blue);border-color:#b9d4f7}
+.tab.active{
+  background:var(--blue);border-color:var(--blue);color:#fff;
+  box-shadow:0 4px 14px rgba(27,108,240,.3);
+}
+.panel{display:none}
+.panel.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.cols{
+  display:grid;grid-template-columns:minmax(320px,400px) minmax(0,1fr);
+  gap:18px;align-items:start;
+}
+@media(max-width:900px){.cols{grid-template-columns:1fr}}
+.card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px 20px;box-shadow:var(--shadow);margin-bottom:16px;
+}
+.card h2{
+  margin:0 0 14px;font-size:15px;font-weight:700;letter-spacing:-.1px;
+  display:flex;align-items:center;gap:8px;
+}
+.card h2 .dot{width:8px;height:8px;border-radius:50%;background:var(--blue);flex:none}
+.field{margin-bottom:16px}
+.field:last-child{margin-bottom:0}
+.label{
+  display:flex;justify-content:space-between;align-items:baseline;
+  font-size:13px;font-weight:600;color:var(--ink);margin-bottom:7px;
+}
+.label .hint{font-weight:400;font-size:11.5px;color:var(--muted)}
+.input{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;
+  font:inherit;font-size:15px;color:var(--ink);background:#fbfdff;transition:.15s;
+}
+.input:focus{
+  outline:none;border-color:var(--blue);background:#fff;
+  box-shadow:0 0 0 3px rgba(27,108,240,.12);
+}
+.agebox{width:130px;font-weight:700;font-size:16px;text-align:left}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:11px 8px;border:1px solid var(--line);border-radius:10px;background:#fbfdff;
+  cursor:pointer;font-size:13.5px;font-weight:600;color:var(--muted);
+  transition:.15s;user-select:none;
+}
+.seg label:hover{border-color:#b9d4f7;color:var(--blue)}
+.seg input:checked + label{
+  background:var(--blue-lt);border-color:var(--blue);
+  color:var(--blue-dk);box-shadow:0 0 0 2px rgba(27,108,240,.1);
+}
+.sym{display:flex;flex-direction:column;gap:7px}
+.sym input{position:absolute;opacity:0;pointer-events:none}
+.sym label{
+  display:flex;align-items:center;gap:10px;padding:10px 12px;
+  border:1px solid var(--line);border-radius:10px;background:#fbfdff;
+  cursor:pointer;font-size:13.5px;transition:.15s;user-select:none;
+}
+.sym label:hover{border-color:#b9d4f7;background:#f5faff}
+.sym input:checked + label{
+  background:var(--blue-lt);border-color:var(--blue);
+  box-shadow:0 0 0 2px rgba(27,108,240,.1);
+}
+.sym .tick{
+  width:17px;height:17px;border-radius:5px;border:1.5px solid #c3d4e6;
+  flex:none;display:flex;align-items:center;justify-content:center;
+  transition:.15s;background:#fff;
+}
+.sym input:checked + label .tick{background:var(--blue);border-color:var(--blue)}
+.sym input:checked + label .tick::after{
+  content:"";width:4px;height:8px;border:solid #fff;
+  border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px);
+}
+.sym .txt{flex:1;font-weight:600;color:var(--ink)}
+.sym .note{font-size:11px;color:var(--muted);font-weight:400;display:block;margin-top:2px}
+.rf{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.rf input{position:absolute;opacity:0;pointer-events:none}
+.rf label{
+  display:flex;align-items:flex-start;gap:8px;padding:8px 10px;
+  border:1px solid var(--line);border-radius:9px;background:#fbfdff;
+  cursor:pointer;font-size:12.5px;transition:.15s;user-select:none;color:var(--muted);
+}
+.rf label:hover{border-color:#b9d4f7}
+.rf input:checked + label{
+  background:var(--blue-lt);border-color:var(--blue);
+  color:var(--blue-dk);font-weight:600;
+}
+.rf .tick{
+  width:15px;height:15px;border-radius:4px;border:1.5px solid #c3d4e6;
+  flex:none;background:#fff;display:flex;align-items:center;justify-content:center;
+  transition:.15s;margin-top:1px;
+}
+.rf input:checked + label .tick{background:var(--blue);border-color:var(--blue)}
+.rf input:checked + label .tick::after{
+  content:"";width:3px;height:7px;border:solid #fff;
+  border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px);
+}
+.rf .rf-lbl{display:flex;flex-direction:column;line-height:1.2}
+.rf .rf-note{font-size:10px;color:var(--muted);font-weight:400;margin-top:2px}
+
+.hero{
+  position:relative;isolation:isolate;
+  background:linear-gradient(135deg,#0b3f8f 0%,#1b6cf0 100%);
+  border-radius:var(--radius);padding:22px 24px;color:#fff;
+  box-shadow:0 6px 26px rgba(27,108,240,.28);margin-bottom:16px;
+}
+.hero .cap{font-size:12px;text-transform:uppercase;letter-spacing:1px;opacity:.75;font-weight:600}
+.hero .big{display:flex;align-items:flex-end;gap:14px;margin:6px 0 4px;flex-wrap:wrap}
+.hero .num{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+.hero .num small{font-size:22px;font-weight:600;opacity:.8;letter-spacing:0}
+.hero .badge{
+  padding:6px 14px;border-radius:999px;font-size:12.5px;font-weight:700;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+  backdrop-filter:blur(4px);margin-bottom:6px;
+  max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.hero .sub{font-size:12.5px;opacity:.8}
+
+/* Заголовок карточки моделей и кнопка копирования */
+.models-head{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin-bottom:14px;
+}
+.models-head h2{margin:0}
+.copy-btn{
+  position:static;flex:none;
+  padding:8px 12px;border-radius:8px;
+  border:1px solid var(--blue);
+  background:var(--blue);color:#fff;
+  font:inherit;font-size:12px;font-weight:600;
+  cursor:pointer;transition:.15s;
+  display:inline-flex;align-items:center;gap:6px;
+  white-space:nowrap;
+}
+.copy-btn:hover{background:var(--blue-dk);border-color:var(--blue-dk)}
+.copy-btn:focus-visible{outline:3px solid rgba(27,108,240,.25);outline-offset:2px}
+.copy-btn.copied{background:var(--green);border-color:var(--green)}
+.copy-btn.failed{background:var(--red);border-color:var(--red)}
+@media(max-width:520px){
+  .models-head{align-items:flex-start;flex-direction:column}
+  .copy-btn{align-self:flex-start}
+}
+
+.gauge{margin-top:16px}
+.gauge-cap{
+  font-size:10.5px;font-weight:700;letter-spacing:.8px;
+  text-transform:uppercase;opacity:.75;margin-bottom:6px;
+}
+.gauge-track{position:relative;height:10px;border-radius:5px;overflow:visible;opacity:.95}
+.gauge-track.esc19{
+  background:linear-gradient(90deg,
+    #12a150 0%, #12a150 5%,
+    #9ecb3c 5%, #9ecb3c 15%,
+    #e8a400 15%, #e8a400 100%);
+}
+.gauge-track.esc24{
+  background:linear-gradient(90deg,
+    #12a150 0%, #12a150 5%,
+    #9ecb3c 5%, #9ecb3c 15%,
+    #e8a400 15%, #e8a400 50%,
+    #e03131 50%, #e03131 100%);
+}
+.gauge-marker{
+  position:absolute;top:-7px;width:5px;height:24px;border-radius:3px;
+  background:#fff;box-shadow:0 0 0 2px rgba(11,63,143,.9),0 2px 8px rgba(0,0,0,.35);
+  transform:translateX(-50%);transition:left .35s cubic-bezier(.4,0,.2,1);
+}
+.gauge-scale{position:relative;height:16px;margin-top:6px;font-size:10.5px;opacity:.75}
+.gauge-scale span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.gauge-scale span:first-child{transform:none}
+.gauge-scale span:last-child{transform:translateX(-100%)}
+
+.models{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:680px){.models{grid-template-columns:1fr}}
+.model{
+  border:1.5px solid var(--line);border-radius:12px;padding:13px 14px;
+  background:#fbfdff;transition:.25s;
+}
+.model .t{
+  font-size:11px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;
+}
+.model .v{font-size:24px;font-weight:800;letter-spacing:-.8px;line-height:1.15}
+.model .v small{font-size:14px;font-weight:600;opacity:.6}
+.model .c{font-size:11.5px;font-weight:700;margin-top:5px}
+.model.cat-vlow{border-color:var(--green);background:var(--green-lt)}
+.model.cat-low{border-color:var(--lime);background:var(--lime-lt)}
+.model.cat-mod{border-color:var(--amber);background:var(--amber-lt)}
+.model.cat-high{border-color:var(--orange);background:var(--orange-lt)}
+.model.cat-vhigh{border-color:var(--red);background:var(--red-lt)}
+
+.chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:700}
+.c-vlow{background:var(--green-lt);color:#0b7a3c;border:1px solid #9adcb7}
+.c-low{background:var(--lime-lt);color:#5d7a10;border:1px solid #c3da85}
+.c-mod{background:var(--amber-lt);color:#9a6d00;border:1px solid #f0d189}
+.c-high{background:var(--orange-lt);color:#b34e00;border:1px solid #f7c39a}
+.c-vhigh{background:var(--red-lt);color:#a51c1c;border:1px solid #f5aaaa}
+.c-none{background:#eef2f7;color:var(--muted);border:1px solid #dbe5f0}
+
+.rec{
+  border-left:4px solid var(--blue);background:var(--blue-lt);
+  border-radius:0 10px 10px 0;padding:12px 16px;
+  font-size:13.5px;line-height:1.55;color:var(--muted);
+}
+.rec.green{border-color:var(--green);background:var(--green-lt);color:var(--ink)}
+.rec.amber{border-color:var(--amber);background:var(--amber-lt);color:var(--ink)}
+.rec.orange{border-color:var(--orange);background:var(--orange-lt);color:var(--ink)}
+.rec.red{border-color:var(--red);background:var(--red-lt);color:var(--ink)}
+.rec ul{margin:6px 0 0;padding-left:18px}
+.rec li{margin-bottom:3px}
+.tbl{width:100%;border-collapse:collapse;font-size:12.5px}
+.tbl th{
+  text-align:left;font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;
+  color:var(--muted);padding:7px 10px;border-bottom:2px solid var(--line);font-weight:700;
+}
+.tbl td{padding:8px 10px;border-bottom:1px solid #eef3f9;vertical-align:top}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr.on{background:var(--blue-lt)}
+.tbl tr.on td{font-weight:600}
+.tbl .mono{font-variant-numeric:tabular-nums;font-weight:700}
+.duke-grid{display:flex;flex-direction:column;gap:14px}
+.duke-out{
+  margin-top:14px;padding:14px 16px;border-radius:12px;background:#f5f9ff;
+  border:1px solid var(--line);display:flex;gap:20px;flex-wrap:wrap;align-items:center;
+}
+.duke-out .k{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:700}
+.duke-out .val{font-size:17px;font-weight:800}
+.algo-embed{
+  background:#fff;border-radius:var(--radius);padding:12px;
+  box-shadow:var(--shadow);overflow:auto;border:1px solid var(--line);
+}
+.algo-embed .mxgraph{background:#fff}
+.note{
+  margin-top:22px;font-size:11.5px;color:var(--muted);line-height:1.6;
+  background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 18px;
+}
+.note b{color:var(--ink)}
+.refs{
+  margin-top:18px;background:#fff;border:1px solid var(--line);
+  border-radius:var(--radius);padding:18px 22px;box-shadow:var(--shadow);
+}
+.refs h3{
+  margin:0 0 12px;font-size:13px;font-weight:700;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.6px;
+}
+.refs ol{margin:0;padding-left:22px;font-size:12.5px;line-height:1.6;color:var(--ink)}
+.refs li{margin-bottom:8px}
+.refs li:last-child{margin-bottom:0}
+.refs .doi{color:var(--muted);font-size:11.5px}
+.footer{
+  margin-top:24px;text-align:center;font-size:12px;color:var(--muted);
+  padding:16px 10px 0;border-top:1px solid var(--line);
+}
+
+/* Тост для обратной связи по копированию */
+.toast{
+  position:fixed;left:50%;bottom:24px;z-index:9999;
+  transform:translateX(-50%) translateY(16px);
+  max-width:90vw;padding:12px 20px;border-radius:10px;
+  background:#0b3f8f;color:#fff;font-size:13.5px;font-weight:600;
+  line-height:1.4;text-align:center;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+  opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:#12a150}
+.toast.warn{background:#e8a400}
+.toast.err{background:#e03131}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>Калькулятор предтестовой вероятности обструктивной ИБС (ПТВ ИБС)</h1>
+    <p>Стратификация риска, выбор неинвазивного теста и показания к коронароангиографии</p>
+    <div class="src">ESC 2019 · РКО/МЗ РФ 2024 · ESC 2024 · Winther et al. 2020 (RF-CL / CACS-CL)</div>
+  </div>
+
+  <div class="tabs">
+    <button type="button" class="tab active" data-tab="calc">Калькулятор ПТВ</button>
+    <button type="button" class="tab" data-tab="algo">Алгоритм КАГ</button>
+  </div>
+
+  <!-- ============ PANEL: CALCULATOR ============ -->
+  <div class="panel active" id="panel-calc">
+    <div class="cols">
+
+      <div>
+        <div class="card">
+          <h2><span class="dot"></span>Пациент</h2>
+
+          <div class="field">
+            <div class="label"><span>Возраст, лет</span></div>
+            <input type="number" class="input agebox" id="ageNum" min="18" max="110" placeholder="—">
+          </div>
+
+          <div class="field">
+            <div class="label"><span>Пол</span></div>
+            <div class="seg">
+              <input type="radio" name="sex" id="sexM" value="m">
+              <label for="sexM">Мужчина</label>
+              <input type="radio" name="sex" id="sexF" value="f">
+              <label for="sexF">Женщина</label>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label"><span>Характер боли в грудной клетке</span></div>
+            <div class="sym">
+              <input type="radio" name="sym" id="symTyp" value="typical">
+              <label for="symTyp"><span class="tick"></span><span class="txt">Типичная стенокардия
+                <span class="note">Загрудинная боль + провокация нагрузкой + снятие покоем/нитроглицерином</span></span></label>
+
+              <input type="radio" name="sym" id="symAty" value="atypical">
+              <label for="symAty"><span class="tick"></span><span class="txt">Атипичная стенокардия
+                <span class="note">2 из 3 критериев</span></span></label>
+
+              <input type="radio" name="sym" id="symNon" value="nonanginal">
+              <label for="symNon"><span class="tick"></span><span class="txt">Неангинозная боль
+                <span class="note">≤1 критерия</span></span></label>
+
+              <input type="radio" name="sym" id="symDys" value="dyspnea">
+              <label for="symDys"><span class="tick"></span><span class="txt">Одышка
+                <span class="note">как основной клинический симптом</span></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2><span class="dot"></span>Факторы риска</h2>
+          <div class="rf">
+            <input type="checkbox" id="rfFam">
+            <label for="rfFam"><span class="tick"></span>
+              <span class="rf-lbl">Анамнез ИБС<span class="rf-note">м&lt;55, ж&lt;65 л.</span></span>
+            </label>
+
+            <input type="checkbox" id="rfLip">
+            <label for="rfLip"><span class="tick"></span>
+              <span class="rf-lbl">Дислипидемия</span>
+            </label>
+
+            <input type="checkbox" id="rfSmk">
+            <label for="rfSmk"><span class="tick"></span>
+              <span class="rf-lbl">Курение<span class="rf-note">в т.ч. экс-курение</span></span>
+            </label>
+
+            <input type="checkbox" id="rfHyp">
+            <label for="rfHyp"><span class="tick"></span>
+              <span class="rf-lbl">Артериальная гипертония</span>
+            </label>
+
+            <input type="checkbox" id="rfDia">
+            <label for="rfDia"><span class="tick"></span>
+              <span class="rf-lbl">Сахарный диабет</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2><span class="dot"></span>Коронарный кальций</h2>
+          <div class="field">
+            <div class="label"><span>Индекс Агатстона</span><span class="hint">необязательно</span></div>
+            <input type="number" class="input" id="cac" min="0" step="1" placeholder="например, 120">
+          </div>
+        </div>
+
+        <div class="card">
+          <h2><span class="dot"></span>Тредмил-тест (Duke)</h2>
+          <div class="duke-grid">
+            <div class="field">
+              <div class="label"><span>Время нагрузки</span><span class="hint">мин</span></div>
+              <input type="number" class="input" id="dukeTime" min="0" max="30" step="0.1" placeholder="—">
+            </div>
+            <div class="field">
+              <div class="label"><span>Депрессия ST</span><span class="hint">мм</span></div>
+              <input type="number" class="input" id="dukeST" min="0" max="10" step="0.1" placeholder="—">
+            </div>
+            <div class="field">
+              <div class="label"><span>Индекс стенокардии</span></div>
+              <select class="input" id="dukeAng">
+                <option value="0">Нет стенокардии</option>
+                <option value="1">Нелимитирующий приступ</option>
+                <option value="2">Лимитирующий приступ</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="hero" id="hero">
+          <div class="cap">ПТВ ИБС — алгоритм ESC, 2019</div>
+          <div class="big">
+            <div class="num" id="ptvNum">—<small>%</small></div>
+            <div class="badge" id="ptvBadge">—</div>
+          </div>
+          <div class="sub" id="ptvSub">—</div>
+
+          <div class="gauge">
+            <div class="gauge-cap">ESC, 2019</div>
+            <div class="gauge-track esc19">
+              <div class="gauge-marker" id="gaugeMark1" style="left:0%"></div>
+            </div>
+            <div class="gauge-scale">
+              <span style="left:0%">0%</span>
+              <span style="left:5%">5%</span>
+              <span style="left:15%">15%</span>
+              <span style="left:50%">50%</span>
+              <span style="left:85%">85%</span>
+              <span style="left:100%">100%</span>
+            </div>
+          </div>
+
+          <div class="gauge">
+            <div class="gauge-cap">ESC, 2024 (RF-CL / CACS-CL)</div>
+            <div class="gauge-track esc24">
+              <div class="gauge-marker" id="gaugeMark2" style="left:0%"></div>
+            </div>
+            <div class="gauge-scale">
+              <span style="left:0%">0%</span>
+              <span style="left:5%">5%</span>
+              <span style="left:15%">15%</span>
+              <span style="left:50%">50%</span>
+              <span style="left:85%">85%</span>
+              <span style="left:100%">100%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="models-head">
+            <h2><span class="dot"></span>Модели оценки вероятности</h2>
+            <button type="button" class="copy-btn" id="copyBtn" title="Копировать заключение в буфер обмена">
+              <span id="copyIcon">⧉</span>
+              <span id="copyLabel">Копировать</span>
+            </button>
+          </div>
+
+          <div class="models">
+            <div class="model" id="modelEsc">
+              <div class="t">ESC, 2019</div>
+              <div class="v" id="mEsc">—<small>%</small></div>
+              <div class="c" id="cEsc">—</div>
+            </div>
+            <div class="model" id="modelRf">
+              <div class="t">Модель RF-CL, 2020</div>
+              <div class="v" id="mRf">—<small>%</small></div>
+              <div class="c" id="cRf">—</div>
+            </div>
+            <div class="model" id="modelCa">
+              <div class="t">Модель CACS-CL, 2020</div>
+              <div class="v" id="mCa">—<small>%</small></div>
+              <div class="c" id="cCa">—</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2><span class="dot"></span>Рекомендации: РКО, 2024</h2>
+          <div class="rec" id="recRko">—</div>
+        </div>
+
+        <div class="card">
+          <h2><span class="dot"></span>Рекомендации: ESC, 2024</h2>
+          <div class="rec" id="recEsc">—</div>
+        </div>
+
+        <div class="card" id="cacCard" style="display:none">
+          <h2><span class="dot"></span>Интерпретация коронарного кальция</h2>
+          <table class="tbl">
+            <thead>
+              <tr><th>Индекс Агатстона</th><th>Риск</th><th>Характеристика</th></tr>
+            </thead>
+            <tbody id="cacBody">
+              <tr data-min="0" data-max="0"><td class="mono">0</td><td><span class="chip c-vlow">Низкий</span></td><td>Нет признаков поражения</td></tr>
+              <tr data-min="1" data-max="9"><td class="mono">1–9</td><td><span class="chip c-low">Умеренный</span></td><td>Минимальная кальцификация</td></tr>
+              <tr data-min="10" data-max="99"><td class="mono">10–99</td><td><span class="chip c-mod">Высокий</span></td><td>Незначительная кальцификация. Обычно имеются АТС-бляшки до 50 %</td></tr>
+              <tr data-min="100" data-max="399"><td class="mono">100–399</td><td><span class="chip c-high">Высокий или очень высокий</span></td><td>Умеренная кальцификация. Обычно 2–4 АТС-бляшки &gt;50 %</td></tr>
+              <tr data-min="400" data-max="999"><td class="mono">400–999</td><td><span class="chip c-high">Очень высокий</span></td><td>Выраженная кальцификация</td></tr>
+              <tr data-min="1000" data-max="99999"><td class="mono">≥1000</td><td><span class="chip c-vhigh">Очень высокий</span></td><td>Массивная кальцификация</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card" id="dukeCard" style="display:none">
+          <h2><span class="dot"></span>Тредмил-индекс Duke</h2>
+          <div class="duke-out">
+            <div><div class="k">Индекс Duke</div><div class="val" id="dukeVal">—</div></div>
+            <div><div class="k">Риск</div><div class="val" id="dukeRisk">—</div></div>
+            <div><div class="k">4-летняя выживаемость</div><div class="val" id="dukeSurv">—</div></div>
+            <div><div class="k">Смертность за год</div><div class="val" id="dukeMort">—</div></div>
+          </div>
+          <div class="rec" id="dukeRec" style="margin-top:14px">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ PANEL: ALGORITHM ============ -->
+ <div class="mxgraph" style="max-width:100%;border:1px solid transparent;" data-mxgraph="{&quot;highlight&quot;:&quot;#0000ff&quot;,&quot;nav&quot;:true,&quot;resize&quot;:true,&quot;dark-mode&quot;:&quot;auto&quot;,&quot;toolbar&quot;:&quot;zoom layers tags lightbox&quot;,&quot;edit&quot;:&quot;_blank&quot;,&quot;xml&quot;:&quot;&lt;mxfile host=\&quot;app.diagrams.net\&quot; agent=\&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 YaBrowser/25.8.0.0 Safari/537.36\&quot;&gt;\n  &lt;diagram id=\&quot;womxnSED4MLLFsCgQVfH\&quot; name=\&quot;Page-1\&quot;&gt;\n    &lt;mxGraphModel dx=\&quot;2663\&quot; dy=\&quot;860\&quot; grid=\&quot;1\&quot; gridSize=\&quot;10\&quot; guides=\&quot;1\&quot; tooltips=\&quot;1\&quot; connect=\&quot;1\&quot; arrows=\&quot;1\&quot; fold=\&quot;1\&quot; page=\&quot;1\&quot; pageScale=\&quot;1\&quot; pageWidth=\&quot;1169\&quot; pageHeight=\&quot;827\&quot; background=\&quot;#ffffff\&quot; math=\&quot;1\&quot; shadow=\&quot;0\&quot;&gt;\n      &lt;root&gt;\n        &lt;mxCell id=\&quot;0\&quot; /&gt;\n        &lt;mxCell id=\&quot;1\&quot; parent=\&quot;0\&quot; /&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-11\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-1\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-10\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;60\&quot; y=\&quot;350\&quot; /&gt;\n              &lt;mxPoint x=\&quot;60\&quot; y=\&quot;350\&quot; /&gt;\n            &lt;/Array&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;s2VyF643DJSbJkA2jyxl-1\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-1\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.75;exitY=1;exitDx=0;exitDy=0;dashed=1;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-50\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;120\&quot; y=\&quot;399\&quot; /&gt;\n            &lt;/Array&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-1\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fillColor=#99CCFF;strokeColor=#3333FF;\&quot; value=\&quot;&amp;lt;b&amp;gt;ПТВ &amp;amp;lt;5%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;ESC, 2019;&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;div&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;РКО, 2024&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;30\&quot; y=\&quot;200\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-89\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-3\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;fontColor=#000000;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-86\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;220\&quot; y=\&quot;270\&quot; /&gt;\n              &lt;mxPoint x=\&quot;220\&quot; y=\&quot;270\&quot; /&gt;\n            &lt;/Array&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-3\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fillColor=#66CC00;strokeColor=#009900;\&quot; value=\&quot;&amp;lt;b&amp;gt;ПТВ 5-15%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;ESC, 2019;&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;div&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;РКО, 2024&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;140\&quot; x=\&quot;200\&quot; y=\&quot;200\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-85\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-4\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;fontColor=#000000;entryX=0;entryY=0.5;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-12\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;670\&quot; y=\&quot;230\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-4\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fillColor=#FFB570;strokeColor=#b85450;\&quot; value=\&quot;&amp;lt;b&amp;gt;ПТВ &amp;amp;gt;15%&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;ESC, 2019;&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;div&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px;&amp;quot;&amp;gt;&amp;lt;i&amp;gt;РКО, 2024&amp;lt;/i&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;400\&quot; y=\&quot;200\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-83\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-5\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;fontColor=#000000;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-1\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;140\&quot; y=\&quot;160\&quot; /&gt;\n              &lt;mxPoint x=\&quot;90\&quot; y=\&quot;160\&quot; /&gt;\n            &lt;/Array&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-5\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;font size=&amp;quot;1&amp;quot;&amp;gt;&amp;lt;b style=&amp;quot;font-size: 14px&amp;quot;&amp;gt;Боли в грудной клетке&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;80\&quot; y=\&quot;50\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-6\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;Стенокардия 3-4 ФК;&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;lt;div&amp;gt;&amp;lt;b&amp;gt;необъяснимая ФВ&amp;amp;lt;35% [S]&amp;lt;/b&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;130\&quot; x=\&quot;870\&quot; y=\&quot;670\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-66\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-7\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=14;fontColor=#000000;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-65\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;1010\&quot; y=\&quot;130\&quot; /&gt;\n              &lt;mxPoint x=\&quot;1010\&quot; y=\&quot;130\&quot; /&gt;\n            &lt;/Array&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-79\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-7\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=10;fontColor=#000000;exitX=0.128;exitY=0.989;exitDx=0;exitDy=0;exitPerimeter=0;entryX=0.631;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-62\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-7\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;b&amp;gt;&amp;lt;font style=&amp;quot;font-size: 13px&amp;quot;&amp;gt;Недавняя выписка&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 14px&amp;quot;&amp;gt;с ОКСбпST&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 11px&amp;quot;&amp;gt;без первичного ЧКВ&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/b&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;70\&quot; width=\&quot;130\&quot; x=\&quot;890\&quot; y=\&quot;50\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-9\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;div style=&amp;quot;text-align: left&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;&amp;amp;nbsp;&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp;- &amp;lt;b&amp;gt;Оперативное лечение&amp;lt;/b&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp; &amp;amp;nbsp;клапанной патологии&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp;- Митральная регургитация умеренной и тяжелой степени&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp; - ГКМП с клиникой&amp;amp;nbsp; &amp;amp;nbsp;стенокардии&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;110\&quot; width=\&quot;180\&quot; x=\&quot;530\&quot; y=\&quot;670\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-10\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;Альтернативный диагноз\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;30\&quot; y=\&quot;430\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-12\&quot; parent=\&quot;1\&quot; style=\&quot;whiteSpace=wrap;html=1;rounded=1;align=left;\&quot; value=\&quot;Стресс-ЭХОКГ&amp;lt;br&amp;gt;ОФЭКТ &amp;lt;font style=&amp;quot;font-size: 9px;&amp;quot;&amp;gt;(гамма-сцинтиграфия)&amp;lt;/font&amp;gt;&amp;lt;font style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px;&amp;quot;&amp;gt;Стресс-МРТ&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;div&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px;&amp;quot;&amp;gt;МСКТ-КАГ&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;lt;font style=&amp;quot;font-size: 12px;&amp;quot;&amp;gt;Стресс-ЭКГ&amp;lt;/font&amp;gt;&amp;lt;font style=&amp;quot;font-size: 11px&amp;quot;&amp;gt; (тредмил!)&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;80\&quot; width=\&quot;149\&quot; x=\&quot;681\&quot; y=\&quot;190\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-25\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-23\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.983;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-24\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;1150\&quot; y=\&quot;240\&quot; /&gt;\n              &lt;mxPoint x=\&quot;1150\&quot; y=\&quot;240\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;1150\&quot; y=\&quot;570\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-23\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;align=left;\&quot; value=\&quot;&amp;lt;div style=&amp;quot;text-align: center&amp;quot;&amp;gt;&amp;lt;b&amp;gt;&amp;lt;font style=&amp;quot;font-size: 13px&amp;quot;&amp;gt;Недавняя выписка&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;&amp;lt;span style=&amp;quot;font-size: 14px&amp;quot;&amp;gt;с ОКСпST&amp;lt;/span&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: center ; font-size: 14px&amp;quot;&amp;gt;&amp;lt;b style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;font-size: 11px&amp;quot;&amp;gt;без первичного ЧКВ&amp;lt;/span&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;70\&quot; width=\&quot;125\&quot; x=\&quot;1040\&quot; y=\&quot;50\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-24\&quot; parent=\&quot;1\&quot; style=\&quot;whiteSpace=wrap;html=1;rounded=1;\&quot; value=\&quot;&amp;lt;b&amp;gt;&amp;lt;font style=&amp;quot;font-size: 18px;&amp;quot;&amp;gt;КоронароАнгиоГрафия (КАГ)&amp;lt;/font&amp;gt;&amp;lt;/b&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;630\&quot; x=\&quot;530\&quot; y=\&quot;580\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-26\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;Медикаментозное лечение\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;600\&quot; y=\&quot;413.5\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-50\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;strokeWidth=1;align=left;\&quot; value=\&quot;&amp;lt;div&amp;gt;+&amp;amp;nbsp;&amp;lt;b&amp;gt;факторы риска&amp;amp;nbsp;&amp;lt;/b&amp;gt;(семейный анамнез ССЗ,&amp;amp;nbsp; &amp;amp;nbsp; &amp;amp;nbsp;дислипидемия, курение, ожирение, АГ, СД)&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;+&amp;amp;nbsp;&amp;lt;b&amp;gt;Стресс-ЭКГ&amp;lt;/b&amp;gt;&amp;amp;nbsp;(ВЭМ, тредмил-тест);&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;+ &amp;lt;b&amp;gt;наличие зубец Q&amp;amp;nbsp; или изменение ST на ЭКГ&amp;lt;/b&amp;gt;&amp;amp;nbsp;&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;&amp;amp;nbsp; &amp;amp;nbsp;(или достоверный перенесенный ИМ, ОКС);&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;+&amp;amp;nbsp;&amp;lt;b&amp;gt;дисфункция синусового узла&amp;amp;nbsp; с ФВ&amp;amp;lt;50%&amp;lt;/b&amp;gt;&amp;amp;nbsp;[S];&amp;lt;/div&amp;gt;&amp;lt;div&amp;gt;+ &amp;lt;b&amp;gt;кальциноз коронарных артерий&amp;lt;/b&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;120\&quot; width=\&quot;300\&quot; x=\&quot;290\&quot; y=\&quot;320\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-55\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-4\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;240\&quot; y=\&quot;160\&quot; /&gt;\n              &lt;mxPoint x=\&quot;390\&quot; y=\&quot;160\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;140\&quot; y=\&quot;160\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;380\&quot; y=\&quot;120\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-62\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontColor=#CC0000;strokeWidth=1;align=center;\&quot; value=\&quot;&amp;lt;font color=&amp;quot;#000000&amp;quot; style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;шкала GRACE2&amp;lt;br&amp;gt;&amp;amp;lt;108 баллов&amp;amp;nbsp;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;850\&quot; y=\&quot;150\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-74\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-65\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=14;fontColor=#000000;exitX=1;exitY=0.5;exitDx=0;exitDy=0;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;1130\&quot; y=\&quot;180\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;1130\&quot; y=\&quot;210\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;1130\&quot; y=\&quot;580\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-65\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fontSize=14;fontColor=#CC0000;strokeWidth=1;align=center;\&quot; value=\&quot;&amp;lt;font color=&amp;quot;#000000&amp;quot; style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;шкала GRACE2&amp;lt;br&amp;gt;&amp;amp;gt;109 баллов&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;995\&quot; y=\&quot;150\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-82\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=10;fontColor=#000000;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-12\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;850\&quot; y=\&quot;168\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;750\&quot; y=\&quot;188\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-84\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=10;fontColor=#000000;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-3\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;270\&quot; y=\&quot;170\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;270\&quot; y=\&quot;160\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;264.99\&quot; y=\&quot;130\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-86\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fontSize=10;fontColor=#000000;strokeWidth=1;align=center;\&quot; value=\&quot;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;МСКТ-КАГ&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;160\&quot; y=\&quot;320\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-92\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-3\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=10;fontColor=#000000;entryX=0.1;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-50\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;300\&quot; y=\&quot;280\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;330\&quot; y=\&quot;310\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-95\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-50\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=10;fontColor=#000000;entryX=0;entryY=0.75;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-12\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;540\&quot; y=\&quot;250\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;509.97\&quot; y=\&quot;300\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;250\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-96\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fontSize=10;fontColor=#000000;strokeWidth=1;align=center;\&quot; value=\&quot;&amp;lt;font style=&amp;quot;font-size: 12px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;Впервые выявленная&amp;lt;br&amp;gt;типичная стенокардия&amp;lt;br&amp;gt;с ФВ&amp;amp;lt;50%[S]&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;140\&quot; x=\&quot;720\&quot; y=\&quot;670\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; parent=\&quot;1\&quot; style=\&quot;swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;fontSize=12;strokeWidth=1;align=center;labelBackgroundColor=none;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#CC0000;\&quot; value=\&quot;Положительная проба&amp;#xa;Высокий риск ССО\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;220\&quot; width=\&quot;250\&quot; x=\&quot;740\&quot; y=\&quot;320\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxRectangle height=\&quot;30\&quot; width=\&quot;50\&quot; x=\&quot;740\&quot; y=\&quot;320\&quot; as=\&quot;alternateBounds\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-98\&quot; parent=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; style=\&quot;text;strokeColor=default;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;fontSize=11;fontColor=#000000;fontStyle=0\&quot; value=\&quot;Стресс-ЭХОКГ: ⩾3 сегментов ЛЖ \&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;30\&quot; width=\&quot;250\&quot; y=\&quot;30\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-99\&quot; parent=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; style=\&quot;text;strokeColor=default;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;ОФЭКТ: ишемия &amp;gt;10% площади миокарда ЛЖ\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;30\&quot; width=\&quot;250\&quot; y=\&quot;60\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-100\&quot; parent=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; style=\&quot;text;strokeColor=default;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;МРТ: дефект перфузии ⩾2 сегментов при ФН&amp;#xa;       и ⩾3 сегментов при пробе с добутамином\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;30\&quot; width=\&quot;250\&quot; y=\&quot;90\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-102\&quot; parent=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; style=\&quot;text;strokeColor=default;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;МСКТ-КАГ: &amp;#xa;- стеноз ствола ЛКА &amp;gt;50%,&amp;#xa;- стеноз проксимальной трети ПНА &amp;gt;50%,&amp;#xa;- 3-х сосудистое поражение с проксимальными &amp;#xa;стенозами &amp;gt;50%.\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;70\&quot; width=\&quot;250\&quot; y=\&quot;120\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;Q4AzLR2drcEjMxYmV_PU-2\&quot; parent=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; style=\&quot;text;strokeColor=default;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;Тредмил-тест: индекс Duke &amp;lt;(-10)\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;30\&quot; width=\&quot;250\&quot; y=\&quot;190\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-117\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontSize=11;strokeColor=#d6b656;strokeWidth=1;align=center;fillColor=#fff2cc;\&quot; value=\&quot;&amp;lt;font color=&amp;quot;#cc0000&amp;quot; size=&amp;quot;1&amp;quot;&amp;gt;&amp;lt;b&amp;gt;Положительная проба&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;br&amp;gt;Низкий &amp;lt;br&amp;gt;и умеренный риск ССО\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;600\&quot; y=\&quot;320\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-125\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;619.66\&quot; y=\&quot;670\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;620\&quot; y=\&quot;640\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-127\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;865\&quot; y=\&quot;540\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;865\&quot; y=\&quot;580\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-132\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;riDTd2bbOmy0N6oeRRlx-117\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-26\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;390\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;410\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-133\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-97\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;760\&quot; y=\&quot;290\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;790\&quot; y=\&quot;250\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-134\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-117\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;660\&quot; y=\&quot;290\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;760\&quot; y=\&quot;290\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;316\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-135\&quot; parent=\&quot;1\&quot; style=\&quot;line;strokeWidth=1;direction=south;html=1;labelBackgroundColor=none;fontSize=11;fontColor=#000000;align=center;\&quot; value=\&quot;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;20\&quot; width=\&quot;10\&quot; x=\&quot;750\&quot; y=\&quot;270\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;riDTd2bbOmy0N6oeRRlx-149\&quot; parent=\&quot;1\&quot; style=\&quot;text;html=1;align=left;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=11;fontColor=#000000;\&quot; value=\&quot;&amp;lt;span style=&amp;quot;text-align: center&amp;quot;&amp;gt;ESC, 2019. РКО/МЗ РФ, 2024.&amp;amp;nbsp;&amp;lt;/span&amp;gt;Адаптировано: к.м.н. Синкевич Д.А., проф. Протасов К.В., Иркутск, 2022-2024&amp;amp;nbsp;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;30\&quot; width=\&quot;580\&quot; x=\&quot;599\&quot; y=\&quot;795\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;mq1VCm9-Q9mmPECadWXM-1\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;Ишемия миокарда сохраняется\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;600\&quot; y=\&quot;500\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;mq1VCm9-Q9mmPECadWXM-4\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;exitX=0.5;exitY=1;exitDx=0;exitDy=0;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;659.66\&quot; y=\&quot;473.5\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;500\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;mq1VCm9-Q9mmPECadWXM-6\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#000000;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660\&quot; y=\&quot;560\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;660.17\&quot; y=\&quot;580\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;mq1VCm9-Q9mmPECadWXM-7\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;fontSize=10;fillColor=#B5DCFF;strokeColor=#6c8ebf;\&quot; value=\&quot;&amp;lt;font style=&amp;quot;font-size: 11px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;&amp;lt;font color=&amp;quot;#0000cc&amp;quot;&amp;gt;Проба сомнительная&amp;lt;/font&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;font color=&amp;quot;#000000&amp;quot;&amp;gt;или если невозможно&amp;lt;br&amp;gt;&amp;amp;nbsp;её провести&amp;lt;/font&amp;gt;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;1000\&quot; y=\&quot;320\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;mq1VCm9-Q9mmPECadWXM-8\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;fontSize=11;fontColor=#0000CC;entryX=0.5;entryY=0;entryDx=0;entryDy=0;\&quot; target=\&quot;mq1VCm9-Q9mmPECadWXM-7\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;1060\&quot; y=\&quot;290\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;860\&quot; y=\&quot;290\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;1060\&quot; y=\&quot;310\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;vDRT_9Ohzmi8P5jk4aXd-1\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;b&amp;gt;Бессимптомная ишемия миокарда&amp;lt;/b&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;550\&quot; y=\&quot;50\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;vDRT_9Ohzmi8P5jk4aXd-2\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;vDRT_9Ohzmi8P5jk4aXd-1\&quot; style=\&quot;edgeStyle=segmentEdgeStyle;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-12\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;Array as=\&quot;points\&quot;&gt;\n              &lt;mxPoint x=\&quot;610\&quot; y=\&quot;210\&quot; /&gt;\n            &lt;/Array&gt;\n            &lt;mxPoint x=\&quot;610\&quot; y=\&quot;190\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;670\&quot; y=\&quot;210\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;vDRT_9Ohzmi8P5jk4aXd-3\&quot; parent=\&quot;1\&quot; style=\&quot;text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;\&quot; value=\&quot;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;&amp;lt;b&amp;gt;Сокращения:&amp;lt;/b&amp;gt;&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;АГ - артериальная гипертония&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ВЭМ - велоэргометрия&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ГКМП - гипертрофическая кардиомиопатия&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ИМ - инфаркт миокарда&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial;&amp;quot;&amp;gt;КАГ - коронароангиография&amp;lt;/span&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ЛЖ - левый желудочек&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;МРТ - магнитная томография&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;МСКТ - мультиспиральная компьютерная томография&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ОКС - острый коронарный синдром&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ОКСбпST - острый коронарный синдром без подъема сегмента ST&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ОКСпST - острый коронарный синдром c подъемом сегмента ST&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ОФЭКТ - однофотонная эмиссионная компьютерная томография&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ПТВ - претестовая вероятность ишемической болезни сердца&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;СД - сахарный диабет&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ССЗ - сердечно-сосудистые заболевания&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ССО - сердечно-сосудистые осложнения&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ЧКВ - чрескожное коронарное вмешательство&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;span&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ФВ [S] - фракция выброса левого желудочка по методу Simpson&amp;lt;/font&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ФК - функциональный класс&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ФН - физическая нагрузка&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ЭКГ - электрокардиография&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: left ; font-size: 10px&amp;quot;&amp;gt;&amp;lt;font style=&amp;quot;font-size: 10px&amp;quot;&amp;gt;ЭХОКГ - эхокардиография&amp;lt;/font&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;text-align: justify&amp;quot;&amp;gt;&amp;lt;/div&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;250\&quot; width=\&quot;350\&quot; x=\&quot;-1\&quot; y=\&quot;545\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;5N7qI_vjbbbjhQraNa_B-2\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;5N7qI_vjbbbjhQraNa_B-1\&quot; style=\&quot;edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-24\&quot;&gt;\n          &lt;mxGeometry relative=\&quot;1\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;520\&quot; y=\&quot;610\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;5N7qI_vjbbbjhQraNa_B-1\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;b&amp;gt;Планируемая абляция&amp;lt;/b&amp;gt; аритмогенных зон\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;60\&quot; width=\&quot;120\&quot; x=\&quot;380\&quot; y=\&quot;580\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;5N7qI_vjbbbjhQraNa_B-3\&quot; parent=\&quot;1\&quot; style=\&quot;rounded=1;whiteSpace=wrap;html=1;\&quot; value=\&quot;&amp;lt;font style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;b style=&amp;quot;font-size: 11px;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;br&amp;gt;Полная реваскуляризация:&amp;lt;br&amp;gt;&amp;lt;div style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial; font-weight: normal;&amp;quot;&amp;gt;стентирование всех найденных значимых стенозов&amp;lt;/span&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial; font-weight: normal; font-size: 12px;&amp;quot;&amp;gt;&amp;amp;nbsp;&amp;amp;nbsp;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;/b&amp;gt;&amp;lt;div style=&amp;quot;font-size: 11px;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial;&amp;quot;&amp;gt;после первичной ЧКВ&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;font-size: 11px;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial;&amp;quot;&amp;gt;у пациентов&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;font-size: 11px;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;background-color: initial;&amp;quot;&amp;gt;с недавним ИМ&amp;amp;nbsp;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;div style=&amp;quot;&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot;font-size: 11px;&amp;quot;&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/span&amp;gt;&amp;lt;/div&amp;gt;&amp;lt;br&amp;gt;&amp;lt;/font&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;120\&quot; width=\&quot;150\&quot; x=\&quot;1009\&quot; y=\&quot;666\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;WbWKwewGUeogrFfKQaon-17\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;endArrow=classic;html=1;rounded=0;entryX=0.413;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;\&quot; target=\&quot;riDTd2bbOmy0N6oeRRlx-24\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;790\&quot; y=\&quot;670\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;840\&quot; y=\&quot;620\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;WbWKwewGUeogrFfKQaon-18\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; style=\&quot;endArrow=classic;html=1;rounded=0;entryX=0.413;entryY=1;entryDx=0;entryDy=0;entryPerimeter=0;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;934.83\&quot; y=\&quot;670\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;935.0199999999999\&quot; y=\&quot;640\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;WbWKwewGUeogrFfKQaon-19\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;mq1VCm9-Q9mmPECadWXM-7\&quot; style=\&quot;endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;1050\&quot; y=\&quot;440\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;1060\&quot; y=\&quot;580\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;8XeTSqRobshKv5VUtcYk-1\&quot; parent=\&quot;1\&quot; style=\&quot;html=1;shadow=0;dashed=0;shape=mxgraph.bootstrap.rrect;rSize=5;strokeColor=none;strokeWidth=1;fillColor=#0077FF;fontColor=#FFFFFF;whiteSpace=wrap;align=center;verticalAlign=middle;spacingLeft=0;fontStyle=0;fontSize=16;spacing=5;\&quot; value=\&quot;&amp;lt;b style=&amp;quot;font-size: 23px;&amp;quot;&amp;gt;Алгоритм назначения КоронароАнгиоГрафии на амбулаторном приёме&amp;lt;/b&amp;gt;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;40\&quot; width=\&quot;1150\&quot; x=\&quot;10\&quot; y=\&quot;4\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;ozAhDQrw7SFwMJoX0QFW-1\&quot; parent=\&quot;1\&quot; style=\&quot;shape=image;verticalLabelPosition=bottom;labelBackgroundColor=default;verticalAlign=top;aspect=fixed;imageAspect=0;image=data:image/png,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;\&quot; value=\&quot;\&quot; vertex=\&quot;1\&quot;&gt;\n          &lt;mxGeometry height=\&quot;52.14\&quot; width=\&quot;44.05\&quot; x=\&quot;660\&quot; y=\&quot;583.93\&quot; as=\&quot;geometry\&quot; /&gt;\n        &lt;/mxCell&gt;\n        &lt;mxCell id=\&quot;ozAhDQrw7SFwMJoX0QFW-3\&quot; edge=\&quot;1\&quot; parent=\&quot;1\&quot; source=\&quot;5N7qI_vjbbbjhQraNa_B-3\&quot; style=\&quot;endArrow=classic;html=1;rounded=0;exitX=0.472;exitY=-0.003;exitDx=0;exitDy=0;exitPerimeter=0;\&quot; value=\&quot;\&quot;&gt;\n          &lt;mxGeometry height=\&quot;50\&quot; relative=\&quot;1\&quot; width=\&quot;50\&quot; as=\&quot;geometry\&quot;&gt;\n            &lt;mxPoint x=\&quot;1080\&quot; y=\&quot;660\&quot; as=\&quot;sourcePoint\&quot; /&gt;\n            &lt;mxPoint x=\&quot;1080\&quot; y=\&quot;640\&quot; as=\&quot;targetPoint\&quot; /&gt;\n          &lt;/mxGeometry&gt;\n        &lt;/mxCell&gt;\n      &lt;/root&gt;\n    &lt;/mxGraphModel&gt;\n  &lt;/diagram&gt;\n&lt;/mxfile&gt;\n&quot;}"></div>
+<script type="text/javascript" src="https://viewer.diagrams.net/js/viewer-static.min.js"></script>
+    </div>
+  </div>
+
+  <div class="note">
+    <b>Дисклеймер.</b> Калькулятор реализует модели претестовой вероятности:
+    ESC 2019 (табличная), RF-CL 2020 и CACS-CL 2020 (Winther et al., Table S3).
+    Не заменяет клиническое суждение и должен интерпретироваться врачом.
+  </div>
+
+  <div class="refs">
+    <h3>Список литературы</h3>
+    <ol>
+      <li>
+        Winther S, Schmidt SE, Mayrhofer T, et al. Incorporating Coronary Calcification Into Pre-Test Assessment of the Likelihood of Coronary Artery Disease. <i>J Am Coll Cardiol.</i> 2020;76(21):2421–32.
+        <span class="doi">doi:10.1016/j.jacc.2020.09.585</span>
+      </li>
+      <li>
+        Сумин А.Н. Алгоритмы диагностики у больных хроническим коронарным синдромом — что показывает реальная клиническая практика? <i>Российский кардиологический журнал.</i> 2023;28(9):5483.
+        <span class="doi">doi:10.15829/1560-4071-2023-5483</span>
+      </li>
+      <li>
+        Miller RJH, Gransar H, Rozanski A, et al. Simplified Approach to Predicting Obstructive Coronary Disease With Integration of Coronary Calcium: Development and External Validation. <i>J Am Heart Assoc.</i> 2023 Dec 19;12(24):e031601.
+      </li>
+      <li>
+        2024 ESC Guidelines for the management of chronic coronary syndromes.
+      </li>
+    </ol>
+  </div>
+
+</div>
+
+<!-- Тост для обратной связи по копированию -->
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ==========================================================
+     ESC 2019 — табличная модель
+     ========================================================== */
+  var ESC_TABLE = {
+    "30-39": { typical:{m:3, f:5},  atypical:{m:4,  f:3},  nonanginal:{m:1,  f:1}, dyspnea:{m:0,  f:3}  },
+    "40-49": { typical:{m:22,f:10}, atypical:{m:10, f:6},  nonanginal:{m:3,  f:2}, dyspnea:{m:12, f:3}  },
+    "50-59": { typical:{m:32,f:13}, atypical:{m:17, f:6},  nonanginal:{m:11, f:3}, dyspnea:{m:20, f:9}  },
+    "60-69": { typical:{m:44,f:16}, atypical:{m:26, f:11}, nonanginal:{m:22, f:6}, dyspnea:{m:27, f:14} },
+    "70+":   { typical:{m:52,f:27}, atypical:{m:34, f:19}, nonanginal:{m:24, f:10},dyspnea:{m:32, f:12} }
+  };
+
+  function escBand(age){
+    if (age < 40) return "30-39";
+    if (age < 50) return "40-49";
+    if (age < 60) return "50-59";
+    if (age < 70) return "60-69";
+    return "70+";
+  }
+
+  function escPTP(age, sex, symptom){
+    var band = ESC_TABLE[escBand(age)];
+    if (!band) return 0;
+    var row = band[symptom] || band.nonanginal;
+    return row[sex];
+  }
+
+  /* ==========================================================
+     RF-CL, 2020 — Table S3
+     ========================================================== */
+  function rfcl(age, sex, symptom, nrf){
+    var nb_rf = (nrf <= 1) ? 1 : (nrf <= 3) ? 2 : 3;
+    var male = (sex === "m") ? 1 : 0;
+    var symp_typical = (symptom === "typical") ? 1 : 0;
+    var symp_non_anginal = (symptom === "nonanginal") ? 1 : 0;
+
+    var logit = -9.5260
+      + 1.6128 * male
+      + 0.08440 * age
+      + 2.7112 * symp_typical
+      + (-0.4675) * symp_non_anginal
+      + 1.4940 * nb_rf
+      + (-0.0187) * age * symp_typical
+      + (-0.0131) * age * nb_rf
+      + (-0.2799) * symp_typical * nb_rf
+      + (-0.2091) * male * nb_rf;
+
+    return 100 / (1 + Math.exp(-logit));
+  }
+
+  /* ==========================================================
+     CACS-CL, 2020 — Table S3
+     ========================================================== */
+  function cacsCL(rf_ptp_pct, cac){
+    var R = rf_ptp_pct / 100;
+    var c_1_9 = 0, c_10_99 = 0, c_100_399 = 0, c_400_999 = 0, c_1000 = 0;
+
+    if (cac >= 1 && cac <= 9)          c_1_9 = 1;
+    else if (cac >= 10 && cac <= 99)   c_10_99 = 1;
+    else if (cac >= 100 && cac <= 399) c_100_399 = 1;
+    else if (cac >= 400 && cac <= 999) c_400_999 = 1;
+    else if (cac >= 1000)              c_1000 = 1;
+
+    var p = 0.0013
+      + R * 0.2021
+      + c_1_9 * 0.0082
+      + c_10_99 * 0.0238
+      + c_100_399 * 0.1131
+      + c_400_999 * 0.2306
+      + c_1000 * 0.4040
+      + R * c_1_9 * 0.1311
+      + R * c_10_99 * 0.2909
+      + R * c_100_399 * 0.4077
+      + R * c_400_999 * 0.4658
+      + R * c_1000 * 0.4489;
+
+    return Math.min(p * 100, 100);
+  }
+
+  function catEsc(v){
+    if (v < 5) return { label:"Очень низкая", cls:"c-vlow" };
+    if (v <= 15) return { label:"Низкая", cls:"c-low" };
+    return { label:"Умеренная", cls:"c-mod" };
+  }
+
+  function catModel(v){
+    if (v <= 5) return { label:"Очень низкая", cls:"c-vlow" };
+    if (v <= 15) return { label:"Низкая", cls:"c-low" };
+    if (v <= 50) return { label:"Умеренная", cls:"c-mod" };
+    if (v <= 85) return { label:"Высокая", cls:"c-high" };
+    return { label:"Очень высокая", cls:"c-vhigh" };
+  }
+
+  var ESC_REC = {
+    r119: { cls:"green", html:"<b>Дообследование не требуется.</b>" },
+    r120: {
+      cls:"amber",
+      html:"<b>Оцените коронарный кальций</b> для реклассификации в группу очень низкого риска (≤5 %). <i>(Class IIa)</i><br><br>" +
+        "<b>Скорректируйте клиническую вероятность</b> <i>(Class I)</i>:" +
+        "<ul>" +
+        "<li>Изменения ЭКГ покоя (з.Q или изменения сегмента ST/T);</li>" +
+        "<li>Изменения на ЭКГ с нагрузкой;</li>" +
+        "<li>Дисфункция ЛЖ;</li>" +
+        "<li>Желудочковая аритмия;</li>" +
+        "<li>Заболевания периферических артерий;</li>" +
+        "<li>Кальцификация коронарных артерий на ранее сделанных КТ органов грудной клетки.</li>" +
+        "</ul><br><i>ИЛИ</i> МСКТ коронарных артерий."
+    },
+    r121: {
+      cls:"orange",
+      html:"<b>МСКТ коронарных артерий</b> или <b>Стресс-ЭХОКГ, ПЭТ/ОФЭКТ, МРТ сердца</b>."
+    },
+    r122: {
+      cls:"orange",
+      html:"<b>Стресс-ЭХОКГ, ПЭТ/ОФЭКТ, МРТ сердца.</b>"
+    },
+    r123: { cls:"red", html:"<b>Инвазивная КАГ.</b>" }
+  };
+
+  function esc2024Rec(v){
+    if (v <= 5) return ESC_REC.r119;
+    if (v <= 15) return ESC_REC.r120;
+    if (v <= 50) return ESC_REC.r121;
+    if (v <= 85) return ESC_REC.r122;
+    return ESC_REC.r123;
+  }
+
+  function rkoRec(ptv){
+    if (ptv < 5) return { cls:"green", html:"<b>Стресс-тест не показан.</b>" };
+    if (ptv > 15) {
+      return {
+        cls:"orange",
+        html:"<b>Стресс-тест</b> для выявления высокого риска сердечно-сосудистых осложнений."
+      };
+    }
+    return {
+      cls:"amber",
+      html:"<b>МСКТ-ангиография</b> и/или <b>Стресс-тест</b> при наличии факторов, повышающих ПТВ ИБС."
+    };
+  }
+
+  /* ==========================================================
+     СОСТОЯНИЕ
+     ========================================================== */
+  function getAge(){
+    var raw = document.getElementById("ageNum").value.trim();
+    if (raw === "") return null;
+    var v = parseFloat(raw);
+    if (isNaN(v)) return null;
+    return Math.max(18, Math.min(110, v));
+  }
+
+  function getSex(){
+    var el = document.querySelector('input[name="sex"]:checked');
+    return el ? el.value : null;
+  }
+
+  function getSymptom(){
+    var el = document.querySelector('input[name="sym"]:checked');
+    return el ? el.value : null;
+  }
+
+  function getCAC(){
+    var raw = document.getElementById("cac").value.trim();
+    if (raw === "") return null;
+    var v = parseFloat(raw);
+    if (isNaN(v) || v < 0) return null;
+    return v;
+  }
+
+  function rfCount(){
+    var ids = ["rfFam","rfLip","rfSmk","rfHyp","rfDia"];
+    var n = 0;
+    ids.forEach(function(id){
+      if (document.getElementById(id).checked) n++;
+    });
+    return n;
+  }
+
+  var SYM_LABEL = {
+    typical:"типичная стенокардия",
+    atypical:"атипичная стенокардия",
+    nonanginal:"неангинозная боль",
+    dyspnea:"одышка"
+  };
+
+  var LAST = {
+    ptv:null,
+    ptvCat:null,
+    baseVal:null,
+    baseCat:null,
+    model:null
+  };
+
+  /* ==========================================================
+     RESET
+     ========================================================== */
+  function resetAll(){
+    document.getElementById("ptvNum").innerHTML = "—<small>%</small>";
+    document.getElementById("ptvBadge").textContent = "—";
+    document.getElementById("ptvSub").textContent = "Заполните возраст, пол и характер боли";
+    document.getElementById("gaugeMark1").style.left = "0%";
+    document.getElementById("gaugeMark2").style.left = "0%";
+
+    document.getElementById("mEsc").innerHTML = "—<small>%</small>";
+    document.getElementById("cEsc").innerHTML = "—";
+    document.getElementById("modelEsc").className = "model";
+
+    document.getElementById("mRf").innerHTML = "—<small>%</small>";
+    document.getElementById("cRf").innerHTML = "—";
+    document.getElementById("modelRf").className = "model";
+
+    document.getElementById("mCa").innerHTML = "—<small>%</small>";
+    document.getElementById("cCa").innerHTML = "—";
+    document.getElementById("modelCa").className = "model";
+
+    var elRko = document.getElementById("recRko");
+    elRko.className = "rec";
+    elRko.innerHTML = "—";
+
+    var elEsc = document.getElementById("recEsc");
+    elEsc.className = "rec";
+    elEsc.innerHTML = "—";
+
+    document.getElementById("cacCard").style.display = "none";
+
+    LAST.ptv = null;
+    LAST.ptvCat = null;
+    LAST.baseVal = null;
+    LAST.baseCat = null;
+    LAST.model = null;
+  }
+
+  /* ==========================================================
+     РЕНДЕР
+     ========================================================== */
+  function render(){
+    var age = getAge();
+    var sex = getSex();
+    var symptom = getSymptom();
+    var cac = getCAC();
+    var nrf = rfCount();
+
+    if (age === null || sex === null || symptom === null){
+      resetAll();
+      renderDuke();
+      return;
+    }
+
+    var ptv = escPTP(age, sex, symptom);
+    var c1 = catEsc(ptv);
+
+    document.getElementById("ptvNum").innerHTML = fmt1(ptv) + "<small>%</small>";
+    document.getElementById("ptvBadge").textContent = c1.label;
+    document.getElementById("ptvSub").textContent =
+      "Возраст " + age + " лет · " + (sex === "m" ? "мужчина" : "женщина") +
+      " · " + SYM_LABEL[symptom] + " · группа " + escBand(age) + " лет";
+
+    document.getElementById("gaugeMark1").style.left =
+      Math.max(0, Math.min(100, ptv)) + "%";
+
+    document.getElementById("mEsc").innerHTML = fmt1(ptv) + "<small>%</small>";
+    document.getElementById("cEsc").innerHTML = chip(c1);
+    document.getElementById("modelEsc").className =
+      "model cat-" + c1.cls.substring(2);
+
+    var rf = rfcl(age, sex, symptom, nrf);
+    var c2 = catModel(rf);
+    document.getElementById("mRf").innerHTML = fmt1(rf) + "<small>%</small>";
+    document.getElementById("cRf").innerHTML = chip(c2);
+    document.getElementById("modelRf").className =
+      "model cat-" + c2.cls.substring(2);
+
+    var ca = null;
+    var c3 = null;
+
+    if (cac !== null){
+      ca = cacsCL(rf, cac);
+      c3 = catModel(ca);
+      document.getElementById("mCa").innerHTML = fmt1(ca) + "<small>%</small>";
+      document.getElementById("cCa").innerHTML = chip(c3);
+      document.getElementById("modelCa").className =
+        "model cat-" + c3.cls.substring(2);
+    } else {
+      document.getElementById("mCa").innerHTML =
+        '<span style="font-size:14px;color:var(--muted);font-weight:600">неприменимо</span>';
+      document.getElementById("cCa").innerHTML =
+        '<span style="color:var(--muted);font-weight:500">укажите коронарный кальций</span>';
+      document.getElementById("modelCa").className = "model";
+    }
+
+    var rko = rkoRec(ptv);
+    var elRko = document.getElementById("recRko");
+    elRko.className = "rec " + rko.cls;
+    elRko.innerHTML = rko.html;
+
+    var baseVal = (ca !== null) ? ca : rf;
+    var baseCat = catModel(baseVal);
+    var esc24 = esc2024Rec(baseVal);
+    var elEsc = document.getElementById("recEsc");
+
+    elEsc.className = "rec " + esc24.cls;
+    elEsc.innerHTML =
+      '<div style="font-size:11.5px;color:var(--muted);margin-bottom:6px">' +
+      "Расчёт по модели <b>" + (ca !== null ? "CACS-CL" : "RF-CL") +
+      "</b> — " + fmt1(baseVal) + " %</div>" + esc24.html;
+
+    document.getElementById("gaugeMark2").style.left =
+      Math.max(0, Math.min(100, baseVal)) + "%";
+
+    var cacCard = document.getElementById("cacCard");
+
+    if (cac !== null){
+      cacCard.style.display = "";
+      document.querySelectorAll("#cacBody tr").forEach(function(tr){
+        var mn = parseFloat(tr.dataset.min);
+        var mx = parseFloat(tr.dataset.max);
+        tr.classList.toggle("on", cac >= mn && cac <= mx);
+      });
+    } else {
+      cacCard.style.display = "none";
+    }
+
+    renderDuke();
+
+    LAST.ptv = ptv;
+    LAST.ptvCat = c1;
+    LAST.baseVal = baseVal;
+    LAST.baseCat = baseCat;
+    LAST.model = (ca !== null) ? "CACS-CL" : "RF-CL";
+  }
+
+  function chip(c){
+    return '<span class="chip ' + c.cls + '">' + c.label + "</span>";
+  }
+
+  function fmt1(x){
+    if (x === null || isNaN(x)) return "—";
+    return (Math.round(x * 10) / 10).toFixed(1).replace(".", ",");
+  }
+
+  /* ==========================================================
+     КОПИРОВАНИЕ
+     ========================================================== */
+  var _toastTimer = null;
+
+  function showToast(msg, type){
+    var el = document.getElementById("toast");
+    if (!el) return;
+
+    el.textContent = msg;
+    el.className = "toast show " + (type || "");
+    clearTimeout(_toastTimer);
+
+    _toastTimer = setTimeout(function(){
+      el.className = "toast " + (type || "");
+    }, 2600);
+  }
+
+  function flashBtn(txt, state){
+    var btn = document.getElementById("copyBtn");
+    var lbl = document.getElementById("copyLabel");
+    if (!btn || !lbl) return;
+
+    btn.classList.remove("copied", "failed");
+    if (state === "ok") btn.classList.add("copied");
+    if (state === "err") btn.classList.add("failed");
+
+    lbl.textContent = txt;
+
+    setTimeout(function(){
+      btn.classList.remove("copied", "failed");
+      lbl.textContent = "Копировать";
+    }, 1800);
+  }
+
+  function copyReport(){
+    if (LAST.ptv === null || LAST.baseVal === null){
+      showToast("Заполните возраст, пол и характер боли", "warn");
+      flashBtn("Заполните", "err");
+      return;
+    }
+
+    var text =
+      "Предтестовая вероятность обструктивной ИБС:\n" +
+      fmt1(LAST.ptv) + " % — " + LAST.ptvCat.label.toLowerCase() +
+      " [РКО, 2024];\n" +
+      fmt1(LAST.baseVal) + " % — " + LAST.baseCat.label.toLowerCase() +
+      " [ESC, 2024; модель " + LAST.model + "]";
+
+    copyText(text).then(function(ok){
+      if (ok){
+        showToast("Заключение скопировано в буфер обмена", "ok");
+        flashBtn("Скопировано", "ok");
+      } else {
+        showToast("Не удалось скопировать автоматически — скопируйте из диалога", "err");
+        flashBtn("Ошибка", "err");
+        try {
+          window.prompt("Скопируйте текст (Ctrl+C / Cmd+C):", text);
+        } catch(e){}
+      }
+    });
+  }
+
+  function copyText(text){
+    if (window.isSecureContext && navigator.clipboard && navigator.clipboard.writeText){
+      return navigator.clipboard.writeText(text).then(
+        function(){ return true; },
+        function(){ return legacyCopy(text); }
+      );
+    }
+    return Promise.resolve(legacyCopy(text));
+  }
+
+  function legacyCopy(text){
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText =
+      "position:fixed;left:0;top:0;width:2em;height:2em;" +
+      "padding:0;border:0;outline:none;box-shadow:none;" +
+      "background:transparent;opacity:0;resize:none;";
+    document.body.appendChild(ta);
+
+    var ok = false;
+    var sel = window.getSelection ? window.getSelection() : null;
+    var savedRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
+
+    try {
+      ta.focus();
+      ta.select();
+      ta.setSelectionRange(0, text.length);
+      ok = document.execCommand("copy") === true;
+    } catch(e) {
+      ok = false;
+    } finally {
+      document.body.removeChild(ta);
+      if (savedRange && sel){
+        sel.removeAllRanges();
+        sel.addRange(savedRange);
+      }
+    }
+    return ok;
+  }
+
+  /* ==========================================================
+     DUKE
+     ========================================================== */
+  function renderDuke(){
+    var tEl = document.getElementById("dukeTime");
+    var sEl = document.getElementById("dukeST");
+    var aEl = document.getElementById("dukeAng");
+
+    var t = parseFloat(tEl.value);
+    var s = parseFloat(sEl.value);
+    var a = parseFloat(aEl.value) || 0;
+
+    var card = document.getElementById("dukeCard");
+    if (isNaN(t) || isNaN(s)){
+      card.style.display = "none";
+      return;
+    }
+    card.style.display = "";
+
+    var score = t - 5 * s - 4 * a;
+    var risk, surv, mort, cls, txt;
+
+    if (score < -10){
+      risk = "Высокий";
+      surv = "79 %";
+      mort = "5,25 %";
+      cls = "red";
+      txt = "<b>КАГ в срочном порядке.</b>";
+    } else if (score >= 5){
+      risk = "Низкий";
+      surv = "99 %";
+      mort = "0,25 %";
+      cls = "green";
+      txt = "<b>Нет необходимости в дальнейшем обследовании.</b> Рекомендуется медикаментозное лечение.";
+    } else {
+      risk = "Средний";
+      surv = "95 %";
+      mort = "1,25 %";
+      cls = "amber";
+      txt = "<b>Стресс-ЭХОКГ, сцинтиграфия миокарда</b>, при необходимости — <b>КАГ в плановом порядке</b>.";
+    }
+
+    document.getElementById("dukeVal").textContent =
+      (Math.round(score * 10) / 10).toString().replace(".", ",");
+    document.getElementById("dukeRisk").textContent = risk;
+    document.getElementById("dukeSurv").textContent = surv;
+    document.getElementById("dukeMort").textContent = mort;
+
+    var recEl = document.getElementById("dukeRec");
+    recEl.className = "rec " + cls;
+    recEl.innerHTML = txt;
+  }
+
+  /* ==========================================================
+     ОБРАБОТЧИКИ
+     ========================================================== */
+  document.getElementById("ageNum").addEventListener("input", render);
+
+  document.querySelectorAll('input[name="sex"], input[name="sym"]')
+    .forEach(function(el){
+      el.addEventListener("change", render);
+    });
+
+  ["rfFam","rfLip","rfSmk","rfHyp","rfDia"].forEach(function(id){
+    document.getElementById(id).addEventListener("change", render);
+  });
+
+  document.getElementById("cac").addEventListener("input", render);
+  document.getElementById("dukeTime").addEventListener("input", render);
+  document.getElementById("dukeST").addEventListener("input", render);
+  document.getElementById("dukeAng").addEventListener("change", render);
+
+  document.getElementById("copyBtn").addEventListener("click", copyReport);
+
+  document.querySelectorAll(".tab").forEach(function(btn){
+    btn.addEventListener("click", function(){
+      document.querySelectorAll(".tab").forEach(function(b){
+        b.classList.remove("active");
+      });
+      document.querySelectorAll(".panel").forEach(function(p){
+        p.classList.remove("active");
+      });
+
+      btn.classList.add("active");
+      document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+      window.scrollTo({ top:0, behavior:"smooth" });
+    });
+  });
+
+  resetAll();
+  renderDuke();
+})();
+</script>
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="grace.html" title="Оценка летальности при ОКС">GRACE</a>
+    <a href="ARC-HBR.html" title="Риск кровотечений после ЧКВ">ARC-HBR</a>
+    <a href="аск поак.html" title="Антитромботическая терапия при стабильной ИБС">АСК + ПОАК</a>
+    <a href="операция.html" title="Перед несердечной операцией">Операционный риск</a>
+    
+  </div>
+</div>
+</body>
+</html>

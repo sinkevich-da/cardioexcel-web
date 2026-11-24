@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Калькулятор СНсФВ (H2FPEF, HFpEF-ABA)</title>
+    <style>
+        :root {
+            --primary-green: #4caf50;
+            --light-green: #e8f5e9;
+            --dark-green: #2e7d32;
+            --border-green: #a5d6a7;
+            --blue-bg: #e3f2fd;
+            --blue-border: #bbdefb;
+            --blue-text: #1565c0;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0; padding: 20px; font-size: 14px; line-height: 1.4;
+        }
+        .container {
+            max-width: 1250px; margin: 0 auto;
+            display: grid; grid-template-columns: 1fr 1fr 1.4fr;
+            gap: 15px; align-items: start;
+        }
+        @media (max-width: 1100px) { .container { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 750px)  { .container { grid-template-columns: 1fr; } }
+
+        .column-stack { display: flex; flex-direction: column; gap: 15px; }
+        .card {
+            background: #fff; border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+            overflow: hidden; border: 1px solid var(--border-green);
+            display: flex; flex-direction: column;
+        }
+        .card-header {
+            background-color: var(--primary-green); color: white;
+            padding: 12px 15px; font-weight: 600; font-size: 15px;
+            text-align: center; letter-spacing: 0.3px;
+        }
+        .card-header.yellow { background-color: #fdd835; color: #333; }
+        .card-body { padding: 15px; flex: 1; }
+
+        .input-row {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 10px; gap: 10px;
+        }
+        .input-row label { flex: 1; font-weight: 500; font-size: 13px; }
+        .input-row input[type="number"] {
+            width: 90px; padding: 6px 8px; border: 1px solid #ccc;
+            border-radius: 4px; font-size: 13px; text-align: center;
+            font-family: inherit;
+        }
+        .input-row .unit { font-size: 12px; color: #555; min-width: 50px; text-align: left; }
+
+        .check-item { margin-bottom: 10px; }
+        .check-item-header { display: flex; align-items: flex-start; gap: 8px; }
+        .check-item-header input[type="checkbox"] {
+            width: 18px; height: 18px; margin: 0; flex-shrink: 0;
+            accent-color: var(--primary-green); cursor: pointer; margin-top: 2px;
+        }
+        .check-item-header label {
+            font-size: 13px; cursor: pointer; font-weight: 600; line-height: 1.35;
+        }
+        .check-item-desc { margin-left: 26px; font-size: 12px; color: #444; line-height: 1.4; }
+        .check-item-desc p { margin: 3px 0; }
+
+        .radio-group {
+            display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+            margin-bottom: 6px;
+        }
+        .radio-group label {
+            font-size: 13px; display: flex; align-items: center; gap: 5px;
+            cursor: pointer; font-weight: 400;
+        }
+        .radio-group input[type="radio"] {
+            width: 16px; height: 16px; margin: 0;
+            accent-color: var(--primary-green); cursor: pointer;
+        }
+        .radio-group.vertical { flex-direction: column; align-items: flex-start; gap: 6px; }
+
+        .sub-header {
+            font-weight: 600; margin-top: 15px; margin-bottom: 8px;
+            color: var(--dark-green);
+            border-bottom: 1px solid var(--border-green);
+            padding-bottom: 4px; font-size: 13px;
+        }
+
+        .result-box {
+            background-color: var(--light-green);
+            border: 1px solid var(--border-green);
+            padding: 10px; border-radius: 4px; margin-top: 10px;
+            font-weight: 600; color: var(--dark-green);
+            text-align: center; font-size: 13px; line-height: 1.45;
+            position: relative;
+        }
+        .result-box.warning { background-color: #fff3e0; border-color: #ffcc80; color: #e65100; }
+        .result-box.success { background-color: #e8f5e9; border-color: #81c784; color: #1b5e20; }
+        .result-box.big { font-size: 18px; padding: 12px; }
+        .result-box.left { text-align: left; white-space: normal; }
+        .result-box.left .label { font-weight: 700; display: block; margin-bottom: 4px; color: inherit; }
+
+        .helper-text { font-size: 12px; color: #666; margin-top: 8px; font-style: italic; }
+
+        .mi-layout { display: grid; grid-template-columns: 1fr 1.8fr; gap: 15px; }
+        @media (max-width: 600px) { .mi-layout { grid-template-columns: 1fr; } }
+        .mi-left { display: flex; flex-direction: column; gap: 10px; }
+        .mi-right { display: flex; flex-direction: column; gap: 10px; }
+        .mi-block { background: #fafafa; border: 1px solid #eee; border-radius: 4px; padding: 8px; }
+        .mi-block-title { font-weight: 600; font-size: 12px; color: #555; margin-bottom: 5px; }
+
+        .killip-notes {
+            margin-top: 8px; font-size: 11px; color: #555; line-height: 1.35;
+            border-top: 1px dashed #ddd; padding-top: 6px;
+        }
+        .killip-notes p { margin: 2px 0; }
+        .killip-notes strong { color: var(--dark-green); }
+
+        .mi-bottom {
+            grid-column: 1 / -1; background-color: var(--blue-bg);
+            padding: 12px; border-radius: 6px; margin-top: 10px;
+            font-size: 13px; border: 1px solid var(--blue-border);
+        }
+        .mi-bottom-row { display: flex; gap: 10px; margin-bottom: 6px; }
+        .mi-bottom-row:last-child { margin-bottom: 0; }
+        .mi-bottom-label { font-weight: 600; color: var(--blue-text); white-space: nowrap; }
+        .mi-bottom-value { color: #0d47a1; font-weight: 500; }
+
+        .mi-footnotes {
+            grid-column: 1 / -1; font-size: 11px; color: #555;
+            margin-top: 10px; line-height: 1.3;
+        }
+        .mi-footnotes p { margin: 2px 0; }
+
+        .source-section {
+            margin-top: 30px; background: #fff; padding: 20px;
+            border-radius: 8px; border: 1px solid #ddd;
+            font-size: 12px; line-height: 1.6; color: #555;
+        }
+        .source-section h3 { color: var(--dark-green); margin-top: 0; font-size: 14px; font-weight: 600; }
+        .source-section ul { padding-left: 20px; margin: 0; }
+        .source-section li { margin-bottom: 6px; }
+
+        .copyright {
+            margin-top: 20px; text-align: center;
+            font-weight: 600; color: #333; font-size: 13px;
+        }
+
+        .copy-btn {
+            display: inline-block;
+            margin-top: 8px;
+            padding: 3px 10px;
+            font-size: 11px;
+            font-family: inherit;
+            cursor: pointer;
+            background: #fff;
+            border: 1px solid var(--border-green);
+            border-radius: 4px;
+            color: var(--dark-green);
+            transition: background 0.15s, color 0.15s;
+        }
+        .copy-btn:hover {
+            background: var(--light-green);
+        }
+        .copy-btn:active {
+            background: var(--border-green);
+        }
+        .copy-feedback {
+            font-size: 10px;
+            color: var(--dark-green);
+            margin-left: 6px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .copy-feedback.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- КОЛОНКА 1: Алгоритм H2FPEF -->
+    <div class="card">
+        <div class="card-header">Алгоритм H2FPEF</div>
+        <div class="card-body">
+            <div class="input-row">
+                <label>*Возраст, годы</label>
+                <input type="number" id="age" min="1" max="120">
+            </div>
+            <div class="input-row">
+                <label>*Рост, см</label>
+                <input type="number" id="height" min="50" max="250">
+            </div>
+            <div class="input-row">
+                <label>*Вес, кг</label>
+                <input type="number" id="weight" min="20" max="300">
+            </div>
+
+            <div class="sub-header">Клинические данные</div>
+            <div class="check-item">
+                <div class="check-item-header">
+                    <input type="checkbox" id="af">
+                    <label for="af">*Фибрилляция предсердий (пароксизмальная или стойкая)</label>
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-item-header">
+                    <input type="checkbox" id="htn">
+                    <label for="htn">Гипертония (≥2 гипотензивных препарата)</label>
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-item-header">
+                    <input type="checkbox" id="ph">
+                    <label for="ph">Лёгочная гипертензия (СДЛА &gt; 35 мм рт.ст.)</label>
+                </div>
+            </div>
+            <div class="check-item">
+                <div class="check-item-header">
+                    <input type="checkbox" id="ee">
+                    <label for="ee">Давление наполнения (Отношение Е/е´ &gt; 9)</label>
+                </div>
+            </div>
+
+            <div class="sub-header">H2FPEF, баллы: <span id="h2fpef-score" style="font-size: 16px;">—</span></div>
+            <div class="result-box left" id="h2fpef-result">
+                <span class="label">Результат:</span>
+                <span id="h2fpef-text">—</span>
+                <button class="copy-btn" id="copy-h2fpef" type="button" style="display:none;">Копировать</button>
+                <span class="copy-feedback" id="fb-h2fpef"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОЛОНКА 2: NT-proBNP + Алгоритм HFpEF-ABA -->
+    <div class="column-stack">
+        <div class="card">
+            <div class="card-header yellow">*Дополнительно для расчета индивидуального порогового значения NT-proBNP</div>
+            <div class="card-body">
+                <div class="input-row">
+                    <label>Пол</label>
+                    <div class="radio-group" style="margin-bottom:0;">
+                        <label><input type="radio" name="sex" value="male"> Мужчина</label>
+                        <label><input type="radio" name="sex" value="female"> Женщина</label>
+                    </div>
+                </div>
+                <div class="input-row">
+                    <label>*Креатинин</label>
+                    <input type="number" id="creatinine" min="10" max="1000">
+                    <span class="unit">мкмоль/л</span>
+                </div>
+                <div class="input-row">
+                    <label>*ЧСС</label>
+                    <input type="number" id="hr" min="30" max="250">
+                    <span class="unit">уд/мин</span>
+                </div>
+
+                <div class="sub-header">Индивидуальный пороговый уровень NT-proBNP:</div>
+                <div class="result-box warning big" id="ntprobnp-result">
+                    <span id="ntprobnp-value">— пг/мл</span>
+                    <button class="copy-btn" id="copy-ntprobnp" type="button" style="display:none;">Копировать</button>
+                    <span class="copy-feedback" id="fb-ntprobnp"></span>
+                </div>
+
+                <div class="helper-text">
+                    * - значения необходимые для расчета индивидуального порогового значения NT-proBNP
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">Алгоритм HFpEF-ABA</div>
+            <div class="card-body">
+                <div class="result-box big" id="hfpefaba-score">—%</div>
+                <div class="result-box left" id="hfpefaba-result">
+                    <span class="label">Результат:</span>
+                    <span id="hfpefaba-text">—</span>
+                    <button class="copy-btn" id="copy-hfpefaba" type="button" style="display:none;">Копировать</button>
+                    <span class="copy-feedback" id="fb-hfpefaba"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- КОЛОНКА 3: Диагноз ХСН после инфаркта миокарда -->
+    <div class="card">
+        <div class="card-header">Диагноз ХСН после инфаркта миокарда</div>
+        <div class="card-body">
+            <div class="mi-layout">
+                <!-- Левая колонка -->
+                <div class="mi-left">
+                    <div class="mi-block">
+                        <div class="mi-block-title">Период оценки после ИМ</div>
+                        <div class="radio-group">
+                            <label><input type="radio" name="period" value="1"> до 28 дней</label>
+                            <label><input type="radio" name="period" value="2"> ≥ 29 дней</label>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="mi-block-title">ХСН в анамнезе</div>
+                        <div class="radio-group">
+                            <label><input type="radio" name="history" value="1"> Да</label>
+                            <label><input type="radio" name="history" value="0"> Нет</label>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="mi-block-title">ОСН в остром периоде</div>
+                        <div class="radio-group vertical">
+                            <label><input type="radio" name="killip" value="1"> Killip I</label>
+                            <label><input type="radio" name="killip" value="2"> Killip II</label>
+                            <label><input type="radio" name="killip" value="3"> Killip III</label>
+                            <label><input type="radio" name="killip" value="4"> Killip IV</label>
+                        </div>
+                        <div class="killip-notes">
+                            <p><strong>Класс 1</strong> — нет симптомов СН.</p>
+                            <p><strong>Класс 2</strong> — застойные влажные хрипы менее, чем над 50% поверхности легких (нижние отделы) и/или 3 тон (ритм галопа).</p>
+                            <p><strong>Класс 3</strong> — застойные влажные хрипы более, чем над 50% поверхности легких, ортопное, пароксизмальная ночная одышка, сердечная астма, отек легких.</p>
+                            <p><strong>Класс 4</strong> — кардиогенный шок.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Правая колонка -->
+                <div class="mi-right">
+                    <div class="mi-block">
+                        <div class="check-item" style="margin-bottom:0;">
+                            <div class="check-item-header">
+                                <input type="checkbox" id="sym">
+                                <label for="sym">Симптомы/признаки СН сейчас</label>
+                            </div>
+                            <div class="check-item-desc">
+                                <p>● Одышка. Ортопноэ. Пароксизмальная ночная одышка. Снижение толерантности к нагрузкам. Слабость, утомляемость, увеличение времени восстановления после нагрузки. Увеличение в объеме лодыжек.</p>
+                                <p>● Повышение ЦВД в яремных венах. Гепатоюгулярный рефлюкс. Третий тон (ритм галопа). Смещение верхушечного толчка влево.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="check-item" style="margin-bottom:0;">
+                            <div class="check-item-header">
+                                <input type="checkbox" id="struct">
+                                <label for="struct">Структурные изменения миокарда</label>
+                            </div>
+                            <div class="check-item-desc">
+                                <p>● Концентрическое ремоделирование/ГЛЖ.</p>
+                                <p>● Зоны гипо/акинезии, ИОЛП &gt;34 мл/м² (синусовый ритм); &gt;40 мл/м² (ФП)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="check-item" style="margin-bottom:0;">
+                            <div class="check-item-header">
+                                <input type="checkbox" id="diast">
+                                <label for="diast">Диастолическая дисфункция</label>
+                            </div>
+                            <div class="check-item-desc">
+                                <p>● СДЛА &gt;35 мм рт.ст. Скорость ТР в покое &gt;2,8 м/с</p>
+                                <p>● Е/е’ в покое &gt;9 (&gt;14)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="check-item" style="margin-bottom:0;">
+                            <div class="check-item-header">
+                                <input type="checkbox" id="sys">
+                                <label for="sys">Систолическая дисфункция (ФВ ЛЖ &lt; 50%)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mi-block">
+                        <div class="check-item" style="margin-bottom:0;">
+                            <div class="check-item-header">
+                                <input type="checkbox" id="np">
+                                <label for="np">Повышение НУП (NT-proBNP/BNP)</label>
+                            </div>
+                            <div class="check-item-desc">
+                                <p>● NT-proBNP &gt;125 (&gt;365 пг/мл при ФП) или рассчитайте индивидуальный порог; BNP &gt;35 (&gt;105)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Нижняя панель -->
+                <div class="mi-bottom">
+                    <div class="mi-bottom-row">
+                        <span class="mi-bottom-label">В рамках Основного заболевания:</span>
+                        <span class="mi-bottom-value" id="main-diagnosis">—</span>
+                    </div>
+                    <div class="mi-bottom-row">
+                        <span class="mi-bottom-label">Осложнение:</span>
+                        <span class="mi-bottom-value" id="complication">—</span>
+                    </div>
+                </div>
+
+                <!-- Сноски -->
+                <div class="mi-footnotes">
+                    <p>1 - Чувствительность 78%, специфичность 59% для наличия инвазивно подтверждённой ХСНсФВ.</p>
+                    <p>2 - Более высокий порог имеет меньшую чувствительность (46%), но более высокую специфичность (86%).</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Раздел с источниками -->
+<div class="source-section">
+    <h3>Источник:</h3>
+    <ul>
+        <li>Pieske B, Tschope C, de Boer R, et al. How to diagnose heart failure with preserved ejection fraction: the HFA–PEFF diagnostic algorithm: a consensus recommendation from the Heart Failure Association (HFA) of the European Society of Cardiology (ESC). Eur J Heart Fail. 2020;22(3):391-412.</li>
+        <li>Гудиева Х.М., Сафарова А.Ф., Кобалава Ж.Д. Применение алгоритма HFA-PEFF для диагностики сердечной недостаточности с сохраненной фракцией выброса левого желудочка. Клин фармакол тер 2020;29(2):47-50.</li>
+        <li>Henein M, Tossavainen E, Aroch R, et al. Can Doppler echocardiography estimate raised pulmonary capillary wedge pressure provoked by passive leg lifting in suspected heart failure? Clin Physiol Funct Imaging 2019;39(2):128-34.</li>
+        <li>Агеев Ф.Т., Яровая Е.Б., Овчинников А.Г. К вопросу о возможности использования европейского (HFA–PEFF) и американского (Н2FPEF) алгоритмов диагностики сердечной недостаточности с сохраненной фракцией выброса левого желудочка в условиях реальной российской клинической практики. Кардиология. 2022;62(12):4–10.</li>
+        <li>Якушин С. С., Барбараш О. Л., Мареев В. Ю., Дупляков Д. В., Певзнер Д. В., Переверзева К. Г. Практика применения новых клинических рекомендаций при постановке диагноза хронической сердечной недостаточности после инфаркта миокарда: мнение по проблеме. Российский кардиологический журнал. 2026;31(3):6756. doi: 10.15829/1560-4071-2026-6756. EDN: YLTJCM.</li>
+        <li>Тачилович И. О., Курносова А. А., Кудрявцева А. А., Скрипка А. И., Соколова А. А., Напалков Д. А., Фомин В. В. Использование калькулятора индивидуальных значений NT-proBNP для диагностики хронической сердечной недостаточности с сохраненной фракцией выброса. Рациональная Фармакотерапия в Кардиологии. 2026;22(2):139-145. DOI: 10.20996/1819-6446-2026-3274. EDN: QAUQIP.</li>
+        <li>Shi Q, Gao Y, Chen D, Shi Z, Zhang C, Gu Y, Shi B, Ma C, Zhang Z, Wang X, Wang Y, Guo Q, Geng B, Li M. The HFpEF-ABA score predicts adverse cardiac remodelling and incident heart failure: a UK biobank study. ESC Heart Fail. 2026 Jul 4;13(4):xvag171. doi: 10.1093/eschf/xvag171. PMID: 42413069; PMCID: PMC13340748.</li>
+    </ul>
+</div>
+
+<script>
+    function getNum(id) {
+        const val = document.getElementById(id).value;
+        if (val === '' || val === null) return null;
+        const n = parseFloat(val);
+        return isNaN(n) ? null : n;
+    }
+    function getChecked(id) { return document.getElementById(id).checked; }
+    function getRadio(name) {
+        const el = document.querySelector(`input[name="${name}"]:checked`);
+        return el ? el.value : null;
+    }
+
+    function calculate() {
+        // === 1. СБОР ДАННЫХ ===
+        const age = getNum('age');
+        const height = getNum('height');
+        const weight = getNum('weight');
+        const af = getChecked('af');
+        const htn = getChecked('htn');
+        const ph = getChecked('ph');
+        const ee = getChecked('ee');
+        const sex = getRadio('sex');
+        const creatinine = getNum('creatinine');
+        const hr = getNum('hr');
+
+        // === 2. ИМТ ===
+        let bmi = (height && height > 0 && weight && weight > 0)
+            ? weight / Math.pow(height / 100, 2)
+            : null;
+
+        // === 3. H2FPEF ===
+        const h2fpefScoreEl = document.getElementById('h2fpef-score');
+        const h2fpefTextEl = document.getElementById('h2fpef-text');
+        const h2fpefResultEl = document.getElementById('h2fpef-result');
+        const copyH2 = document.getElementById('copy-h2fpef');
+        const fbH2 = document.getElementById('fb-h2fpef');
+        let h2fpefCopyText = '';
+        const h2fpefValid = (age !== null && age > 0 && bmi !== null);
+
+        if (h2fpefValid) {
+            let h2fpef = 0;
+            if (age > 60) h2fpef += 1;
+            if (bmi > 30) h2fpef += 2;
+            if (af) h2fpef += 3;
+            if (ph) h2fpef += 1;
+            if (ee) h2fpef += 1;
+            if (htn) h2fpef += 1;
+
+            h2fpefScoreEl.innerText = h2fpef;
+
+            let h2fpefText = '';
+            let h2fpefClass = 'result-box left';
+            let probText = '';
+
+            if (h2fpef <= 1) {
+                h2fpefText = 'СНсФВ отсутствует.<br>Вероятность ХСН — 20%.';
+                probText = '20%';
+                h2fpefClass += ' success';
+            } else if (h2fpef === 2) {
+                h2fpefText = 'СНсФВ сомнительна.<br>Вероятность ХСН — 40%.<br>Рекомендована субмаксимальная диастолическая стресс-ЭхоКГ.';
+                probText = '40%';
+                h2fpefClass += ' warning';
+            } else if (h2fpef === 3) {
+                h2fpefText = 'СНсФВ сомнительна.<br>Вероятность ХСН — 50%.<br>Рекомендована субмаксимальная диастолическая стресс-ЭхоКГ.';
+                probText = '50%';
+                h2fpefClass += ' warning';
+            } else if (h2fpef === 4) {
+                h2fpefText = 'СНсФВ сомнительна.<br>Вероятность ХСН — 70%.<br>Рекомендована субмаксимальная диастолическая стресс-ЭхоКГ.';
+                probText = '70%';
+                h2fpefClass += ' warning';
+            } else if (h2fpef === 5) {
+                h2fpefText = 'СНсФВ сомнительна.<br>Вероятность ХСН — 80%.<br>Рекомендована субмаксимальная диастолическая стресс-ЭхоКГ.';
+                probText = '80%';
+                h2fpefClass += ' warning';
+            } else if (h2fpef === 6) {
+                h2fpefText = 'СНсФВ подтверждена.<br>Вероятность ХСН — 90%.<br>Рассмотреть назначение ингибиторов SGLT2.';
+                probText = '90%';
+                h2fpefClass += ' success';
+            } else if (h2fpef >= 7) {
+                h2fpefText = 'СНсФВ подтверждена.<br>Вероятность ХСН — 95%.<br>Рассмотреть назначение ингибиторов SGLT2.';
+                probText = '95%';
+                h2fpefClass += ' success';
+            }
+
+            h2fpefTextEl.innerHTML = h2fpefText;
+            h2fpefResultEl.className = h2fpefClass;
+            h2fpefCopyText = `Алгоритм H2FPEF, баллы: ${h2fpef} (Вероятность ХСН — ${probText}).`;
+            copyH2.style.display = 'inline-block';
+        } else {
+            h2fpefScoreEl.innerText = '—';
+            h2fpefTextEl.innerHTML = '—';
+            h2fpefResultEl.className = 'result-box left';
+            h2fpefCopyText = 'Алгоритм H2FPEF, баллы: —';
+            copyH2.style.display = 'none';
+        }
+        copyH2.dataset.copy = h2fpefCopyText;
+
+        // === 4. NT-proBNP ===
+        const ntValueEl = document.getElementById('ntprobnp-value');
+        const copyNt = document.getElementById('copy-ntprobnp');
+        let ntCopyText = '';
+        const ntValid = (sex !== null && age !== null && age > 0 &&
+                         creatinine !== null && creatinine > 0 &&
+                         hr !== null && hr > 0 && bmi !== null);
+
+        if (ntValid) {
+            let scr = creatinine / 88.4;
+            let egfr = 0;
+            if (sex === 'male') {
+                let k = 0.9;
+                let alpha = scr <= k ? -0.411 : -1.209;
+                egfr = 141 * Math.pow(scr / k, alpha) * Math.pow(0.993, age);
+            } else {
+                let k = 0.7;
+                let alpha = scr <= k ? -0.329 : -1.209;
+                egfr = 144 * Math.pow(scr / k, alpha) * Math.pow(0.993, age);
+            }
+            egfr = Math.round(egfr * 10) / 10;
+
+            let baseNt = 0;
+            if (sex === 'male') {
+                if (age < 60) baseNt = 75;
+                else if (age < 70) baseNt = 125;
+                else if (age < 80) baseNt = 175;
+                else baseNt = 250;
+            } else {
+                if (age < 60) baseNt = 125;
+                else if (age < 70) baseNt = 175;
+                else if (age < 80) baseNt = 225;
+                else baseNt = 250;
+            }
+
+            let afMult = 1;
+            if (af) {
+                if (hr <= 90) afMult = 1.5;
+                else afMult = 2;
+            }
+
+            let skfMult = 1;
+            if (egfr < 30) skfMult = 1.35;
+            else if (egfr < 45) skfMult = 1.25;
+            else if (egfr < 60) skfMult = 1.15;
+
+            let bmiMult = 1;
+            if (bmi >= 40) bmiMult = 0.6;
+            else if (bmi >= 35) bmiMult = 0.7;
+            else if (bmi >= 30) bmiMult = 0.75;
+
+            let finalNt = Math.round(baseNt * afMult * skfMult * bmiMult);
+
+            ntValueEl.innerText = finalNt + ' пг/мл';
+            ntCopyText = `Индивидуальный пороговый уровень NT-proBNP: ${finalNt} пг/мл`;
+            copyNt.style.display = 'inline-block';
+        } else {
+            ntValueEl.innerText = '— пг/мл';
+            ntCopyText = 'Индивидуальный пороговый уровень NT-proBNP: —';
+            copyNt.style.display = 'none';
+        }
+        copyNt.dataset.copy = ntCopyText;
+
+        // === 5. HFpEF-ABA ===
+        const abaScoreEl = document.getElementById('hfpefaba-score');
+        const abaTextEl = document.getElementById('hfpefaba-text');
+        const abaResultEl = document.getElementById('hfpefaba-result');
+        const copyAba = document.getElementById('copy-hfpefaba');
+        let abaCopyText = '';
+        const abaValid = (age !== null && age > 0 && bmi !== null);
+
+        if (abaValid) {
+            let linearPredictor = -7.788751 + (0.062564 * age) + (0.135149 * bmi) + (2.040806 * (af ? 1 : 0));
+            let probability = 100 / (1 + Math.exp(-linearPredictor));
+            probability = Math.round(probability * 10) / 10;
+
+            abaScoreEl.innerText = probability + '%';
+
+            let riskText = '';
+            let abaClass = 'result-box left';
+            let riskShort = '';
+
+            if (probability < 25) {
+                riskText = 'низкий риск СН';
+                riskShort = 'низкий риск СН';
+                abaClass += ' success';
+            } else if (probability <= 80) {
+                riskText = 'промежуточный риск СН';
+                riskShort = 'промежуточный риск СН';
+                abaClass += ' warning';
+            } else {
+                riskText = 'высокий риск СН.<br>Целесообразно проведение ЭхоКГ с оценкой снижения GLS или повышения E/e’ + NT-proBNP.<br>Решение вопроса о назначении ингибиторов SGLT2 и агонистов рецептора GLP-1.';
+                riskShort = 'высокий риск СН';
+                abaClass += ' warning';
+            }
+
+            abaTextEl.innerHTML = riskText;
+            abaResultEl.className = abaClass;
+
+            let probComma = probability.toString().replace('.', ',');
+            abaCopyText = `Алгоритм  HFpEF-ABA: ${riskShort} - ${probComma}%`;
+            copyAba.style.display = 'inline-block';
+        } else {
+            abaScoreEl.innerText = '—%';
+            abaTextEl.innerHTML = '—';
+            abaResultEl.className = 'result-box left';
+            abaCopyText = 'Алгоритм  HFpEF-ABA: —';
+            copyAba.style.display = 'none';
+        }
+        copyAba.dataset.copy = abaCopyText;
+
+        // ================================================================
+        // 6. ДИАГНОЗ ХСН ПОСЛЕ ИМ
+        // ================================================================
+        const periodStr = getRadio('period');
+        const historyStr = getRadio('history');
+        const killipStr = getRadio('killip');
+        const mainDiagnosisEl = document.getElementById('main-diagnosis');
+        const complicationEl = document.getElementById('complication');
+        const miValid = (periodStr !== null && historyStr !== null);
+
+        if (miValid) {
+            const BT6 = historyStr === '1' ? 1 : 2;
+            const BT7 = periodStr === '2' ? 2 : 1;
+            const BT8 = killipStr ? parseInt(killipStr) : 0;
+            const BT9  = getChecked('sym')    ? 1 : 0;
+            const BT10 = getChecked('struct') ? 1 : 0;
+            const BT11 = getChecked('sys')    ? 1 : 0;
+            const BT12 = getChecked('diast')  ? 1 : 0;
+            const BT13 = getChecked('np')     ? 1 : 0;
+
+            function preCHF() {
+                let s = '';
+                if (BT11) s += 'систолическая дисфункция; ';
+                if (BT12) s += 'диастолическая дисфункция; ';
+                if (BT10) s += 'структурные изменения; ';
+                if (BT13) s += 'повышение НУП; ';
+                s = s.replace(/; $/, '');
+                return s ? 'Предстадия СН (' + s + ')' : 'Предстадия СН';
+            }
+
+            let BT14;
+            if (BT6 === 1) {
+                BT14 = 'ХСН (уточнить стадию/ФК)';
+            } else {
+                if (BT7 === 1) {
+                    BT14 = preCHF();
+                } else {
+                    if (BT10 === 1 || BT11 === 1 || BT12 === 1 || BT13 === 1) {
+                        if (BT9 === 1) {
+                            BT14 = 'ХСН de novo (уточнить ФВ ЛЖ, ФК)';
+                        } else {
+                            BT14 = preCHF();
+                        }
+                    } else {
+                        BT14 = 'Предстадия СН (риск после ИМ)';
+                    }
+                }
+            }
+
+            const killipRoman = ['', 'I', 'II', 'III', 'IV'][BT8];
+            let BT15;
+            if (BT7 === 1 && BT6 === 2 && BT8 > 0) {
+                BT15 = 'ОСН (Killip ' + killipRoman + ' ...[дата]...)';
+            } else if (BT8 > 0) {
+                BT15 = 'ОСН (Killip ' + killipRoman + ')';
+            } else {
+                BT15 = '';
+            }
+
+            mainDiagnosisEl.innerText = BT14 || '—';
+            complicationEl.innerText = BT15 || '—';
+        } else {
+            mainDiagnosisEl.innerText = '—';
+            complicationEl.innerText = '—';
+        }
+    }
+
+    // === КОПИРОВАНИЕ ===
+    function fallbackCopy(text) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.left = '-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); } catch (e) {}
+        document.body.removeChild(ta);
+    }
+
+    function copyText(text, feedbackEl) {
+        if (!text) return;
+        const showFeedback = () => {
+            if (feedbackEl) {
+                feedbackEl.textContent = 'Скопировано';
+                feedbackEl.classList.add('show');
+                setTimeout(() => feedbackEl.classList.remove('show'), 1500);
+            }
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(showFeedback).catch(() => {
+                fallbackCopy(text);
+                showFeedback();
+            });
+        } else {
+            fallbackCopy(text);
+            showFeedback();
+        }
+    }
+
+    // === НАВЕШИВАЕМ СОБЫТИЯ ===
+    document.querySelectorAll('input').forEach(input => {
+        input.addEventListener('input', calculate);
+        input.addEventListener('change', calculate);
+    });
+
+    document.getElementById('copy-h2fpef').addEventListener('click', function () {
+        copyText(this.dataset.copy, document.getElementById('fb-h2fpef'));
+    });
+    document.getElementById('copy-ntprobnp').addEventListener('click', function () {
+        copyText(this.dataset.copy, document.getElementById('fb-ntprobnp'));
+    });
+    document.getElementById('copy-hfpefaba').addEventListener('click', function () {
+        copyText(this.dataset.copy, document.getElementById('fb-hfpefaba'));
+    });
+
+    // Первичный расчёт при загрузке — все поля пустые, результаты «—»
+    calculate();
+</script>
+
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="Анемия.html" title="Диагностика ЖДА и дозы железа при ХСН">Анемия / дефицит Fe</a>
+    <a href="maxЧСС.html" title="Тренировочные зоны ЧСС">Зоны пульса</a>
+    <a href="поак.html" title="Антикоагулянты в периоперационном периоде">Операция и ПОАК</a>
+    <a href="EGFR.html" title="Ренальная функция и дозы препаратов">рСКФ / ХБП</a>
+    
+  </div>
+</div>
+</body>
+</html>

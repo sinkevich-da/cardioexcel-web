@@ -1,0 +1,1196 @@
+<!DOCTYPE html>
+<!-- saved from url=(0098)file:///C:/Users/%D0%94%D0%B5%D0%BD%D0%B8%D1%81/Downloads/deepseek_html_20261030_4ec470%20(2).html -->
+<html lang="ru"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Подбор оптимальной гипохолестериновой терапии</title>
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-soft: #eff6ff;
+        --accent: #0ea5e9;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --text-soft: #94a3b8;
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --success: #059669;
+        --danger: #dc2626;
+        --warning: #d97706;
+        --radius-lg: 18px;
+        --radius: 12px;
+        --radius-sm: 8px;
+        --shadow-sm: 0 1px 2px rgba(15, 23, 42, .05);
+        --shadow: 0 1px 3px rgba(15, 23, 42, .06), 0 8px 24px rgba(15, 23, 42, .05);
+        --shadow-lg: 0 12px 40px rgba(15, 23, 42, .10);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background:
+            radial-gradient(1200px 600px at 8% -10%, #dbeafe 0%, transparent 60%),
+            radial-gradient(1000px 500px at 110% 5%, #e0f2fe 0%, transparent 55%),
+            #eef2f7;
+        min-height: 100vh;
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.5;
+        padding: 28px 16px 44px;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .app-container {
+        max-width: 1300px;
+        margin: 0 auto;
+    }
+
+    /* ---------- Header ---------- */
+    .app-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 26px;
+        padding: 0 4px;
+    }
+
+    .header-icon {
+        width: 54px;
+        height: 54px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #2563eb, #0ea5e9);
+        display: grid;
+        place-items: center;
+        color: #fff;
+        box-shadow: 0 10px 22px rgba(37, 99, 235, .35);
+        flex-shrink: 0;
+    }
+
+    .header-icon svg {
+        width: 28px;
+        height: 28px;
+    }
+
+    .app-header h1 {
+        font-size: 22px;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        line-height: 1.2;
+    }
+
+    .subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+
+    /* ---------- Layout ---------- */
+    .main-grid {
+        display: grid;
+        grid-template-columns: 1.7fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+        .main-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* ---------- Cards ---------- */
+    .card {
+        background: #fff;
+        border-radius: var(--radius-lg);
+        border: 1px solid rgba(226, 232, 240, .85);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .card + .card {
+        margin-top: 16px;
+    }
+
+    .card-header {
+        padding: 18px 22px 0;
+    }
+
+    .card-title {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -.01em;
+    }
+
+    .card-sub {
+        font-size: 12px;
+        color: var(--text-muted);
+        margin-top: 3px;
+    }
+
+    .card-body {
+        padding: 16px 22px 22px;
+    }
+
+    /* ---------- Params ---------- */
+    .params-body {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        flex-wrap: wrap;
+    }
+
+    .param-group label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+    }
+
+    .input-row {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+    }
+
+    .ldl-input {
+    width: 118px;
+    font-size: 22px;
+    font-weight: 800;
+    padding: 7px 12px;
+    border: 2px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    background: #fff;
+    transition: border-color .2s, box-shadow .2s;
+    font-family: inherit;
+    text-align: center;
+}
+
+    .ldl-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, .12);
+    }
+
+    .unit {
+        font-size: 12px;
+        color: var(--text-muted);
+        font-weight: 600;
+    }
+
+    .param-divider {
+        width: 1px;
+        height: 52px;
+        background: var(--border);
+    }
+
+    .target-chip {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 8px;
+        background: var(--primary-soft);
+        color: var(--primary-dark);
+        font-weight: 800;
+        font-size: 26px;
+        padding: 5px 16px;
+        border-radius: 12px;
+        letter-spacing: -.02em;
+    }
+
+    .target-chip .unit {
+        font-size: 12px;
+        color: var(--primary-dark);
+        opacity: .75;
+    }
+
+    /* ---------- Therapy table ---------- */
+    .therapy-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 6px;
+    }
+
+    .therapy-table th {
+        font-size: 10.5px;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-soft);
+        font-weight: 700;
+        padding: 2px 6px 6px;
+        text-align: center;
+    }
+
+    .therapy-table th:first-child,
+    .therapy-table th:last-child {
+        text-align: left;
+    }
+
+    .therapy-table td {
+        padding: 2px;
+        vertical-align: middle;
+    }
+
+    .statin-name {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 12.5px;
+        padding: 10px 12px !important;
+        white-space: nowrap;
+    }
+
+    .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+
+    .dot-atorva { background: #2563eb; }
+    .dot-rozuva { background: #7c3aed; }
+    .dot-pitava { background: #0d9488; }
+
+    /* Pills (radio) */
+    .pill {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 38px;
+        padding: 8px 6px;
+        border-radius: 11px;
+        border: 1.5px solid var(--border);
+        background: #fff;
+        cursor: pointer;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text-muted);
+        transition: all .18s ease;
+        user-select: none;
+        text-align: center;
+    }
+
+    .pill:hover {
+        border-color: var(--border-strong);
+        background: #f8fafc;
+        color: var(--text);
+    }
+
+    .pill input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    .pill:has(input:checked) {
+        background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        border-color: var(--primary-dark);
+        color: #fff;
+        box-shadow: 0 4px 14px rgba(37, 99, 235, .38);
+        transform: translateY(-1px);
+    }
+
+    .pill:has(input:disabled) {
+        opacity: .4;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .pill:focus-within {
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .25);
+    }
+
+    .pill-group {
+        display: flex;
+        gap: 4px;
+    }
+
+    .pill-group .pill {
+        flex: 1;
+    }
+
+    /* Add-ons */
+    .addons {
+        background: linear-gradient(180deg, #f8fafc, #f1f5f9);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+        height: 100%;
+    }
+
+    .addons-title {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-soft);
+        margin-bottom: 8px;
+    }
+
+    .chip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 9px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-muted);
+        border: 1px solid transparent;
+        transition: all .15s ease;
+        margin-bottom: 3px;
+    }
+
+    .chip:last-child {
+        margin-bottom: 0;
+    }
+
+    .chip:hover {
+        background: #fff;
+        color: var(--text);
+    }
+
+    .chip input {
+        width: 15px;
+        height: 15px;
+        accent-color: var(--primary);
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .chip:has(input:checked) {
+        background: #fff;
+        color: var(--primary-dark);
+        border-color: #bfdbfe;
+        box-shadow: var(--shadow-sm);
+    }
+
+    /* Intolerance callout */
+    .intolerance {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        color: #9a3412;
+        font-size: 12.5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all .15s ease;
+    }
+
+    .intolerance:hover {
+        background: #ffedd5;
+    }
+
+    .intolerance input {
+        width: 16px;
+        height: 16px;
+        accent-color: #ea580c;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    /* ---------- Result row ---------- */
+    .result-row {
+        display: grid;
+        grid-template-columns: 1.55fr 1fr;
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    @media (max-width: 700px) {
+        .result-row {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .result-box {
+        position: relative;
+        overflow: hidden;
+        border-radius: var(--radius-lg);
+        padding: 20px 22px;
+        color: #fff;
+        background: linear-gradient(135deg, #059669 0%, #10b981 60%, #34d399 100%);
+        box-shadow: 0 12px 30px rgba(5, 150, 105, .28);
+        transition: background .35s ease, box-shadow .35s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .result-box::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(400px 200px at 100% 0%, rgba(255, 255, 255, .2), transparent 70%);
+        pointer-events: none;
+    }
+
+    .result-box.not-achieved {
+        background: linear-gradient(135deg, #b91c1c 0%, #dc2626 60%, #ef4444 100%);
+        box-shadow: 0 12px 30px rgba(220, 38, 38, .28);
+    }
+
+    .result-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 6px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .result-label {
+        font-size: 10.5px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        opacity: .92;
+    }
+
+    .result-status {
+        font-size: 10.5px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, .22);
+        white-space: nowrap;
+    }
+
+    .result-value {
+        font-size: 30px;
+        font-weight: 800;
+        letter-spacing: -.02em;
+        line-height: 1.15;
+        position: relative;
+        z-index: 1;
+    }
+
+    .result-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 16px;
+        margin-top: 8px;
+        font-size: 12.5px;
+        position: relative;
+        z-index: 1;
+    }
+
+    .result-percent {
+        font-weight: 800;
+        font-size: 14px;
+    }
+
+    .result-target {
+        opacity: .92;
+    }
+
+    /* Instruction */
+    .instruction-card {
+        padding: 18px 20px;
+    }
+
+    .instruction-title {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+        color: var(--text-soft);
+        margin-bottom: 12px;
+    }
+
+    .instruction-list {
+        list-style: none;
+        counter-reset: step;
+    }
+
+    .instruction-list li {
+        counter-increment: step;
+        position: relative;
+        padding-left: 28px;
+        font-size: 12px;
+        color: #475569;
+        margin-bottom: 10px;
+        line-height: 1.45;
+    }
+
+    .instruction-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .instruction-list li::before {
+        content: counter(step);
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        background: var(--primary-soft);
+        color: var(--primary-dark);
+        font-size: 10px;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+    }
+
+    /* ---------- Dose column highlighting ---------- */
+    .dose-moderate {
+        background-color: #e0f2fe !important;
+        border-radius: 10px;
+        padding: 6px 4px;
+    }
+    .dose-high {
+        background-color: #fee2e2 !important;
+        border-radius: 10px;
+        padding: 6px 4px;
+    }
+    .dose-empty {
+        background-color: #f8fafc;
+        border-radius: 10px;
+    }
+
+    .header-moderate {
+        background: linear-gradient(135deg, #bae6fd, #7dd3fc);
+        color: #075985;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-size: 10.5px;
+        padding: 8px 4px;
+        border-radius: 10px;
+    }
+    .header-high {
+        background: linear-gradient(135deg, #fecaca, #fca5a5);
+        color: #991b1b;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: .05em;
+        font-size: 10.5px;
+        padding: 8px 4px;
+        border-radius: 10px;
+    }
+
+    /* ---------- Risk ---------- */
+    .risk-list {
+        padding: 14px 18px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .risk-card {
+        position: relative;
+        padding: 12px 14px 12px 18px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background-color: #fff;
+        cursor: pointer;
+        transition: all .2s ease;
+        overflow: hidden;
+    }
+
+    .risk-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--risk-color, #94a3b8);
+    }
+
+    .risk-card:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow);
+        border-color: var(--border-strong);
+    }
+
+    .risk-card.active-risk {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .18);
+    }
+
+    .risk-extreme { --risk-color: #dc2626; background-color: #fef2f2; }
+    .risk-very-high { --risk-color: #ea580c; background-color: #fff7ed; }
+    .risk-high { --risk-color: #d97706; background-color: #fffbeb; }
+    .risk-moderate { --risk-color: #ca8a04; background-color: #fefce8; }
+    .risk-low { --risk-color: #16a34a; background-color: #f0fdf4; }
+
+    .risk-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 4px;
+    }
+
+    .risk-badge {
+        font-size: 13px;
+        font-weight: 700;
+        color: var(--risk-color);
+        letter-spacing: -.01em;
+    }
+
+    .risk-target-chip {
+        font-size: 10.5px;
+        font-weight: 700;
+        color: var(--text-muted);
+        background: #f1f5f9;
+        padding: 2px 8px;
+        border-radius: 999px;
+        white-space: nowrap;
+    }
+
+    .risk-desc {
+        font-size: 11.5px;
+        color: #475569;
+        line-height: 1.45;
+    }
+
+    /* ---------- Footer ---------- */
+    .app-footer {
+        margin-top: 24px;
+    }
+
+    .footer-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 32px;
+        padding: 22px 24px;
+    }
+
+    @media (max-width: 800px) {
+        .footer-grid {
+            grid-template-columns: 1fr;
+            gap: 22px;
+        }
+    }
+
+    .footer-block h4 {
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: .07em;
+        color: var(--text-soft);
+        margin-bottom: 10px;
+    }
+
+    .footer-block ul,
+    .footer-block ol {
+        list-style: none;
+    }
+
+    .footer-block ol {
+        list-style: decimal;
+        padding-left: 18px;
+    }
+
+    .footer-block li {
+        font-size: 11.5px;
+        color: #475569;
+        padding: 5px 0;
+        border-bottom: 1px dashed #eef2f7;
+        line-height: 1.45;
+    }
+
+    .footer-block li:last-child {
+        border-bottom: none;
+    }
+
+    .footer-block ol li {
+        padding-left: 2px;
+    }
+
+    .footer-block strong {
+        color: var(--text);
+    }
+
+    .footer-block a {
+        color: var(--primary);
+        text-decoration: none;
+        word-break: break-word;
+    }
+
+    .footer-block a:hover {
+        text-decoration: underline;
+    }
+
+    .footer-bottom {
+        padding: 14px 24px;
+        border-top: 1px solid var(--border);
+        text-align: center;
+        font-size: 11.5px;
+        color: var(--text-muted);
+        background: #fafbfc;
+    }
+
+    .disclaimer {
+        color: var(--danger);
+        font-weight: 700;
+    }
+
+    /* Scroll wrapper for narrow screens */
+    .table-scroll {
+        overflow-x: auto;
+    }
+</style>
+</head>
+<body>
+
+<div class="app-container">
+
+    <!-- Header -->
+    <header class="app-header">
+        <div class="header-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.8 5.6a5.5 5.5 0 0 0-7.8 0L12 6.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 22l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+                <path d="M3.5 12h4l1.5-3 3 6 1.5-3h7"></path>
+            </svg>
+        </div>
+        <div>
+            <h1>Подбор оптимальной гипохолестериновой терапии</h1>
+            <div class="subtitle">Калькулятор подбора гиполипидемической терапии по целевому уровню ХС-ЛПНП</div>
+        </div>
+    </header>
+
+    <div class="main-grid">
+
+        <!-- ================= LEFT COLUMN ================= -->
+        <div class="left-col">
+
+            <!-- Params card -->
+            <div class="card">
+                <div class="card-body params-body">
+                    <div class="param-group">
+                        <label for="currentLDL">Текущий уровень ХС-ЛПНП</label>
+                        <div class="input-row">
+                            <input type="text" id="currentLDL" class="ldl-input" value="3,1" inputmode="decimal" autocomplete="off">
+                            <span class="unit">ммоль/л</span>
+                        </div>
+                    </div>
+                    <div class="param-divider"></div>
+                    <div class="param-group">
+                        <label>Целевой уровень ХС-ЛПНП менее</label>
+                        <div class="target-chip">
+                            <span id="targetLDLDisplay">1,8</span>
+                            <span class="unit">ммоль/л</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Therapy card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Выбор гиполипидемической терапии</div>
+                    <div class="card-sub">Отметьте статин и, при необходимости, дополнительные препараты</div>
+                </div>
+                <div class="card-body">
+                    <div class="table-scroll">
+                        <table class="therapy-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th colspan="2" class="header-moderate">Умеренные дозы</th>
+                                    <th colspan="2" class="header-high">Высокие дозы</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Atorvastatin -->
+                                <tr>
+                                    <td class="statin-name"><span class="dot dot-atorva"></span>АТОРВАстатин</td>
+                                    <td class="dose-moderate"><label class="pill"><input type="radio" name="statin" value="atorva-10"><span>10 мг</span></label></td>
+                                    <td class="dose-moderate"><label class="pill"><input type="radio" name="statin" value="atorva-20"><span>20 мг</span></label></td>
+                                    <td class="dose-high"><label class="pill"><input type="radio" name="statin" value="atorva-40"><span>40 мг</span></label></td>
+                                    <td class="dose-high"><label class="pill"><input type="radio" name="statin" value="atorva-80"><span>80 мг</span></label></td>
+                                    <td rowspan="3" style="width: 168px;">
+                                        <div class="addons">
+                                            <div class="addons-title">Дополнительно</div>
+                                            <label class="chip"><input type="checkbox" id="addEzetimibe"> Эзетимиб</label>
+                                            <label class="chip"><input type="checkbox" id="addBempedoic"> Бемпедоевая кислота</label>
+                                            <label class="chip"><input type="checkbox" id="addPCSK9"> иPCSK9 / Инклисиран</label>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                <!-- Rosuvastatin -->
+                                <tr>
+                                    <td class="statin-name"><span class="dot dot-rozuva"></span>РОЗУВАстатин</td>
+                                    <td class="dose-moderate"><label class="pill"><input type="radio" name="statin" value="rozuva-5"><span>5 мг</span></label></td>
+                                    <td class="dose-moderate"><label class="pill"><input type="radio" name="statin" value="rozuva-10"><span>10 мг</span></label></td>
+                                    <td class="dose-high"><label class="pill"><input type="radio" name="statin" value="rozuva-20"><span>20 мг</span></label></td>
+                                    <td class="dose-high"><label class="pill"><input type="radio" name="statin" value="rozuva-40"><span>40 мг</span></label></td>
+                                </tr>
+
+                                <!-- Pitavastatin -->
+                                <tr>
+                                    <td class="statin-name"><span class="dot dot-pitava"></span>ПИТАВАстатин</td>
+                                    <td class="dose-moderate">
+                                        <div class="pill-group">
+                                            <label class="pill"><input type="radio" name="statin" value="pitava-1"><span>1 мг</span></label>
+                                            <label class="pill"><input type="radio" name="statin" value="pitava-2"><span>2 мг</span></label>
+                                        </div>
+                                    </td>
+                                    <td class="dose-moderate"><label class="pill"><input type="radio" name="statin" value="pitava-4"><span>4 мг</span></label></td>
+                                    <td class="dose-empty"></td>
+                                    <td class="dose-empty"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <label class="intolerance">
+                        <input type="checkbox" id="statinIntolerance">
+                        Синдром цитолиза / непереносимость статинов / статинофобия
+                    </label>
+                </div>
+            </div>
+
+            <!-- Result row -->
+            <div class="result-row">
+                <div class="result-box not-achieved" id="resultBox">
+                    <div class="result-top">
+                        <div class="result-label">Ожидаемый уровень ХС-ЛПНП</div>
+                        <div class="result-status" id="resultStatus">✕ Цель не достигнута</div>
+                    </div>
+                    <div class="result-value" id="expectedLDL">3,10 ммоль/л</div>
+                    <div class="result-meta">
+                        <span class="result-percent">↓ <span id="reductionPercent">−0,0%</span></span>
+                        <span class="result-target">цель &lt; <span id="targetNote">1,8</span> ммоль/л</span>
+                    </div>
+                </div>
+
+                <div class="card instruction-card">
+                    <div class="instruction-title">Инструкция</div>
+                    <ol class="instruction-list">
+                        <li>Укажите текущий уровень ХС-ЛПНП.</li>
+                        <li>Оцените сердечно-сосудистый риск.</li>
+                        <li>Подберите терапию так, чтобы ожидаемый уровень ХС-ЛПНП был меньше или равен целевому.</li>
+                    </ol>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ================= RIGHT COLUMN ================= -->
+        <div class="right-col">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-title">Оценка сердечно-сосудистого риска</div>
+                    <div class="card-sub">Шкала глобальной оценки 10-летнего ССР (нарушения липидного обмена) МЗ РФ, 2023 г.</div>
+                </div>
+                <div class="risk-list">
+
+                    <div class="risk-card risk-extreme" data-target="1.0" data-risk="4">
+                        <div class="risk-head">
+                            <span class="risk-badge">Экстремальный</span>
+                            <span class="risk-target-chip">&lt; 1,0 ммоль/л</span>
+                        </div>
+                        <div class="risk-desc">
+                            Наличие 2 и более сердечно-сосудистых осложнений в течение 2 лет, несмотря на оптимальную гиполипидемическую терапию или достигнутый уровень ХС-ЛПНП &lt;1,4 ммоль/л.
+                        </div>
+                    </div>
+
+                    <div class="risk-card risk-very-high" data-target="1.4" data-risk="3">
+                        <div class="risk-head">
+                            <span class="risk-badge">Очень высокий</span>
+                            <span class="risk-target-chip">&lt; 1,4 ммоль/л</span>
+                        </div>
+                        <div class="risk-desc">
+                            • Документированное атеросклеротическое ССЗ (ОКС, ИБС, ЧКВ, КШ или операции на артериях, инсульт/ТИА, поражения периферических артерий).<br>
+                            • Атеросклеротическое ССЗ по данным обследований — значимая АСБ (стеноз &gt;50%).<br>
+                            • СД + поражение органов-мишеней, &gt;3 ФР, ранее начало СД с длительностью &gt;20 лет.<br>
+                            • ХБП с СКФ &lt;30 мл/мин/1,73 м².<br>
+                            • СГХС в сочетании с ФР.<br>
+                            • SCORE2 &gt;7,5% (&lt;50 лет), &gt;10% (50–69 лет), &gt;15% (&gt;70 лет).<br>
+                            • Значимо выраженный ФР — ОХС &gt;8 ммоль/л и/или ХС-ЛПНП &gt;4,9 ммоль/л и/или АД &gt;180/110 мм рт. ст.
+                        </div>
+                    </div>
+
+                    <div class="risk-card risk-high active-risk" data-target="1.8" data-risk="2">
+                        <div class="risk-head">
+                            <span class="risk-badge">Высокий</span>
+                            <span class="risk-target-chip">&lt; 1,8 ммоль/л</span>
+                        </div>
+                        <div class="risk-desc">
+                            • СГХС без ФР.<br>
+                            • СД без поражения органов-мишеней, СД &gt;10 лет или с ФР.<br>
+                            • ХБП с СКФ 30–59 мл/мин/1,73 м².<br>
+                            • Гемодинамически незначимый атеросклероз некоронарных артерий (стеноз(ы) &gt;25–49%).<br>
+                            • SCORE2 = 2,5–7,5% (&lt;50 лет), 5–10% (50–69 лет), 7,5–15% (&gt;70 лет).
+                        </div>
+                    </div>
+
+                    <div class="risk-card risk-moderate" data-target="2.6" data-risk="1">
+                        <div class="risk-head">
+                            <span class="risk-badge">Умеренный</span>
+                            <span class="risk-target-chip">&lt; 2,6 ммоль/л</span>
+                        </div>
+                        <div class="risk-desc">
+                            • Молодые пациенты (СД 1-го типа моложе 35 лет, СД 2-го типа моложе 50 лет) с длительностью СД &lt;10 лет без поражения органов-мишеней и ФР.<br>
+                            • SCORE2 &lt;2,5% (&lt;50 лет), &lt;5% (50–69 лет), &lt;7,5% (&gt;70 лет).
+                        </div>
+                    </div>
+
+                    <div class="risk-card risk-low" data-target="3.0" data-risk="5">
+                        <div class="risk-head">
+                            <span class="risk-badge">Низкий</span>
+                            <span class="risk-target-chip">&lt; 3,0 ммоль/л</span>
+                        </div>
+                        <div class="risk-desc">
+                            • SCORE2 &lt;2,5% (&lt;50 лет), &lt;5% (50–69 лет), &lt;7,5% (&gt;70 лет).
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= FOOTER ================= -->
+    <footer class="app-footer">
+        <div class="card">
+            <div class="footer-grid">
+                <div class="footer-block">
+                    <h4>Сокращения</h4>
+                    <ul>
+                        <li><strong>ХС-ЛПНП</strong> — холестерин липопротеинов низкой плотности</li>
+                        <li><strong>ССЗ</strong> — сердечно-сосудистые заболевания</li>
+                        <li><strong>ОКС</strong> — острый коронарный синдром</li>
+                        <li><strong>ИБС</strong> — ишемическая болезнь сердца</li>
+                        <li><strong>ХБП</strong> — хроническая болезнь почек</li>
+                        <li><strong>СД</strong> — сахарный диабет</li>
+                        <li><strong>ФР</strong> — факторы риска</li>
+                        <li><strong>SCORE2</strong> — Systematic COronary Risk Evaluation 2</li>
+                    </ul>
+                </div>
+                <div class="footer-block">
+                    <h4>Источники</h4>
+                    <ol>
+                        <li>Шкала глобальной оценки 10-летнего сердечно-сосудистого риска (нарушения липидного обмена) МЗ РФ, 2023 г.</li>
+                        <li>Knopp, R. H. (1999). Drug Treatment of Lipid Disorders. <em>New England Journal of Medicine</em>, 341(7), 498–511. <a href="https://doi.org/10.1056/nejm199908123410707" target="_blank" rel="noopener">doi:10.1056/nejm199908123410707</a></li>
+                        <li>Collins R. et al. Interpretation of the evidence for the efficacy and safety of statin therapy. <em>The Lancet</em>. — 2016. — Vol. 388. — N 10059. — P. 2532–2561. <a href="https://doi.org/10.1016/S0140-6736(16)31357-5" target="_blank" rel="noopener">doi: 10.1016/S0140-6736(16)31357-5</a></li>
+                        <li>Nicholls SJ, Brandrup-Wognsen G, Palmer M, Barter PJ. Meta-analysis of Comparative Efficacy of Increasing Dose of Atorvastatin Versus Rosuvastatin Versus Simvastatin on Lowering Levels of Atherogenic Lipids (from VOYAGER). <em>The American Journal of Cardiology</em>. 2010;105(1):69–76. <a href="https://doi.org/10.1016/j.amjcard.2009.08.651" target="_blank" rel="noopener">DOI: 10.1016/j.amjcard.2009.08.651</a></li>
+                        <li>Российские рекомендации «Нарушения липидного обмена», 2023.</li>
+                        <li>Использование бемпедоевой кислоты в клинической практике. <em>Атеросклероз и дислипидемии</em>. 2024;3(56):14–20.</li>
+                        <li>Сумароков А.Б. Инклисиран — липид-снижающий препарат, использующий метод РНК-терапии. Гиполипидемический потенциал. <em>Кардиологический вестник</em>. 2022;17(4):32–37.</li>
+                    </ol>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span class="disclaimer">⚠ Не является заменой консультации врача.</span>
+                &nbsp;Калькулятор предназначен для образовательных целей.
+            </div>
+        </div>
+    </footer>
+
+</div>
+
+<script>
+    // Данные из Excel диапазона W47:AJ55
+    const matrixReductions = {
+        'statin_only': {
+            'atorva-10': 35.5, 'atorva-20': 41.4, 'atorva-40': 46.2, 'atorva-80': 50.2,
+            'rozuva-5': 38.8, 'rozuva-10': 44.1, 'rozuva-20': 49.5, 'rozuva-40': 54.7,
+            'pitava-1': 34, 'pitava-2': 42, 'pitava-4': 47
+        },
+        'statin_ezetimibe': {
+            'atorva-10': 56.5, 'atorva-20': 62.4, 'atorva-40': 67.2, 'atorva-80': 71.2,
+            'rozuva-5': 59.8, 'rozuva-10': 65.1, 'rozuva-20': 70.5, 'rozuva-40': 75.7,
+            'pitava-1': 55, 'pitava-2': 63, 'pitava-4': 68
+        },
+        'statin_pcsk9': {
+            'atorva-10': 60.5, 'atorva-20': 66.4, 'atorva-40': 71.2, 'atorva-80': 75.2,
+            'rozuva-5': 63.8, 'rozuva-10': 69.1, 'rozuva-20': 74.5, 'rozuva-40': 79.7,
+            'pitava-1': 59, 'pitava-2': 67, 'pitava-4': 72
+        },
+        'statin_pcsk9_inclisiran': {
+            'atorva-10': 81.5, 'atorva-20': 81.4, 'atorva-40': 86.2, 'atorva-80': 90.2,
+            'rozuva-5': 83.8, 'rozuva-10': 84.1, 'rozuva-20': 89.5, 'rozuva-40': 94.7,
+            'pitava-1': 81, 'pitava-2': 82, 'pitava-4': 83
+        },
+        'statin_bempedoic': {
+            'atorva-10': 53.5, 'atorva-20': 59.4, 'atorva-40': 64.2, 'atorva-80': 68.2,
+            'rozuva-5': 56.8, 'rozuva-10': 62.1, 'rozuva-20': 67.5, 'rozuva-40': 72.7,
+            'pitava-1': 52, 'pitava-2': 60, 'pitava-4': 65
+        },
+        'statin_bempedoic_ezetimibe': {
+            'atorva-10': 73.5, 'atorva-20': 79.4, 'atorva-40': 84.2, 'atorva-80': 88.2,
+            'rozuva-5': 76.8, 'rozuva-10': 82.1, 'rozuva-20': 87.5, 'rozuva-40': 92.7,
+            'pitava-1': 72, 'pitava-2': 80, 'pitava-4': 85
+        }
+    };
+
+    // DOM Elements
+    const currentLDLInput = document.getElementById('currentLDL');
+    const targetLDLDisplay = document.getElementById('targetLDLDisplay');
+    const expectedLDLDisplay = document.getElementById('expectedLDL');
+    const reductionPercentDisplay = document.getElementById('reductionPercent');
+    const statinIntolerance = document.getElementById('statinIntolerance');
+    const resultBox = document.getElementById('resultBox');
+    const resultStatus = document.getElementById('resultStatus');
+    const targetNote = document.getElementById('targetNote');
+
+    const addEzetimibe = document.getElementById('addEzetimibe');
+    const addBempedoic = document.getElementById('addBempedoic');
+    const addPCSK9 = document.getElementById('addPCSK9');
+
+    let currentTargetLDL = 1.8;
+
+    const fmt = n => n.toFixed(1).replace('.', ',');
+
+    function setTarget(value) {
+        currentTargetLDL = value;
+        targetLDLDisplay.textContent = fmt(currentTargetLDL);
+        if (targetNote) targetNote.textContent = fmt(currentTargetLDL);
+    }
+
+    // Инициализация
+    function init() {
+        const defaultRiskCard = document.querySelector('.risk-high');
+        if (defaultRiskCard) {
+            defaultRiskCard.classList.add('active-risk');
+            setTarget(parseFloat(defaultRiskCard.getAttribute('data-target')));
+        }
+        updateCalculation();
+    }
+
+    // Обработка выбора риска
+    document.querySelectorAll('.risk-card[data-risk]').forEach(card => {
+        card.addEventListener('click', () => {
+            document.querySelectorAll('.risk-card').forEach(c => c.classList.remove('active-risk'));
+            card.classList.add('active-risk');
+            setTarget(parseFloat(card.getAttribute('data-target')));
+            updateCalculation();
+        });
+    });
+
+    // Получение процента снижения на основе матрицы W47:AJ55
+    function getReduction(statinValue, hasEzetimibe, hasPCSK9, hasBempedoic, hasIntolerance) {
+        if (hasIntolerance) {
+            let reduction = 0;
+            if (hasEzetimibe) reduction += 21;
+            if (hasPCSK9) reduction += 25;
+            if (hasBempedoic) reduction += 18;
+            return Math.min(reduction, 100);
+        }
+
+        let rowKey = '';
+        if (hasEzetimibe && !hasPCSK9 && !hasBempedoic) rowKey = 'statin_ezetimibe';
+        else if (!hasEzetimibe && hasPCSK9 && !hasBempedoic) rowKey = 'statin_pcsk9';
+        else if (hasEzetimibe && hasPCSK9 && !hasBempedoic) rowKey = 'statin_pcsk9_inclisiran';
+        else if (!hasEzetimibe && !hasPCSK9 && hasBempedoic) rowKey = 'statin_bempedoic';
+        else if (hasEzetimibe && !hasPCSK9 && hasBempedoic) rowKey = 'statin_bempedoic_ezetimibe';
+        else if (!hasEzetimibe && !hasPCSK9 && !hasBempedoic) rowKey = 'statin_only';
+        else {
+            let base = matrixReductions['statin_only'][statinValue] || 0;
+            if (hasEzetimibe) base += 21;
+            if (hasPCSK9) base += 25;
+            if (hasBempedoic) base += 18;
+            return Math.min(base, 100);
+        }
+
+        return matrixReductions[rowKey][statinValue] || 0;
+    }
+
+    // Логика расчета
+    function updateCalculation() {
+        const currentLDL = parseFloat(currentLDLInput.value.replace(/,/g, '.')) || 0;
+
+        const statinType = document.querySelector('input[name="statin"]:checked');
+        const statinValue = statinType ? statinType.value : null;
+
+        const hasEzetimibe = addEzetimibe.checked;
+        const hasPCSK9 = addPCSK9.checked;
+        const hasBempedoic = addBempedoic.checked;
+        const hasIntolerance = statinIntolerance.checked;
+
+        let totalReduction = 0;
+
+        if (statinValue) {
+            totalReduction = getReduction(statinValue, hasEzetimibe, hasPCSK9, hasBempedoic, hasIntolerance);
+        } else if (hasIntolerance) {
+            if (hasEzetimibe) totalReduction += 21;
+            if (hasPCSK9) totalReduction += 25;
+            if (hasBempedoic) totalReduction += 18;
+        }
+
+        totalReduction = Math.min(totalReduction, 100);
+        const expectedLDL = currentLDL * (1 - totalReduction / 100);
+
+        // Обновление UI
+        expectedLDLDisplay.textContent = expectedLDL.toFixed(2).replace('.', ',') + ' ммоль/л';
+        reductionPercentDisplay.textContent = '−' + totalReduction.toFixed(1).replace('.', ',') + '%';
+
+        const achieved = expectedLDL <= currentTargetLDL && currentLDL > 0 && totalReduction > 0;
+        resultBox.classList.toggle('not-achieved', !achieved);
+        if (resultStatus) {
+            resultStatus.textContent = achieved ? '✓ Цель достигнута' : '✕ Цель не достигнута';
+        }
+    }
+
+    // Слушатели событий
+    currentLDLInput.addEventListener('input', updateCalculation);
+
+    document.querySelectorAll('input[name="statin"]').forEach(radio => {
+        radio.addEventListener('change', updateCalculation);
+    });
+
+    statinIntolerance.addEventListener('change', () => {
+        const statinRadios = document.querySelectorAll('input[name="statin"]');
+        statinRadios.forEach(r => r.disabled = statinIntolerance.checked);
+        if (statinIntolerance.checked) {
+            statinRadios.forEach(r => r.checked = false);
+        }
+        updateCalculation();
+    });
+
+    addEzetimibe.addEventListener('change', updateCalculation);
+    addBempedoic.addEventListener('change', updateCalculation);
+    addPCSK9.addEventListener('change', updateCalculation);
+
+    // Запуск
+    init();
+</script>
+
+
+<!-- ============ Связанные калькуляторы ============ -->
+<style>
+  .ccal{display:block;margin:22px 0 6px;padding:12px 14px;border:1px solid #d9d0c5;border-radius:10px;background:#fbf7f0;}
+  .ccal-title{font-weight:700;margin-bottom:8px;font-size:13px;color:#5a4632;}
+  .ccal a{display:inline-block;margin:3px 8px 3px 0;padding:4px 10px;background:#fff;border:1px solid #d9d0c5;border-radius:999px;color:#a63d3d;font-weight:600;text-decoration:none;font-size:12px;transition:.15s;}
+  .ccal a:hover{background:#a63d3d;color:#fff;border-color:#a63d3d;}
+</style>
+<div class="ccal">
+  <div class="ccal-title">Связанные калькуляторы:</div>
+  <div class="ccal-links">
+    <a href="SCORE2.html" title="Расчёт риска для цели гиполипидемической терапии">SCORE2</a>
+    <a href="SCORE2-DM.html" title="Риск ССЗ при сахарном диабете">SCORE2-DM</a>
+    <a href="dlcn.html" title="Критерии семейной гиперхолестеринемии">DLCN (геСГХС)</a>
+    <a href="samc-ci.html" title="Статин-индуцированная миалгия">SAMS-CI</a>
+    
+  </div>
+</div>
+</body></html>
