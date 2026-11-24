@@ -153,12 +153,6 @@ function trackUsage(id){
   });
   try { localStorage.setItem('cardioexcel.lastUsed.v1', JSON.stringify(state.lastUsed)); } catch(_) {}
   try { ls.set(LSKEY.pairOpens, state.pairOpens); } catch(_) {}
-
-  // Обезличенная телеметрия: только тип "open_calc" и id калькулятора.
-  // Никаких данных формы, результатов или персональных данных не передаётся.
-  if (window.CardioAnalytics) {
-    try { window.CardioAnalytics.openCalc(id); } catch(_) {}
-  }
 }
 
 // ---------- injectBase ----------
@@ -1251,10 +1245,6 @@ async function init(){
   initHandlers();
   if (window.__CARDIO_GUARD_BLOCKED__) return;
 
-  // Обезличенная телеметрия запуска приложения. Никаких данных пользователя.
-  if (window.CardioAnalytics) {
-    try { window.CardioAnalytics.openApp(); } catch(_) {}
-  }
   if (el.versionBadge) el.versionBadge.textContent = 'v' + APP_VERSION;
   applyPracticeOpenState(!!state.practiceOpen);
   renderPractice();
