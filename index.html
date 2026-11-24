@@ -843,22 +843,6 @@ const FILE_TO_ID = {};
 <script src="core/db.js"></script>
 <script src="core/migration.js"></script>
 <script src="core/registry.js"></script>
-<script>
-/* Конфигурация сбора обезличенной статистики (Яндекс.Метрика-совместимо).
-   Анонимная статистика включена постоянно, отключение пользователем
-   не предусмотрено (подробнее — в политике конфиденциальности).
-   Отправка идёт только при наличии сети; для офлайн-сборки счётчик пуст —
-   модуль неактивен. Персональные данные НЕ передаются:
-   см. core/analytics.js и privacy.html. */
-window.__CARDIO_ANALYTICS__ = {
-  enabled: true,
-  counterId: 114625300,   // numeric id счётчика Яндекс.Метрики
-  endpoint: 'https://mc.yandex.ru',
-  sampleRate: 1,
-  stateKey: 'cardioexcel.analytics.state.v1'
-};
-</script>
-<script src="core/analytics.js"></script>
 <script src="core/app.js"></script>
 <script src="calculators/ad-config.js"></script>
 <script src="core/ads.js"></script>
